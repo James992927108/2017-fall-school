@@ -1,0 +1,9 @@
+E:\GitHub\SampleKmean\SampleKmean\bin\Debug\netcoreapp1.1\SampleKmean.deps.json
+E:\GitHub\SampleKmean\SampleKmean\bin\Debug\netcoreapp1.1\SampleKmean.runtimeconfig.json
+E:\GitHub\SampleKmean\SampleKmean\bin\Debug\netcoreapp1.1\SampleKmean.runtimeconfig.dev.json
+E:\GitHub\SampleKmean\SampleKmean\bin\Debug\netcoreapp1.1\SampleKmean.dll
+E:\GitHub\SampleKmean\SampleKmean\bin\Debug\netcoreapp1.1\SampleKmean.pdb
+E:\GitHub\SampleKmean\SampleKmean\obj\Debug\netcoreapp1.1\SampleKmean.csprojResolveAssemblyReference.cache
+E:\GitHub\SampleKmean\SampleKmean\obj\Debug\netcoreapp1.1\SampleKmean.AssemblyInfo.cs
+E:\GitHub\SampleKmean\SampleKmean\obj\Debug\netcoreapp1.1\SampleKmean.dll
+E:\GitHub\SampleKmean\SampleKmean\obj\Debug\netcoreapp1.1\SampleKmean.pdb
