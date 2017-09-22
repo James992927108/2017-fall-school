@@ -1,5 +1,0 @@
-/Users/antonyteng/Desktop/Github/SimpleKmean/SimpleKmeanVS/SimpleKmeanVS/SimpleKmeanVS/bin/Debug/SimpleKmeanVS.exe
-/Users/antonyteng/Desktop/Github/SimpleKmean/SimpleKmeanVS/SimpleKmeanVS/SimpleKmeanVS/bin/Debug/SimpleKmeanVS.pdb
-/Users/antonyteng/Desktop/Github/SimpleKmean/SimpleKmeanVS/SimpleKmeanVS/SimpleKmeanVS/obj/x86/Debug/SimpleKmeanVS.csproj.CoreCompileInputs.cache
-/Users/antonyteng/Desktop/Github/SimpleKmean/SimpleKmeanVS/SimpleKmeanVS/SimpleKmeanVS/obj/x86/Debug/SimpleKmeanVS.exe
-/Users/antonyteng/Desktop/Github/SimpleKmean/SimpleKmeanVS/SimpleKmeanVS/SimpleKmeanVS/obj/x86/Debug/SimpleKmeanVS.pdb

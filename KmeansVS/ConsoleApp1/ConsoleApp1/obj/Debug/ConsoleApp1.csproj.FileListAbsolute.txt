@@ -1,0 +1,7 @@
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\bin\Debug\ConsoleApp1.exe.config
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\bin\Debug\ConsoleApp1.exe
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\bin\Debug\ConsoleApp1.pdb
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\obj\Debug\ConsoleApp1.csprojResolveAssemblyReference.cache
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.CoreCompileInputs.cache
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\obj\Debug\ConsoleApp1.exe
+E:\GitHub\SimpleKmean\KmeansVS\ConsoleApp1\ConsoleApp1\obj\Debug\ConsoleApp1.pdb
