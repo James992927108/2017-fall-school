@@ -1,6 +1,0 @@
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/obj/Debug/ConsoleApplication.csprojResolveAssemblyReference.cache
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/obj/Debug/ConsoleApplication.csproj.CoreCompileInputs.cache
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/bin/Debug/ConsoleApplication.exe
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/bin/Debug/ConsoleApplication.pdb
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/obj/Debug/ConsoleApplication.exe
-/Users/tengtzu-chi/Desktop/SimpleKmean/ConsoleApplication/ConsoleApplication/obj/Debug/ConsoleApplication.pdb
