@@ -154,7 +154,7 @@ namespace ConsoleApp1
                     classes[j, 0] = tempClasses[j, 0];
                     classes[j, 1] = tempClasses[j, 1];
                 }
-                System.Console.ReadKey();
+                //System.Console.ReadKey();
                 // recursive
                 kMean(nodeNumber, classNumber, nodes, classes);
                 loopCount++;
