@@ -1,10 +1,10 @@
 ﻿{
   "version": "1.0.0",
   "restore": {
-    "projectUniqueName": "/Users/tengtzu-chi/Desktop/SimpleKmean/SampleKmean/SampleKmean.csproj",
+    "projectUniqueName": "E:\\GitHub\\SimpleKmean\\SampleKmean\\SampleKmean.csproj",
     "projectName": "SampleKmean",
-    "projectPath": "/Users/tengtzu-chi/Desktop/SimpleKmean/SampleKmean/SampleKmean.csproj",
-    "outputPath": "/Users/tengtzu-chi/Desktop/SimpleKmean/SampleKmean/obj/",
+    "projectPath": "E:\\GitHub\\SimpleKmean\\SampleKmean\\SampleKmean.csproj",
+    "outputPath": "E:\\GitHub\\SimpleKmean\\SampleKmean\\obj\\",
     "projectStyle": "PackageReference",
     "originalTargetFrameworks": [
       "netcoreapp1.1"
@@ -23,17 +23,6 @@
           "version": "1.1.2"
         }
       }
-    }
-  },
-  "runtimes": {
-    "win": {
-      "#import": []
-    },
-    "win-x64": {
-      "#import": []
-    },
-    "win-x86": {
-      "#import": []
     }
   }
 }
