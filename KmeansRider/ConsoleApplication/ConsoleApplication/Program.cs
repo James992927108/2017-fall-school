@@ -26,23 +26,30 @@ namespace ConsoleApplication
             RandomAssignClusterCenter(classNumber, classes);
             //for recursive
             kMean(nodeNumber, classNumber, nodes, classes);
+            //計算SSE
+            CulSEEFun(classNumber, nodeNumber, nodes, classes);
+
+            System.Console.WriteLine("=================================");
+            System.Console.WriteLine("finish! recusive times : {0}", loopCount);
+            System.Console.WriteLine("Press any key to continue...");
+            System.Console.ReadKey();
+        }
+
+        private static void CulSEEFun(int classNumber, int nodeNumber, double[,] nodes, double[,] classes)
+        {
             double SSE = 0;
             for (int i = 0; i < classNumber; i++)
             {
                 for (int j = 0; j < nodeNumber; j++)
                 {
-                    if (nodes[i, 4] == j)
+                    if (nodes[j, 4] == i)
                     {
-                         SSE = SSE +  CulSSE(nodes[i, 0], nodes[i, 1], nodes[i, 2], nodes[i, 3], classes[j, 0],
-                            classes[j, 1], classes[j, 2], classes[j, 3]);
+                        SSE = SSE + CulSSE(nodes[j, 0], nodes[j, 1], nodes[j, 2], nodes[j, 3], classes[i, 0],
+                                  classes[i, 1], classes[i, 2], classes[i, 3]);
                     }
                 }
             }
             System.Console.WriteLine("SSE : {0}", SSE);
-            System.Console.WriteLine("=================================");
-            System.Console.WriteLine("finish! recusive times : {0}", loopCount);
-            System.Console.WriteLine("Press any key to continue...");
-            System.Console.ReadKey();
         }
 
 
@@ -90,8 +97,8 @@ namespace ConsoleApplication
         static double CulSSE(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
         {
             return  Math.Round(
-                Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2) +
-                          Math.Pow((w1 - w2), 2), 3);
+                Math.Pow(Math.Abs(x1 - x2), 2) + Math.Pow(Math.Abs(y1 - y2), 2) + Math.Pow(Math.Abs(z1 - z2), 2) +
+                          Math.Pow(Math.Abs(w1 - w2), 2), 3);
         }
 
         static void showResult(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
