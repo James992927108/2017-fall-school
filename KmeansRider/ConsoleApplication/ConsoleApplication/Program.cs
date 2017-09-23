@@ -12,7 +12,31 @@ namespace ConsoleApplication
     {
         static int loopCount = 1;
         static int recursiveFlag = 0;
-
+        
+        private static void CulSEEFun(int classNumber, int nodeNumber, double[,] nodes, double[,] classes)
+        {
+            double SSE = 0;
+            for (int i = 0; i < classNumber; i++)
+            {
+                for (int j = 0; j < nodeNumber; j++)
+                {
+                    if (nodes[j, 4] == i)
+                    {
+                        SSE = SSE + CulSSE(nodes[j, 0], nodes[j, 1], nodes[j, 2], nodes[j, 3], classes[i, 0],
+                                  classes[i, 1], classes[i, 2], classes[i, 3]);
+                    }
+                }
+            }
+            System.Console.WriteLine("SSE : {0}", SSE);
+        }
+        
+        static double CulSSE(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
+        {
+            return  Math.Round(
+                Math.Pow(Math.Abs(x1 - x2), 2) + Math.Pow(Math.Abs(y1 - y2), 2) + Math.Pow(Math.Abs(z1 - z2), 2) +
+                Math.Pow(Math.Abs(w1 - w2), 2), 3);
+        }
+        
         static void Main(string[] args)
         {
             double[,] nodes = new double[151, 151];
@@ -31,27 +55,7 @@ namespace ConsoleApplication
 
             System.Console.WriteLine("=================================");
             System.Console.WriteLine("finish! recusive times : {0}", loopCount);
-            System.Console.WriteLine("Press any key to continue...");
-            System.Console.ReadKey();
         }
-
-        private static void CulSEEFun(int classNumber, int nodeNumber, double[,] nodes, double[,] classes)
-        {
-            double SSE = 0;
-            for (int i = 0; i < classNumber; i++)
-            {
-                for (int j = 0; j < nodeNumber; j++)
-                {
-                    if (nodes[j, 4] == i)
-                    {
-                        SSE = SSE + CulSSE(nodes[j, 0], nodes[j, 1], nodes[j, 2], nodes[j, 3], classes[i, 0],
-                                  classes[i, 1], classes[i, 2], classes[i, 3]);
-                    }
-                }
-            }
-            System.Console.WriteLine("SSE : {0}", SSE);
-        }
-
 
         private static void ReadFile(double[,] nodes)
         {
@@ -86,37 +90,6 @@ namespace ConsoleApplication
             }
         }
 
-        
-
-        static double distance(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
-        {
-            return Math.Round(
-                Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2) +
-                          Math.Pow((w1 - w2), 2)), 3);
-        }
-        
-        static double CulSSE(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
-        {
-            return  Math.Round(
-                Math.Pow(Math.Abs(x1 - x2), 2) + Math.Pow(Math.Abs(y1 - y2), 2) + Math.Pow(Math.Abs(z1 - z2), 2) +
-                          Math.Pow(Math.Abs(w1 - w2), 2), 3);
-        }
-
-        static void showResult(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
-        {
-//            for (int i = 0; i < classNumber; i++)
-//            {
-//                System.Console.WriteLine("\tclass[{0}]--({1},{2},{3},{4})", i, classes[i, 0], classes[i, 1],
-//                    classes[i, 2], classes[i, 3]);
-//            }
-            System.Console.WriteLine("-------------------");
-//            for (int i = 0; i < nodeNumber; i++)
-//            {
-//                System.Console.WriteLine("{5}---({0},{1},{2},{3}) --> class[{4}]", nodes[i, 0], nodes[i, 1],
-//                    nodes[i, 2], nodes[i, 3], nodes[i, 4], i);
-//            }
-        }
-        
         static void kMean(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
         {
             //產生初始群集
@@ -128,6 +101,59 @@ namespace ConsoleApplication
             CompareLastClass(nodeNumber, classNumber, nodes, classes, tempClasses);
         }
 
+        private static void InitClusterAndCulDistance(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
+        {
+            System.Console.WriteLine("\t---------GeneratesInitialCluster----------");
+            for (int i = 0; i < nodeNumber; i++)
+            {
+                double min = 100000;
+                for (int j = 0; j < classNumber; j++)
+                {
+                    double mindDistance = CulDistance(nodes[i, 0], nodes[i, 1], nodes[i, 2], nodes[i, 3], classes[j, 0],
+                        classes[j, 1], classes[j, 2], classes[j, 3]);
+                    //System.Console.WriteLine("i = {0} j = {1} mindDistance = {2}",i,j,mindDistance);
+                    if (mindDistance < min)
+                    {
+                        min = mindDistance;
+                        nodes[i, 4] = j;
+                    }
+                }
+            }
+        }
+        
+        static double CulDistance(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
+        {
+            return Math.Round(
+                Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2) +
+                          Math.Pow((w1 - w2), 2)), 3);
+        }
+        
+        private static double[,] CalculateNewCenterClass(int nodeNumber, int classNumber, double[,] nodes)
+        {
+            System.Console.WriteLine("\t---------CalculateNewCenterClass----------");
+            double[,] tempClasses = new double[nodeNumber, 5];
+            for (int j = 0; j < classNumber; j++)
+            {
+                double[] tempCoordinate = new double[4];
+                for (int i = 0; i < nodeNumber; i++)
+                {
+                    if (nodes[i, 4] == j)
+                    {
+                        for (int n = 0; n < 4; n++)
+                            tempCoordinate[n] = tempCoordinate[n] + nodes[i, n];
+                        tempClasses[j, 4]++;
+                    }
+                }
+                if (tempClasses[j, 4] == 0)
+                    tempClasses[j, 4] = 1;
+                for (int m = 0; m < 4; m++)
+                    tempClasses[j, m] = Math.Round(tempCoordinate[m] / tempClasses[j, 4], 1);
+                System.Console.WriteLine("class[{0}] :new cor ({1},{2},{3},{4}),count = {5},",j, tempClasses[j, 0],
+                    tempClasses[j, 1], tempClasses[j, 2], tempClasses[j, 3], tempClasses[j, 4]);
+            }
+            return tempClasses;
+        }
+        
         private static void CompareLastClass(int nodeNumber, int classNumber, double[,] nodes, double[,] classes,
             double[,] tempClasses)
         {
@@ -158,55 +184,8 @@ namespace ConsoleApplication
             }
             if (recursiveFlag == 0)
             {
-                showResult(nodeNumber, classNumber, nodes, classes);
+                System.Console.WriteLine("{0}",loopCount);
             }
         }
-
-        private static void InitClusterAndCulDistance(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
-        {
-            System.Console.WriteLine("\t---------GeneratesInitialCluster----------");
-            for (int i = 0; i < nodeNumber; i++)
-            {
-                double min = 100000;
-                for (int j = 0; j < classNumber; j++)
-                {
-                    double mindDistance = distance(nodes[i, 0], nodes[i, 1], nodes[i, 2], nodes[i, 3], classes[j, 0],
-                        classes[j, 1], classes[j, 2], classes[j, 3]);
-                    //System.Console.WriteLine("i = {0} j = {1} mindDistance = {2}",i,j,mindDistance);
-                    if (mindDistance < min)
-                    {
-                        min = mindDistance;
-                        nodes[i, 4] = j;
-                    }
-                }
-            }
-        }
-        
-        private static double[,] CalculateNewCenterClass(int nodeNumber, int classNumber, double[,] nodes)
-        {
-            System.Console.WriteLine("\t---------CalculateNewCenterClass----------");
-            double[,] tempClasses = new double[nodeNumber, 5];
-            for (int j = 0; j < classNumber; j++)
-            {
-                double[] tempCoordinate = new double[4];
-                for (int i = 0; i < nodeNumber; i++)
-                {
-                    if (nodes[i, 4] == j)
-                    {
-                        for (int n = 0; n < 4; n++)
-                            tempCoordinate[n] = tempCoordinate[n] + nodes[i, n];
-                        tempClasses[j, 4]++;
-                    }
-                }
-                if (tempClasses[j, 4] == 0)
-                    tempClasses[j, 4] = 1;
-                for (int m = 0; m < 4; m++)
-                    tempClasses[j, m] = Math.Round(tempCoordinate[m] / tempClasses[j, 4], 1);
-                System.Console.WriteLine("class[{0}] :new cor ({1},{2},{3},{4}),count = {5},",j, tempClasses[j, 0],
-                    tempClasses[j, 1], tempClasses[j, 2], tempClasses[j, 3], tempClasses[j, 4]);
-            }
-            return tempClasses;
-        }
-
     }
 }
