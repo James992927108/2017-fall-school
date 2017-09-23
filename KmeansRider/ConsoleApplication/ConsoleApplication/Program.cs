@@ -55,8 +55,8 @@ namespace ConsoleApplication
 
         private static void ReadFile(double[,] nodes)
         {
-            string[] lines = System.IO.File.ReadAllLines(@"E:\\GitHub\\SimpleKmean\\IrisData.txt");
-            //string[] lines = System.IO.File.ReadAllLines(@"../../../../../IrisData.txt");
+            //string[] lines = System.IO.File.ReadAllLines(@"E:\\GitHub\\SimpleKmean\\IrisData.txt");
+            string[] lines = System.IO.File.ReadAllLines(@"../../../../../IrisData.txt");
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] GetCoordinate = lines[i].Split(',');
