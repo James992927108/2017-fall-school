@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;    
 
 namespace ConsoleApplication
 {
@@ -12,7 +13,7 @@ namespace ConsoleApplication
     {
         static int loopCount = 1;
         static int recursiveFlag = 0;
-
+        
         private static void CulSEEFun(int classNumber, int nodeNumber, double[,] nodes, double[,] classes)
         {
             double SSE = 0;
@@ -32,19 +33,23 @@ namespace ConsoleApplication
 
         static double CulSSE(double x1, double y1, double z1, double w1, double x2, double y2, double z2, double w2)
         {
-            return 
-                Math.Pow(Math.Abs(x1 - x2), 2) + Math.Pow(Math.Abs(y1 - y2), 2) + Math.Pow(Math.Abs(z1 - z2), 2) +
+            return Math.Pow(Math.Abs(x1 - x2), 2) + Math.Pow(Math.Abs(y1 - y2), 2) + Math.Pow(Math.Abs(z1 - z2), 2) +
                 Math.Pow(Math.Abs(w1 - w2), 2);
         }
 
         static void Main(string[] args)
         {
-            double[,] nodes = new double[151, 151];
+            inint();
+        }
+
+        private static void inint()
+        {
+            double[,] nodes = new double[151, 5];
             int nodeNumber = 150;
 
             double[,] classes = new double[3, 5];
             int classNumber = 3;
-
+            
             ReadFile(nodes);
             //隨機指派群集中心
             RandomAssignClusterCenter(classNumber, classes);
@@ -52,15 +57,15 @@ namespace ConsoleApplication
             kMean(nodeNumber, classNumber, nodes, classes);
             //計算SSE
             CulSEEFun(classNumber, nodeNumber, nodes, classes);
-
+            
             System.Console.WriteLine("=================================");
             System.Console.WriteLine("finish! recusive times : {0}", loopCount);
         }
 
         private static void ReadFile(double[,] nodes)
         {
-            string[] lines = System.IO.File.ReadAllLines(@"E:\\GitHub\\SimpleKmean\\IrisData.txt");
-            //string[] lines = System.IO.File.ReadAllLines(@"../../../../../IrisData.txt");
+            //string[] lines = System.IO.File.ReadAllLines(@"E:\\GitHub\\SimpleKmean\\IrisData.txt");
+            string[] lines = System.IO.File.ReadAllLines(@"../../../../../IrisData.txt");
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] GetCoordinate = lines[i].Split(',');
@@ -80,26 +85,24 @@ namespace ConsoleApplication
             for (int i = 0; i < classNumber; i++)
             {
                 Random random = new Random(DateTime.Now.Millisecond);
-                for (int j = 0; j < classNumber; j++)
+                for (int j = 0; j < 4; j++)
                 {
-//                    classes[i, j] = Math.Round(random.NextDouble() * 10, 1);
                     classes[i, j] = random.NextDouble() * 10;
-                    Thread.Sleep(20);
+                    Thread.Sleep(30);
                 }
                 System.Console.WriteLine("\tclass[{0}]--({1:N2},{2:N2},{3:N2},{4:N2})", i, classes[i, 0], classes[i, 1],
-                    classes[i, 2],
-                    classes[i, 3]);
+                    classes[i, 2], classes[i, 3]);
             }
         }
-
+        
         static void kMean(int nodeNumber, int classNumber, double[,] nodes, double[,] classes)
         {
             //產生初始群集
             InitClusterAndCulDistance(nodeNumber, classNumber, nodes, classes);
 
             //產生新的質量中心
-            var tempClasses = CalculateNewCenterClass(nodeNumber, classNumber, nodes);
-
+            var tempClasses = CalculateNewCenterClass(nodeNumber, classNumber, nodes,classes);
+            
             CompareLastClass(nodeNumber, classNumber, nodes, classes, tempClasses);
         }
 
@@ -127,17 +130,15 @@ namespace ConsoleApplication
         static double CulDistance(double x1, double y1, double z1, double w1, double x2, double y2, double z2,
             double w2)
         {
-//            return Math.Round(
-//                Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2) +
-//                          Math.Pow((w1 - w2), 2)), 3);
             return Math.Sqrt(Math.Pow((x1 - x2), 2) + Math.Pow((y1 - y2), 2) + Math.Pow((z1 - z2), 2) +
                           Math.Pow((w1 - w2), 2));
         }
 
-        private static double[,] CalculateNewCenterClass(int nodeNumber, int classNumber, double[,] nodes)
+        private static double[,] CalculateNewCenterClass(int nodeNumber, int classNumber, double[,] nodes,double[,] classes)
         {
             System.Console.WriteLine("\t---------CalculateNewCenterClass----------");
             double[,] tempClasses = new double[nodeNumber, 5];
+            int checkcountEqualOneNum = 0;
             for (int j = 0; j < classNumber; j++)
             {
                 double[] tempCoordinate = new double[4];
@@ -151,12 +152,26 @@ namespace ConsoleApplication
                     }
                 }
                 if (tempClasses[j, 4] == 0)
+                {
                     tempClasses[j, 4] = 1;
+                    checkcountEqualOneNum++;
+                }
+                if (checkcountEqualOneNum == 2)
+                {
+                    checkcountEqualOneNum = 0;
+                    loopCount = 1;
+                    System.Console.WriteLine("\t---------recreate-----CalculateNewCenterClass----------");
+                    inint();
+                    Environment.Exit(0);
+                }
+
                 for (int m = 0; m < 4; m++)
                     tempClasses[j, m] = tempCoordinate[m] / tempClasses[j, 4];
-                    //tempClasses[j, m] = Math.Round(tempCoordinate[m] / tempClasses[j, 4], 1);
-                System.Console.WriteLine("class[{0}] :new cor ({1:N1},{2:N1},{3:N1},{4:N1}),count = {5},", j, tempClasses[j, 0],
+                System.Console.WriteLine("class[{0}] :new cor ({1:N1},{2:N1},{3:N1},{4:N1}),count = {5},", j,
+                    tempClasses[j, 0],
                     tempClasses[j, 1], tempClasses[j, 2], tempClasses[j, 3], tempClasses[j, 4]);
+                
+                
             }
             return tempClasses;
         }
