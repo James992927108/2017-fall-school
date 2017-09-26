@@ -52,7 +52,7 @@ namespace ConsoleApplication
             
             ReadFile(nodes);
             //隨機指派群集中心
-            RandomAssignClusterCenter(classNumber, classes);
+            RandomAssignClusterCenter(classNumber, classes, nodes);
             //for recursive
             kMean(nodeNumber, classNumber, nodes, classes);
             //計算SSE
@@ -74,22 +74,28 @@ namespace ConsoleApplication
                     nodes[i, j] = Convert.ToDouble(GetCoordinate[j]);
                     //Console.WriteLine(nodes[i,j]);
                 }
-                //Console.WriteLine("\t" + lines[i]);
+                //Console.WriteLine("\tnum {0} = " + lines[i] , i);
             }
         }
 
-        private static void RandomAssignClusterCenter(int classNumber, double[,] classes)
+        private static void RandomAssignClusterCenter(int classNumber, double[,] classes,double[,] nodes)
         {
             System.Console.WriteLine("\t---------RandomAssignClusterCenter----------");
             System.Console.WriteLine("\tclass[ ]--( x , y , z , w )");
             for (int i = 0; i < classNumber; i++)
             {
                 Random random = new Random(DateTime.Now.Millisecond);
-                for (int j = 0; j < 4; j++)
+                /*for (int j = 0; j < 4; j++)
                 {
                     classes[i, j] = random.NextDouble() * 10;
                     Thread.Sleep(30);
-                }
+                }*/
+                int randomnumber = 0;
+                randomnumber = random.Next(0,150);
+                for (int j = 0; j < 4; j++)                
+                    classes[i, j] = nodes[randomnumber, j];
+                Thread.Sleep(20);
+                //System.Console.WriteLine("\trandomnumber={0}",randomnumber);
                 System.Console.WriteLine("\tclass[{0}]--({1:N2},{2:N2},{3:N2},{4:N2})", i, classes[i, 0], classes[i, 1],
                     classes[i, 2], classes[i, 3]);
             }
