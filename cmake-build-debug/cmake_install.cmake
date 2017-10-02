@@ -1,8 +1,8 @@
-# Install script for directory: E:/GitHub/Simulated_Annealing_eil51
+# Install script for directory: /Users/antonyteng/Desktop/Github/Simulated_Annealing_eil51
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Simulated_Annealing_eil51")
+  set(CMAKE_INSTALL_PREFIX "/usr/local")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "E:/GitHub/Simulated_Annealing_eil51/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/antonyteng/Desktop/Github/Simulated_Annealing_eil51/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

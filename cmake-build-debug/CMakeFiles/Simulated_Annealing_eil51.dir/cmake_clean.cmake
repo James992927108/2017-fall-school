@@ -1,9 +1,7 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Simulated_Annealing_eil51.dir/main.cpp.obj"
+  "CMakeFiles/Simulated_Annealing_eil51.dir/main.cpp.o"
   "Simulated_Annealing_eil51.pdb"
-  "Simulated_Annealing_eil51.exe"
-  "Simulated_Annealing_eil51.exe.manifest"
-  "libSimulated_Annealing_eil51.dll.a"
+  "Simulated_Annealing_eil51"
 )
 
 # Per-language clean rules from dependency scanning.
