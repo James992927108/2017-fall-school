@@ -4,21 +4,51 @@
 #include <cstring>
 
 using namespace std;
+<<<<<<< HEAD
 int main(){
+=======
 
+
+const int dimension = 2;
+const int totalNodes = 50;
+int nodes[totalNodes][dimension+2];
+int start_node_num;
+
+void ReadFile();
+>>>>>>> ac816fe70b254477b6f03bf7c500b9aeb5696e1a
+
+void SelectStartNode();
+
+void anneal(){
+    ReadFile();
+    SelectStartNode();
+}
+
+void SelectStartNode() {
+    srand((unsigned)time(0));
+    start_node_num = (rand()%50)+1;
+    nodes[start_node_num][3] = 0;
+    cout << "Start node = "<<nodes[start_node_num][0]<<":[" <<nodes[start_node_num][1]<<"]["<<nodes[start_node_num][2]<<"]" << "\n";
+}
+
+int main(){
+    anneal();
+    system("pause");
+    return 0;
+}
+
+void ReadFile() {
     fstream file;
-    file.open("eil51.txt",ios::in);
-
-    const int dimension = 2;
-    const int totalNodes = 50;
-
-    int nodes[totalNodes][dimension+1];
+    file.open("eil51.txt", ios_base::in);
     char line[0];
-
     const char *d = " ";
     char *p;
+<<<<<<< HEAD
 
     int i= 0;
+=======
+    int i= 1;
+>>>>>>> ac816fe70b254477b6f03bf7c500b9aeb5696e1a
     while(file.getline(line,totalNodes,'\n')){
         p = strtok(line,d);
         int j=0;
@@ -28,17 +58,14 @@ int main(){
             strValue << p;
             unsigned int temp;
             strValue >> temp;
-
             nodes[i][j] = temp;
-            cout << "nodes[" << i << "]["<< j <<"]= ";
-            cout << nodes[i][j] << endl;
+           /* cout << "nodes[" << i << "]["<< j <<"]= ";
+            cout << nodes[i][j] << endl;*/
             p = strtok(NULL,d);
             j++;
         }
-        cout << "+++" << endl;
+        /*cout << "+++" << endl;*/
         i++;
     }
-
-    system("pause");
-    return 0;
+    cout << "Read file done" << endl;
 }
