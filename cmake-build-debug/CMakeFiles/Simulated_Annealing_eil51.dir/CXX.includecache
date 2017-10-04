@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/antonyteng/Desktop/Github/Simulated_Annealing_eil51/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+
