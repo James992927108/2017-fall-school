@@ -1,11 +1,9 @@
 #include<iostream>
 #include<fstream>
 #include <sstream>
+#include <cstring>
 
 using namespace std;
-
-
-
 int main(){
 
     fstream file;
@@ -19,7 +17,6 @@ int main(){
 
     const char *d = " ";
     char *p;
-
 
     int i= 0;
     while(file.getline(line,totalNodes,'\n')){
