@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 const int dimension = 2;
 const int totalNodes = 50; // 城市数量
 int nodes[totalNodes][dimension+3];
@@ -18,83 +17,36 @@ int PathLength(int row);
 int Caldistance(int node1,int node2);
 
 void Intital_Path();
-void Nearest_Neighbor();
 
 void create_new();
 void TwoOptSwap(int i, int k);
 
 int main(){
-    time_t start,finish;
-    int count = 0;
 
-    ReadFile();
-
-    start = clock();
-
-    ReadFile();
     double T = 1000;// 初始温度
     double T_END = 0.001;
-    double Q = 0.99;  // 退火系数
+    double Q = 0.999;  // 退火系数
     int L = 1000;//單次溫度迭代
-    double R = 0.9;//接受率
+    double R = 0.98;//接受率
 
-    Intital_Path();
-
-    int f1,f2,df;
-    while(T > T_END) {
-        for (int i = 0; i < L; i++) {
-            for (int j = 0; j < totalNodes; j++) {
-                nodes[j][3] = nodes[j][0];
-            }
-            Nearest_Neighbor();
-            f1 = PathLength(3);//nodes[][3] old
-            f2 = PathLength(0);//nodes[][0] new
-            df = f2 - f1;
-            if (df < 0) {
-                for (int j = 0; j < totalNodes; j++) {
-                    nodes[j][3] = nodes[j][0];
-                }
-            } else {
-                if (exp(-df / T) >= R) {
-                    for (int j = 0; j < totalNodes; j++) {
-                        nodes[j][3] = nodes[j][0];
-                    }
-                } else {
-                    for (int j = 0; j < totalNodes; j++) {
-                        nodes[j][0] = nodes[j][3];
-                    }
-                }
-            }
-        }
-        T *= Q;
-        count++;
-    }
-    finish = clock(); // 退火过程结束
-    double duration = ((double)(finish-start))/CLOCKS_PER_SEC; // 计算时间
-    int len = PathLength(0);
-    printf("count:%ld\n",count);
-    printf("path length:%ld\n",len);
-    printf("time :%lfs.\n",duration);
-    /*srand((unsigned)time(NULL));
+    srand((unsigned)time(NULL));
     time_t start,finish;
     int count = 0;
     ReadFile();
     start = clock();
     int f1,f2,df;
     while(T > T_END){
-        for(int j = 0 ;j < totalNodes ;j++) {
-            nodes[j][3] = nodes[j][0];
-        }
-        f1 = PathLength(3);//nodes[][3]
+        Intital_Path();
         create_new();
+        f1 = PathLength(3);//nodes[][3]
         f2 = PathLength(0);//nodes[][0]
         df = f2 - f1;
-        *//*if(df < 0) {
+        if(df < 0) {
             for(int j = 0 ;j < totalNodes ;j++) {
                 nodes[j][3] = nodes[j][0];
             }
         }else{
-            if(exp(-df/T) >= r){
+            if(exp(-df/T) >= R){
                 for(int j = 0 ;j < totalNodes ;j++) {
                     nodes[j][3] = nodes[j][0];
                 }
@@ -103,31 +55,30 @@ int main(){
                     nodes[j][0] = nodes[j][3];
                 }
             }
-        }*//*
+        }
         if(df >= 0)
         {
-            if(exp(-df/T) <= Ｒ) // 保留原来的解
+            if(exp(-df/T) <= R) // 保留原来的解
             {
                 for(int j = 0 ;j < totalNodes ;j++) {
                     nodes[j][0] = nodes[j][3];
                 }
             }
         }
-        //printf("%d\n",count);
-        T *= Ｑ;
+        T *= Q;
         count++;
     }
     finish = clock(); // 退火过程结束
 
     double duration = ((double)(finish-start))/CLOCKS_PER_SEC; // 计算时间
-    *//*for(int i=0;i<totalNodes;i++)
-    {
-        printf("%d_%d\n",i+1,nodes[i][0]);
-    }*//*
+//    for(int i=0;i<totalNodes;i++)
+//    {
+//        printf("%d_%d\n",i+1,nodes[i][0]);
+//    }
     int len = PathLength(0);
     printf("count:%ld\n",count);
     printf("path length:%ld\n",len);
-    printf("time :%lfs.\n",duration);*/
+    printf("time :%lfs.\n",duration);
     return 0;
 }
 void Intital_Path(){
@@ -146,70 +97,31 @@ void Intital_Path(){
 
 }
 
-void Nearest_Neighbor() {
-    //選任一點為起始節點
-    srand((unsigned)time(NULL));
-    nodes[0][0] = rand()%50+1;
-
-    //找到距離最新加入路徑最近的點，將其加入路徑
-
-    int distance = 0;
-    int i_mindistance = 1000;
-    for(int i = 0;i < totalNodes; i++){
-        int j_mindistance = 1000;
-        for(int j = 0;j < totalNodes;j++) {
-            int node1 = nodes[i][0];
-            int node2 = nodes[j][0];
-            if( i == 0 && j ==0)
-                distance = 1000;
-            if(j!=i)
-                distance = Caldistance(node1, node2);
-            if(distance < j_mindistance){
-                nodes[i][3] = j;
-                nodes[i][4] = distance;
-                j_mindistance = distance;
-                printf("%d_%d_j_mindistance_%d\n",i,j,j_mindistance);
-                i_mindistance = j_mindistance;
-            }
-        }
-        printf("%d_mindistance_%d\n",i,i_mindistance);
-    }
-    //printnode();
-    int Nearest_Neighbor = PathLength(4);
-    printf("Nearest_Neighbor : %d\n",Nearest_Neighbor);
-}
-
 int Caldistance(int node1,int node2)
 {
-    double x1 = nodes[node1][1];
-    double y1 = nodes[node1][2];
-    double x2 = nodes[node2][1];
-    double y2 = nodes[node2][2];
-    int dis = sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+    int x1 = nodes[node1][1];
+    int y1 = nodes[node1][2];
+    int x2 = nodes[node2][1];
+    int y2 = nodes[node2][2];
+    int x = (x1-x2)*(x1-x2);
+    int y = (y1-y2)*(y1-y2);
+    double dis = sqrt(x+y);
+    //printf("--%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%f\t\n",node1,node2,x1,y1,x2,y2,x,y,dis);
     return dis;
 }
 
 int PathLength(int row)
 {
     int path = 0;
-    for(int i= 0 ;i < totalNodes; i++){
-        path += nodes[i][row];
-    }
-    path += Caldistance(nodes[0][row],nodes[totalNodes][row]);
-    return path;
-}
-/*int PathLength(int row)
-{
-    int path = 0;
-    for(int i= 0 ;i < totalNodes; i++){
+    for(int i= 0 ;i < totalNodes-1; i++){
         int node1 = nodes[i][row];
         int node2 = nodes[i+1][row];
         int dis = Caldistance(node1,node2);
         path += dis;
     }
-    path += Caldistance(nodes[0][row],nodes[totalNodes][row]);
+    path += Caldistance(nodes[0][row],nodes[totalNodes-1][row]);
     return path;
-}*/
+}
 
 void ReadFile() {
     fstream file;
@@ -283,13 +195,5 @@ void create_new() {
         double r2 = ((double)rand())/(RAND_MAX+1.0);
         k = (int)(totalNodes * r2);
     }
-    printf("r1 = %d r2 = %d\n",i,k);
-    for(int i= 0 ;i < totalNodes ; i++) {
-        printf("%i--%d\n",i,nodes[i][0]);
-    }
     TwoOptSwap( i, k );
-    printf("after\n");
-    for(int i= 0 ;i < totalNodes ; i++) {
-        printf("%i--%d\n",i,nodes[i][0]);
-    }
 }
