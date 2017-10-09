@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/GitHub/Simulated_Annealing_eil51/window(nearset neighbor 2 nodes swap)/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+cmath
+-
+thread
+-
+cstring
+-
+unistd.h
+-
+

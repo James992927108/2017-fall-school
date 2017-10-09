@@ -7,17 +7,16 @@
 
 using namespace std;
 
-
 const int dimension = 2;
 const int totalNodes = 50; // 城市数量
 int nodes[totalNodes][dimension+4];
 
 void printnode();
-void ReadFile();
+
 void ReadFile1();
 
 int PathLength(int row);
-int PathLength1(int row);
+int PathLength_row4();
 
 double Caldistance(int node1,int node2);
 
@@ -30,14 +29,13 @@ int main(){
     ReadFile1();
 
     start = clock();
-    double T = 1000;// 初始温度
+    double T = 100;// 初始温度
     double T_END = 0.01;
     double Q = 0.99;  // 退火系数
-    int L = 100;//單次溫度迭代
+    int L = 1000;//單次溫度迭代
     double R = 0.9;//接受率
 
     Intital_Path();
-
     int f1,f2,df;
     while(T > T_END) {
         for (int i = 0; i < L; i++) {
@@ -111,7 +109,6 @@ void Nearest_Neighbor() {
     for(int i = 0 ;i < 50 ; i++) {
         double j_mindistance = 1000;
         for (int j = 0; j < totalNodes; j++) {
-            //缺一個半段是否搜尋過
             if (j == index || j == i ||nodes[i][3] == j)
                 distance = 1000;
             else
@@ -123,19 +120,18 @@ void Nearest_Neighbor() {
                 nodes[i+1][4] = (int)distance;
             }
         }
-        //printf("%d_distance_%f\n",i,j_mindistance);
         nodes[nodes[i+1][3]][5] = 1;
     }
     for(int i = 0; i < totalNodes ;i++){
         if(nodes[i][5]==0){
-            nodes[0][4] = (int)Caldistance(nodes[totalNodes-1][3], nodes[i][3]);
+            nodes[0][4] = (int)Caldistance(nodes[totalNodes-1][3], nodes[0][3]);
             nodes[i][5] = 1 ;
         }
     }
     //printnode();
     int Nearest_Neighbor = PathLength(3);
-    int Nearest_Neighbor1 = PathLength1(4);
-    printf("Nearest_Neighbor : %d\n",Nearest_Neighbor);
+    int Nearest_Neighbor1 = PathLength_row4();
+    printf("Nearest_Neighbor : %d\t%d\n",Nearest_Neighbor,Nearest_Neighbor1);
 }
 
 double Caldistance(int node1,int node2)
@@ -151,25 +147,23 @@ double Caldistance(int node1,int node2)
     return dis;
 }
 
-int PathLength1(int row)
+int PathLength_row4()
 {
     int path = 0;
-    for(int i= 0 ;i < totalNodes-1; i++){
-        path += nodes[i][row];
-    }
-    path += Caldistance(nodes[0][row],nodes[totalNodes-1][row]);
+    for(int i= 0 ;i < totalNodes; i++)
+        path += nodes[i][4];
     return path;
 }
 int PathLength(int row)
 {
-    int path = 0;
+    double path = 0;
     for(int i= 0 ;i < totalNodes-1; i++){
         int node1 = nodes[i][row];
         int node2 = nodes[i+1][row];
-        int dis = Caldistance(node1,node2);
-        path += dis;
+        double dis = Caldistance(node1,node2) + 0.5;
+        path += (int)dis;
     }
-    path += Caldistance(nodes[0][row],nodes[totalNodes-1][row]);
+    path += Caldistance(nodes[totalNodes-1][row],nodes[0][row]);
     return path;
 }
 
