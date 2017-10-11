@@ -32,7 +32,7 @@ int main(){
     double T = 100;// 初始温度
     double T_END = 0.01;
     double Q = 0.99;  // 退火系数
-    int L = 1000;//單次溫度迭代
+    int L = 100;//單次溫度迭代
     double R = 0.9;//接受率
 
     Intital_Path();
@@ -119,7 +119,7 @@ void Nearest_Neighbor() {
                 distance += 0.5;
                 nodes[i+1][4] = (int)distance;
             }
-        }
+        } ㄘㄛ
         nodes[nodes[i+1][3]][5] = 1;
     }
     for(int i = 0; i < totalNodes ;i++){
