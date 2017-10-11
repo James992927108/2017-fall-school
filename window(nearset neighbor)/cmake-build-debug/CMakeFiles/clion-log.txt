@@ -1,4 +1,4 @@
-"E:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" E:\GitHub\Simulated_Annealing_eil51\window
+"E:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" "E:\GitHub\Simulated_Annealing_eil51\window(nearset neighbor)"
 -- The C compiler identification is GNU 6.3.0
 -- The CXX compiler identification is GNU 6.3.0
 -- Check for working C compiler: E:/MinGW/bin/gcc.exe
@@ -15,4 +15,4 @@
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: E:/GitHub/Simulated_Annealing_eil51/window/cmake-build-debug
+-- Build files have been written to: E:/GitHub/Simulated_Annealing_eil51/window(nearset neighbor)/cmake-build-debug

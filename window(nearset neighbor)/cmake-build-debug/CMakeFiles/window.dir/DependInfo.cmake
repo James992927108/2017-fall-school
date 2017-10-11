@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "E:/GitHub/Simulated_Annealing_eil51/window/main.cpp" "E:/GitHub/Simulated_Annealing_eil51/window/cmake-build-debug/CMakeFiles/window.dir/main.cpp.obj"
+  "E:/GitHub/Simulated_Annealing_eil51/window(nearset neighbor)/main.cpp" "E:/GitHub/Simulated_Annealing_eil51/window(nearset neighbor)/cmake-build-debug/CMakeFiles/window.dir/main.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
