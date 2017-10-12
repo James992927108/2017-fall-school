@@ -28,9 +28,9 @@ int main(){
     reafFile();
     time_t start,finish;
     start = clock();
-    double T = 1000;// 初始温度
-    double T_END = 0;
-    double Q = 1;  // 退火系数
+    double T = 10000;// 初始温度
+    double T_END = 0.001;
+    double Q = 0.999;  // 退火系数
     int L = 100;//單次溫度迭代
     double R = 0.9999999;//接受率
     srand((unsigned)time(NULL));
@@ -43,7 +43,6 @@ int main(){
                 nodes[j][3] = nodes[j][0];
             }
             RandonTwoNodeSwap();
-
             f1 = cal_PathLength(3);//nodes[][3] old
             f2 = cal_PathLength(0);//nodes[][0] new
             df = f2 - f1;
@@ -66,7 +65,7 @@ int main(){
         if(counttableusestate == totalNodes*totalNodes-1){
             break;
         }
-        T -= Q;
+        T *= Q;
         count++;
         printf("%d new path :\t",count);
         print_Length();
