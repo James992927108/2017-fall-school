@@ -35,7 +35,7 @@ int main(){
     IntitalPathNearsetNeighbor();
     int f1,f2,df;
     int count = 0;
-
+    double NewPathLength = 0;
     while (T > T_END) {
         for (int j = 0; j < totalNodes; j++) {
             nodes[j][3] = nodes[j][0];
@@ -62,7 +62,7 @@ int main(){
                 }
             }
         }
-        double NewPathLength = cal_PathLength(3);
+        NewPathLength = cal_PathLength(3);
         printf("C : %d\tP :%f\t T:%f\n",count,NewPathLength,T);
         count++;
     }
@@ -70,11 +70,9 @@ int main(){
     for(int i = 0 ;i < totalNodes ;i++){
         printf("%d--->",nodes[i][3]);
     }
-
-    printf("\ncount:%d\n",count);
+    printf("\ncount:%d\t Path : %f\n",count,NewPathLength);
     double duration = ((double)(finish-start))/CLOCKS_PER_SEC; // 计算时间
     printf("time :%lfs.\n",duration);
-    //printf("counttableusestate:%d\n",counttableusestate);
     return 0;
 }
 void IntitalPathNearsetNeighbor(){
@@ -84,7 +82,7 @@ void IntitalPathNearsetNeighbor(){
     nodes[0][0] = index;
     //找到距離最近加入路徑最近的點，將其加入路徑
     double distance = 1000;
-    for(int i = 0 ;i < 50 ; i++) {
+    for(int i = 0 ;i < totalNodes ; i++) {
         double j_mindistance = 1000;
         for (int j = 0; j < totalNodes; j++) {
             if (j == index || j == i || j == nodes[i][0]) //j == index : 取一次取點取到原點
@@ -180,6 +178,6 @@ void reafFile() {
         }
         i++;
     }
-    print_Nodes();
+    //print_Nodes();
     cout << "Read file done" << endl;
 }
