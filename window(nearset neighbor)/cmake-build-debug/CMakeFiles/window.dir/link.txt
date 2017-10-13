@@ -1,3 +1,0 @@
-"E:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -E remove -f CMakeFiles\window.dir/objects.a
-E:\MinGW\bin\ar.exe cr CMakeFiles\window.dir/objects.a @CMakeFiles\window.dir\objects1.rsp
-E:\MinGW\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\window.dir/objects.a -Wl,--no-whole-archive  -o window.exe -Wl,--out-implib,libwindow.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\window.dir\linklibs.rsp

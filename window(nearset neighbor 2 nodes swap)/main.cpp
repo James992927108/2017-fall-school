@@ -11,64 +11,60 @@ using namespace std;
 const int dimension = 2;
 const int totalNodes = 50; // 城市数量
 int nodes[totalNodes][dimension+4];
-int table[totalNodes][totalNodes];
+
 void reafFile();
 void print_Length();
 void print_Nodes();
 
-int cal_PathLength(int row);
-int cal_InitalPathLength();
+double cal_PathLength(int row);
+double cal_InitalPathLength();
 double cal_Distance(int node1, int node2);
 void IntitalPathNearsetNeighbor();
 void RandonTwoNodeSwap();
 int get_RandonNum();
 
-int counttableusestate = 0;
 int main(){
     reafFile();
     time_t start,finish;
     start = clock();
-    double T = 10000;// 初始温度
-    double T_END = 0.001;
-    double Q = 0.999;  // 退火系数
-    int L = 100;//單次溫度迭代
-    double R = 0.9999999;//接受率
+    double T = 110;// 初始温度
+    double T_END = 0.1;
+    double Q = 0.9996;  // 退火系数
+
     srand((unsigned)time(NULL));
     IntitalPathNearsetNeighbor();
     int f1,f2,df;
     int count = 0;
-    while(T > T_END) {
-        for (int i = 0; i < L; i++) {
+
+    while (T > T_END) {
+        for (int j = 0; j < totalNodes; j++) {
+            nodes[j][3] = nodes[j][0];
+        }
+        RandonTwoNodeSwap();
+
+        f1 = cal_PathLength(3);//nodes[][3] old
+        f2 = cal_PathLength(0);//nodes[][0] new
+        df = f2 - f1;
+        if (df < 0) {
+            T = T * Q;
             for (int j = 0; j < totalNodes; j++) {
                 nodes[j][3] = nodes[j][0];
             }
-            RandonTwoNodeSwap();
-            f1 = cal_PathLength(3);//nodes[][3] old
-            f2 = cal_PathLength(0);//nodes[][0] new
-            df = f2 - f1;
-            if (df < 0) {
+        } else {
+            if (exp((double)-df / T) >= ((double)rand()/(RAND_MAX))) {
+                T = T * Q;
                 for (int j = 0; j < totalNodes; j++) {
                     nodes[j][3] = nodes[j][0];
                 }
             } else {
-                if (exp(-df / T) >= R) {
-                    for (int j = 0; j < totalNodes; j++) {
-                        nodes[j][3] = nodes[j][0];
-                    }
-                } else {
-                    for (int j = 0; j < totalNodes; j++) {
-                        nodes[j][0] = nodes[j][3];
-                    }
+                for (int j = 0; j < totalNodes; j++) {
+                    nodes[j][0] = nodes[j][3];
                 }
             }
         }
-        if(counttableusestate == totalNodes*totalNodes-1){
-            break;
-        }
-        T *= Q;
+        double NewPathLength = cal_PathLength(3);
+        printf("C : %d\tP :%f\t T:%f\n",count,NewPathLength,T);
         count++;
-        printf("%d new path :\t",count);
-        print_Length();
     }
     finish = clock(); // 退火过程结束
     for(int i = 0 ;i < totalNodes ;i++){
@@ -78,7 +74,7 @@ int main(){
     printf("\ncount:%d\n",count);
     double duration = ((double)(finish-start))/CLOCKS_PER_SEC; // 计算时间
     printf("time :%lfs.\n",duration);
-    printf("counttableusestate:%d\n",counttableusestate);
+    //printf("counttableusestate:%d\n",counttableusestate);
     return 0;
 }
 void IntitalPathNearsetNeighbor(){
@@ -98,8 +94,7 @@ void IntitalPathNearsetNeighbor(){
             if (distance < j_mindistance && nodes[j][5] == 0) {
                 j_mindistance = distance;
                 nodes[i+1][0] = j;//紀錄是哪個點距離nodes[i][0]最近
-                distance += 0.5;
-                nodes[i+1][4] = (int)distance;//記下初始路徑依序兩點距離，方便計算總初始距離
+                nodes[i+1][4] = distance;//記下初始路徑依序兩點距離，方便計算總初始距離
             }
         }
         nodes[nodes[i+1][0]][5] = 1;//作為標籤避免重複找
@@ -110,12 +105,9 @@ void IntitalPathNearsetNeighbor(){
             nodes[i][5] = 1 ;
         }
     }
-    //print_Nodes();
-    printf("inital path : \t");
-    print_Length();
 }
 
-int cal_InitalPathLength() {
+double cal_InitalPathLength() {
     int path = 0;
     for(int i= 0 ;i < totalNodes; i++)
         path += nodes[i][4];
@@ -125,20 +117,14 @@ int cal_InitalPathLength() {
 void RandonTwoNodeSwap(){
     int index1 = get_RandonNum();
     int index2 = get_RandonNum();
-    //printf("%d\n",table[index1][index2]);
-    if(table[index1][index2] == 0){
-        int temp = nodes[index1][0];
-        nodes[index1][0] = nodes[index2][0];
-        nodes[index2][0] = temp;
-        table[index1][index2] = 1;//使用過記錄到table
-        counttableusestate++;
-    }
+    int temp = nodes[index1][0];
+    nodes[index1][0] = nodes[index2][0];
+    nodes[index2][0] = temp;
 }
 
 int get_RandonNum() {
     double R = ((double)rand()) / (RAND_MAX + 1.0);
     int RandonNum  = (int)(totalNodes * R);
-    //printf("%d\n",RandonNum);
     return RandonNum;
 }
 
@@ -152,13 +138,13 @@ double cal_Distance(int node1, int node2) {
     return sqrt(x+y);
 }
 
-int cal_PathLength(int row) {
+double cal_PathLength(int row) {
     double path = 0;
     for(int i= 0 ;i < totalNodes-1; i++){
         int node1 = nodes[i][row];
         int node2 = nodes[i+1][row];
-        double dis = cal_Distance(node1, node2) + 0.5;
-        path += (int)dis;
+        double dis = cal_Distance(node1, node2);
+        path += dis;
     }
     path += cal_Distance(nodes[totalNodes - 1][row], nodes[0][row]);
     return path;
@@ -194,6 +180,6 @@ void reafFile() {
         }
         i++;
     }
-    //print_Nodes();
+    print_Nodes();
     cout << "Read file done" << endl;
 }
