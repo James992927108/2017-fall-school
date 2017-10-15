@@ -3,5 +3,7 @@ project(Tabu_IrisData)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES
+        main.cpp)
+
 add_executable(Tabu_IrisData ${SOURCE_FILES})

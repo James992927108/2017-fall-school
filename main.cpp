@@ -40,14 +40,6 @@ double cal_Distance(int node1, int node2);
 void print_Nodes();
 void print_Classes();
 
-
-
-
-void print_Length();
-double cal_PathLength(int row);
-double cal_InitalPathLength();
-void RandonTwoNodeSwap();
-
 void Cal_ClassesElementAvg();
 
 
@@ -57,33 +49,17 @@ void UpdateTabuList();
 
 void SecondAssignClusterCenter();
 
+void print_TabuList();
+
 int main(){
     reafFile();
     srand((unsigned)time(NULL));
     RandomAssignClusterCenter();
     ClassifyNodesByDistance();
     cal_StandardDeviation();    //計算每一組的x,y,z,w的標準差
-
-    //-------------------------------clean
-    for(int i = 0 ;i <ClassesNum ;i++){
-        ClassesEachElementTotal[i].x  = 0;
-        ClassesEachElementTotal[i].y  = 0;
-        ClassesEachElementTotal[i].z  = 0;
-        ClassesEachElementTotal[i].w  = 0;
-        ClassesEachElementTotal[i].index  = 0;
-        ClassesEachElementTotal[i].count  = 0;
-        TotalEachElement[i].x = 0;
-        TotalEachElement[i].y = 0;
-        TotalEachElement[i].z = 0;
-        TotalEachElement[i].w = 0;
-        TotalEachElement[i].index = 0;
-        TotalEachElement[i].count = 0;
-    }
-
-//    UpdateTabuList();
-
+    UpdateTabuList();
     
-    for(int i = 0;i < 2 ;i++) {
+    for(int i = 0;i < 3 ;i++) {
         SecondAssignClusterCenter();//重新找中心點
         for(int i = 0 ;i <ClassesNum ;i++){
             ClassesEachElementTotal[i].x  = 0;
@@ -102,25 +78,13 @@ int main(){
         ClassifyNodesByDistance();//再分類
         cal_StandardDeviation();    //計算每一組的x,y,z,w的標準差
 
-
-
-
-//        if(TabuListState <=7)//若tabulist未滿，哲直接放入
-//            UpdateTabuList();
-//        else {//比較標準差，若叫好更新tabulist
-//
-//        }
-
-//        for(int i = 0 ;i < TabuListSize ;i++) {
-//            for (int j = 0; j < ClassesNum; j++) {
-//                TabuList[i][j].x = StandardDeviationClasses[j].x;
-//                TabuList[i][j].y = StandardDeviationClasses[j].y;
-//                TabuList[i][j].z = StandardDeviationClasses[j].z;
-//                TabuList[i][j].w = StandardDeviationClasses[j].w;
-//            }
-//        }
-
+        if(TabuListState <7)//若tabulist未滿，哲直接放入
+            UpdateTabuList();
+        else {//比較標準差，若叫好更新tabulist
+            TabuListState = 0;//重置TabuList FIFO
+        }
     }
+    print_TabuList();
     return 0;
 }
 
@@ -141,9 +105,10 @@ void UpdateTabuList() {
         TabuList[TabuListState][i].y = StandardDeviationClasses[i].y;
         TabuList[TabuListState][i].z = StandardDeviationClasses[i].z;
         TabuList[TabuListState][i].w = StandardDeviationClasses[i].w;
-        TabuListState++;
     }
+    TabuListState++;
 }
+
 
 void cal_StandardDeviation() {
     for(int i = 0 ; i < NodesNum ; i ++){
@@ -262,6 +227,16 @@ void print_Classes() {
     for(int i=0; i < ClassesNum; i++)
         printf("%d\t%f\t%f\t%f\t%f\t%0.f\n",i,Classes[i][0],Classes[i][1],Classes[i][2],Classes[i][3],Classes[i][4]);
 }
+
+void print_TabuList() {
+    printf("print_TabuList\n");
+    for(int i = 0 ; i < TabuListSize ; i++){
+        for(int j= 0 ;j < ClassesNum ;j++) {
+            printf("%d\t%d\t%f\t%f\t%f\t%f\n", i,j, TabuList[i][j].x, TabuList[i][j].y,
+                   TabuList[i][j].z, TabuList[i][j].w);
+        }
+    }
+}
 //---------------------------------------------------------------------------------------
 
 void reafFile() {
@@ -289,35 +264,3 @@ void reafFile() {
     cout << "Read file done" << endl;
 }
 //---------------------------------------------------------------------------------------
-
-double cal_PathLength(int row) {
-    double path = 0;
-    for(int i= 0 ;i < NodesNum-1; i++){
-        int node1 = Nodes[i][row];
-        int node2 = Nodes[i+1][row];
-        double dis = cal_Distance(node1, node2);
-        path += dis;
-    }
-    path += cal_Distance(Nodes[NodesNum - 1][row], Nodes[0][row]);
-    return path;
-}
-
-void print_Length() {
-    int NewPathLength = cal_PathLength(3);
-    int InitalPathLength = cal_InitalPathLength();
-    printf("%d\t%d\n",InitalPathLength,NewPathLength);
-}
-double cal_InitalPathLength() {
-    int path = 0;
-    for(int i= 0 ;i < NodesNum; i++)
-        path += Nodes[i][4];
-    return path;
-}
-
-//void RandonTwoNodeSwap(){
-//    int index1 = get_RandonNum();
-//    int index2 = get_RandonNum();
-//    int temp = Nodes[index1][0];
-//    Nodes[index1][0] = Nodes[index2][0];
-//    Nodes[index2][0] = temp;
-//}

@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "E:/GitHub/Tabu-IrisData/main.cpp" "E:/GitHub/Tabu-IrisData/cmake-build-debug/CMakeFiles/Tabu_IrisData.dir/main.cpp.obj"
+  "/Users/antonyteng/Desktop/Github/Tabu-IrisData/main.cpp" "/Users/antonyteng/Desktop/Github/Tabu-IrisData/cmake-build-debug/CMakeFiles/Tabu_IrisData.dir/main.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
