@@ -51,6 +51,8 @@ void SecondAssignClusterCenter();
 
 void print_TabuList();
 
+void InitalStructValue();
+
 int main(){
     reafFile();
     srand((unsigned)time(NULL));
@@ -61,7 +63,24 @@ int main(){
     
     for(int i = 0;i < 3 ;i++) {
         SecondAssignClusterCenter();//重新找中心點
-        for(int i = 0 ;i <ClassesNum ;i++){
+        InitalStructValue();
+        ClassifyNodesByDistance();//再分類
+        cal_StandardDeviation();    //計算每一組的x,y,z,w的標準差
+
+        if(TabuListState <7)//若tabulist未滿，哲直接放入
+            UpdateTabuList();
+        else {//比較標準差，若叫好更新tabulist
+
+            TabuListState = 0;//重置TabuList FIFO(有問題)
+        }
+    }
+
+    print_TabuList();
+    return 0;
+}
+
+void InitalStructValue() {
+    for(int i = 0 ; i < ClassesNum ; i++){
             ClassesEachElementTotal[i].x  = 0;
             ClassesEachElementTotal[i].y  = 0;
             ClassesEachElementTotal[i].z  = 0;
@@ -75,17 +94,6 @@ int main(){
             TotalEachElement[i].index = 0;
             TotalEachElement[i].count = 0;
         }
-        ClassifyNodesByDistance();//再分類
-        cal_StandardDeviation();    //計算每一組的x,y,z,w的標準差
-
-        if(TabuListState <7)//若tabulist未滿，哲直接放入
-            UpdateTabuList();
-        else {//比較標準差，若叫好更新tabulist
-            TabuListState = 0;//重置TabuList FIFO
-        }
-    }
-    print_TabuList();
-    return 0;
 }
 
 void SecondAssignClusterCenter() {
@@ -229,7 +237,7 @@ void print_Classes() {
 }
 
 void print_TabuList() {
-    printf("print_TabuList\n");
+    printf("TabuList\n");
     for(int i = 0 ; i < TabuListSize ; i++){
         for(int j= 0 ;j < ClassesNum ;j++) {
             printf("%d\t%d\t%f\t%f\t%f\t%f\n", i,j, TabuList[i][j].x, TabuList[i][j].y,
