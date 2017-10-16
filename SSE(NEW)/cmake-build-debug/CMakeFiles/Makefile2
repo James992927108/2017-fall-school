@@ -53,45 +53,45 @@ RM = "D:\Program Files\JetBrains\CLion 2017.2.3\bin\cmake\bin\cmake.exe" -E remo
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE
+CMAKE_SOURCE_DIR = C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE(NEW)
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE\cmake-build-debug
+CMAKE_BINARY_DIR = C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE(NEW)\cmake-build-debug
 
 #=============================================================================
-# Target rules for target CMakeFiles/abchdbaesdfasdfs.dir
+# Target rules for target CMakeFiles/SSE_NEW_.dir
 
 # All Build rule for target.
-CMakeFiles/abchdbaesdfasdfs.dir/all:
-	$(MAKE) -f CMakeFiles\abchdbaesdfasdfs.dir\build.make CMakeFiles/abchdbaesdfasdfs.dir/depend
-	$(MAKE) -f CMakeFiles\abchdbaesdfasdfs.dir\build.make CMakeFiles/abchdbaesdfasdfs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE\cmake-build-debug\CMakeFiles --progress-num=1,2 "Built target abchdbaesdfasdfs"
-.PHONY : CMakeFiles/abchdbaesdfasdfs.dir/all
+CMakeFiles/SSE_NEW_.dir/all:
+	$(MAKE) -f CMakeFiles\SSE_NEW_.dir\build.make CMakeFiles/SSE_NEW_.dir/depend
+	$(MAKE) -f CMakeFiles\SSE_NEW_.dir\build.make CMakeFiles/SSE_NEW_.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE(NEW)\cmake-build-debug\CMakeFiles --progress-num=1,2 "Built target SSE_NEW_"
+.PHONY : CMakeFiles/SSE_NEW_.dir/all
 
 # Include target in all.
-all: CMakeFiles/abchdbaesdfasdfs.dir/all
+all: CMakeFiles/SSE_NEW_.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/abchdbaesdfasdfs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE\cmake-build-debug\CMakeFiles 2
-	$(MAKE) -f CMakeFiles\Makefile2 CMakeFiles/abchdbaesdfasdfs.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE\cmake-build-debug\CMakeFiles 0
-.PHONY : CMakeFiles/abchdbaesdfasdfs.dir/rule
+CMakeFiles/SSE_NEW_.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE(NEW)\cmake-build-debug\CMakeFiles 2
+	$(MAKE) -f CMakeFiles\Makefile2 CMakeFiles/SSE_NEW_.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\Antony\Desktop\github\Tabu-IrisData\SSE(NEW)\cmake-build-debug\CMakeFiles 0
+.PHONY : CMakeFiles/SSE_NEW_.dir/rule
 
 # Convenience name for target.
-abchdbaesdfasdfs: CMakeFiles/abchdbaesdfasdfs.dir/rule
+SSE_NEW_: CMakeFiles/SSE_NEW_.dir/rule
 
-.PHONY : abchdbaesdfasdfs
-
-# clean rule for target.
-CMakeFiles/abchdbaesdfasdfs.dir/clean:
-	$(MAKE) -f CMakeFiles\abchdbaesdfasdfs.dir\build.make CMakeFiles/abchdbaesdfasdfs.dir/clean
-.PHONY : CMakeFiles/abchdbaesdfasdfs.dir/clean
+.PHONY : SSE_NEW_
 
 # clean rule for target.
-clean: CMakeFiles/abchdbaesdfasdfs.dir/clean
+CMakeFiles/SSE_NEW_.dir/clean:
+	$(MAKE) -f CMakeFiles\SSE_NEW_.dir\build.make CMakeFiles/SSE_NEW_.dir/clean
+.PHONY : CMakeFiles/SSE_NEW_.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/SSE_NEW_.dir/clean
 
 .PHONY : clean
 

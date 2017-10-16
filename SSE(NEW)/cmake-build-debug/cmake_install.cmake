@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/Antony/Desktop/github/Tabu-IrisData/SSE
+# Install script for directory: C:/Users/Antony/Desktop/github/Tabu-IrisData/SSE(NEW)
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/abchdbaesdfasdfs")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/SSE_NEW_")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Antony/Desktop/github/Tabu-IrisData/SSE/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Antony/Desktop/github/Tabu-IrisData/SSE(NEW)/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
