@@ -73,7 +73,7 @@ int main(){
     print_Classes();
     print_TabuList();
 
-    for(int i = 1;i < 100000 ;i++) {
+    for(int i = 1;i < 10000;i++) {
         RandomAssignClusterCenter(i%7);
         ClassifyNodesByDistance(i%7);//再分類
         double sse = SEE(i%7);
@@ -83,6 +83,11 @@ int main(){
 
     print_Classes();
     print_TabuList();
+
+    for(int i=0;i<NodesNum;i++)
+        printf("%d\t%d\n",i,Nodes[i].classes);
+    printf("//---------------------------------------------------------------------------------------\n");
+
 
     double duration = ((double)(finish-start))/CLOCKS_PER_SEC; //計算時間
     printf("time :%lfs.\n",duration);
@@ -173,45 +178,6 @@ void UpdateTabuList(double sse ,int classes) {
     TabuListState++;
 }
 
-//---------------------------------------------------------------------------------------
-
-//void cal_ClassElementCount(){
-//    for(int i = 0 ;i < ClassesNum ; i++){
-//        ClassesNodes[i].count = 0;
-//    }
-//    for(int i = 0 ;i < NodesNum ;i ++){
-//        switch (Nodes[i].classes){
-//            case 0:
-//                ClassesNodes[0].count++;
-//                break;
-//            case 1:
-//                ClassesNodes[1].count++;
-//                break;
-//            case 2:
-//                ClassesNodes[2].count++;
-//                break;
-//        }
-//    }
-//}
-//
-//void SecondAssignClusterCenter() {
-//    cal_ClassElementCount();
-//    for(int i = 0; i < ClassesNum; i++){
-//        printf("//%d\n",ClassesNodes[i].count);
-//        int NodeIndex = get_RandonNum(ClassesNodes[i].count);
-//        printf("--%d\n",NodeIndex);
-//        for(int j = 0 ;j < NodesNum ; j++){
-//            if(Nodes[j].count == NodeIndex && Nodes[j].classes == i){
-//                printf("%d**%d\n",i,j);
-//                ClassesNodes[i].classes = j;
-//            }
-//        }
-//        ClassesNodes[i].x = Nodes[ClassesNodes[i].classes].x;
-//        ClassesNodes[i].y = Nodes[ClassesNodes[i].classes].y;
-//        ClassesNodes[i].z = Nodes[ClassesNodes[i].classes].z;
-//        ClassesNodes[i].w = Nodes[ClassesNodes[i].classes].w;
-//    }
-//}
 //---------------------------------------------------------------------------------------
 void print_Nodes(){
     for(int i=0;i<NodesNum;i++)
