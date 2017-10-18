@@ -41,20 +41,20 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveBorder;
-            this.panel1.Location = new System.Drawing.Point(12, 11);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2);
+            this.panel1.Location = new System.Drawing.Point(16, 14);
+            this.panel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(600, 600);
+            this.panel1.Size = new System.Drawing.Size(800, 750);
             this.panel1.TabIndex = 0;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnPanelMouseDown);
             // 
             // button_Run
             // 
-            this.button_Run.Location = new System.Drawing.Point(403, 627);
-            this.button_Run.Margin = new System.Windows.Forms.Padding(2);
+            this.button_Run.Location = new System.Drawing.Point(741, 787);
+            this.button_Run.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button_Run.Name = "button_Run";
-            this.button_Run.Size = new System.Drawing.Size(56, 18);
+            this.button_Run.Size = new System.Drawing.Size(75, 22);
             this.button_Run.TabIndex = 1;
             this.button_Run.Text = "Run";
             this.button_Run.UseVisualStyleBackColor = true;
@@ -62,10 +62,10 @@
             // 
             // button_Clean
             // 
-            this.button_Clean.Location = new System.Drawing.Point(403, 672);
-            this.button_Clean.Margin = new System.Windows.Forms.Padding(2);
+            this.button_Clean.Location = new System.Drawing.Point(741, 841);
+            this.button_Clean.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button_Clean.Name = "button_Clean";
-            this.button_Clean.Size = new System.Drawing.Size(56, 18);
+            this.button_Clean.Size = new System.Drawing.Size(75, 22);
             this.button_Clean.TabIndex = 2;
             this.button_Clean.Text = "Clean";
             this.button_Clean.UseVisualStyleBackColor = true;
@@ -73,9 +73,10 @@
             // 
             // button_TEST
             // 
-            this.button_TEST.Location = new System.Drawing.Point(303, 627);
+            this.button_TEST.Location = new System.Drawing.Point(602, 787);
+            this.button_TEST.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_TEST.Name = "button_TEST";
-            this.button_TEST.Size = new System.Drawing.Size(75, 23);
+            this.button_TEST.Size = new System.Drawing.Size(100, 29);
             this.button_TEST.TabIndex = 3;
             this.button_TEST.Text = "TEST";
             this.button_TEST.UseVisualStyleBackColor = true;
@@ -83,9 +84,10 @@
             // 
             // button_OpenFile
             // 
-            this.button_OpenFile.Location = new System.Drawing.Point(12, 627);
+            this.button_OpenFile.Location = new System.Drawing.Point(16, 784);
+            this.button_OpenFile.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_OpenFile.Name = "button_OpenFile";
-            this.button_OpenFile.Size = new System.Drawing.Size(75, 23);
+            this.button_OpenFile.Size = new System.Drawing.Size(100, 29);
             this.button_OpenFile.TabIndex = 4;
             this.button_OpenFile.Text = "OpenFile";
             this.button_OpenFile.UseVisualStyleBackColor = true;
@@ -93,9 +95,10 @@
             // 
             // button_Output_txt
             // 
-            this.button_Output_txt.Location = new System.Drawing.Point(9, 667);
+            this.button_Output_txt.Location = new System.Drawing.Point(12, 834);
+            this.button_Output_txt.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Output_txt.Name = "button_Output_txt";
-            this.button_Output_txt.Size = new System.Drawing.Size(75, 23);
+            this.button_Output_txt.Size = new System.Drawing.Size(100, 29);
             this.button_Output_txt.TabIndex = 5;
             this.button_Output_txt.Text = "Output txt";
             this.button_Output_txt.UseVisualStyleBackColor = true;
@@ -108,9 +111,10 @@
             // 
             // button_Next
             // 
-            this.button_Next.Location = new System.Drawing.Point(115, 627);
+            this.button_Next.Location = new System.Drawing.Point(153, 784);
+            this.button_Next.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Next.Name = "button_Next";
-            this.button_Next.Size = new System.Drawing.Size(75, 23);
+            this.button_Next.Size = new System.Drawing.Size(100, 29);
             this.button_Next.TabIndex = 6;
             this.button_Next.Text = "Next";
             this.button_Next.UseVisualStyleBackColor = true;
@@ -118,9 +122,9 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(634, 711);
+            this.ClientSize = new System.Drawing.Size(845, 889);
             this.Controls.Add(this.button_Next);
             this.Controls.Add(this.button_Output_txt);
             this.Controls.Add(this.button_OpenFile);
@@ -128,7 +132,7 @@
             this.Controls.Add(this.button_Clean);
             this.Controls.Add(this.button_Run);
             this.Controls.Add(this.panel1);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
             this.Text = "Voronoi Homework";
             this.ResumeLayout(false);

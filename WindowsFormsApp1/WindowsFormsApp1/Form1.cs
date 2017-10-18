@@ -72,8 +72,8 @@ namespace WindowsFormsApp1
             {
                 System.IO.StreamReader file = new
                     System.IO.StreamReader(openFileDialog1.FileName);
-                FileStream fileStream = new FileStream(@"..\aaaa.txt", FileMode.Create);
-                fileStream.Close();
+                //FileStream fileStream = new FileStream(@"..\aaaa.txt", FileMode.Create);
+                //fileStream.Close();
                 //StreamWriter sw = new StreamWriter(@"..\aaaa.txt");
                 while ((line = file.ReadLine()) != null)
                 {
@@ -107,14 +107,13 @@ namespace WindowsFormsApp1
                 }
             }
             this.button_Next.Show();//show按鈕，顯示測資個數
-            this.button_Next.Text = $"{NodeNumList.Count}";
-            RemainDateCount = NodeNumList.Count;
+            this.button_Next.Text = $"{NodeNumList.Count - 2}";
+            RemainDateCount = NodeNumList.Count - 2;
         }
 
         private void Next_Click(object sender, EventArgs e)
         {
-            RemainDateCount--;
-            int CurrentDataIndex = NodeNumList.Count - RemainDateCount;
+            int CurrentDataIndex = (NodeNumList.Count - 2) - RemainDateCount;
 
             if (RemainDateCount == -1)
             {
@@ -136,8 +135,8 @@ namespace WindowsFormsApp1
                 g.DrawImageUnscaled(nodeBitmap, NodeList[i].x, NodeList[i].y);
                 g.DrawImageUnscaled(nodeBitmap, NodeList[i+1].x, NodeList[i+1].y);
 
-                g.DrawString($"{NodeList[i].x},{NodeList[i].x}", myFont, Brushes.Firebrick, NodeList[i].x, NodeList[i].y);
-                g.DrawString($"{NodeList[i+1].x},{NodeList[i+1].x}", myFont, Brushes.Firebrick, NodeList[i+1].x, NodeList[i+1].y);
+                g.DrawString($"{NodeList[i].x},{NodeList[i].y}", myFont, Brushes.Firebrick, NodeList[i].x, NodeList[i].y);
+                g.DrawString($"{NodeList[i+1].x},{NodeList[i+1].y}", myFont, Brushes.Firebrick, NodeList[i+1].x, NodeList[i+1].y);
 
                 g.DrawLine(myPen, NodeList[i].x, NodeList[i].y, NodeList[i + 1].x, NodeList[i + 1].y);
             }
@@ -150,6 +149,7 @@ namespace WindowsFormsApp1
                 NodeList.Add(node);//塞到list裡面
                 NodeList.RemoveAt(0);
             }
+            RemainDateCount--;
         }
 
         private void Output_txt_Click(object sender, EventArgs e)
