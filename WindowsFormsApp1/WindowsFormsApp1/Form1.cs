@@ -51,9 +51,9 @@ namespace WindowsFormsApp1
 
         public void clean_function()
         {
-//            NodeList.Clear();//清空有問題
-//            NodeNumList.Clear();
-//            this.button_Next.Hide();
+            //            NodeList.Clear();//清空有問題
+            //            NodeNumList.Clear();
+            //            this.button_Next.Hide();
             this.panel1.Refresh();
         }
 
@@ -133,14 +133,14 @@ namespace WindowsFormsApp1
             for (int i = 0; i < NodeNumList[CurrentDataIndex] - 1; i++)
             {
                 g.DrawImageUnscaled(nodeBitmap, NodeList[i].x, NodeList[i].y);
-                g.DrawImageUnscaled(nodeBitmap, NodeList[i+1].x, NodeList[i+1].y);
+                g.DrawImageUnscaled(nodeBitmap, NodeList[i + 1].x, NodeList[i + 1].y);
 
                 g.DrawString($"{NodeList[i].x},{NodeList[i].y}", myFont, Brushes.Firebrick, NodeList[i].x, NodeList[i].y);
-                g.DrawString($"{NodeList[i+1].x},{NodeList[i+1].y}", myFont, Brushes.Firebrick, NodeList[i+1].x, NodeList[i+1].y);
+                g.DrawString($"{NodeList[i + 1].x},{NodeList[i + 1].y}", myFont, Brushes.Firebrick, NodeList[i + 1].x, NodeList[i + 1].y);
 
                 g.DrawLine(myPen, NodeList[i].x, NodeList[i].y, NodeList[i + 1].x, NodeList[i + 1].y);
             }
-            //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個
+            //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
             for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
             {
                 NodeStruct node = new NodeStruct();//新增點結構
@@ -154,7 +154,21 @@ namespace WindowsFormsApp1
 
         private void Output_txt_Click(object sender, EventArgs e)
         {
+            FileStream fileStream = new FileStream(@"..\bbb.txt", FileMode.Create);
+            fileStream.Close();
+            StreamWriter sw = new StreamWriter(@"..\bbb.txt");
+            //將NodeList中的元素跟具x值排序
+            var NodeList_Sort = from a in NodeList 
+                                orderby a.x
+                                select a;
 
+            foreach (var node in NodeList_Sort)
+            {
+                sw.Write("P " + node.x + " " + node.y);
+                sw.Write(System.Environment.NewLine);
+            }
+            sw.Close();
+            MessageBox.Show("完成輸出txt");
         }
         //--------------------------------------------------------------------------------------------------
         //        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
@@ -166,11 +180,11 @@ namespace WindowsFormsApp1
             //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
             //新增字型用
-            Font myFont = new Font(FontFamily.GenericSansSerif,10,FontStyle.Regular);
+            Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);
             //新增畫筆用於畫線
-            Pen myPen = new Pen(Color.Red, 1);  
+            Pen myPen = new Pen(Color.Red, 1);
             //點座標
-            g.DrawImageUnscaled(nodeBitmap, e.X, e.Y);     
+            g.DrawImageUnscaled(nodeBitmap, e.X, e.Y);
             // Draw the $"Coordinate [{e.X},{e.Y}]"
             g.DrawString($"{e.X},{e.Y}", myFont, Brushes.Firebrick, e.X, e.Y);
 
