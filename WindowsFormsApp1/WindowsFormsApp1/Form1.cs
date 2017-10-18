@@ -51,9 +51,9 @@ namespace WindowsFormsApp1
 
         public void clean_function()
         {
-            NodeList.Clear();//清空有問題
-            NodeNumList.Clear();
-            this.button_Next.Hide();
+//            NodeList.Clear();//清空有問題
+//            NodeNumList.Clear();
+//            this.button_Next.Hide();
             this.panel1.Refresh();
         }
 
@@ -81,8 +81,8 @@ namespace WindowsFormsApp1
                     if (lineArray.Length != 0 && lineArray[0] != "#")
                     {
                         ReadFileArrayList.Add(line);
-//                        sw.Write(line);
-//                        sw.Write(System.Environment.NewLine);
+                        //                        sw.Write(line);
+                        //                        sw.Write(System.Environment.NewLine);
                     }
                 }
                 //sw.Close();
@@ -93,13 +93,13 @@ namespace WindowsFormsApp1
             {
                 Char delimiter = ' ';
                 String[] substrings = ReadFileArrayList[i].ToString().Split(delimiter);
-                if (substrings.Length ==1)
+                if (substrings.Length == 1)
                 {
                     //NodeNumList的值代表有幾個點
                     NodeNumList.Add(Convert.ToInt32(ReadFileArrayList[i]));
                 }
                 else//為座標放入NodeList裡面
-                {  
+                {
                     NodeStruct node = new NodeStruct();//新增點結構
                     node.x = Convert.ToInt32(substrings[0]);
                     node.y = Convert.ToInt32(substrings[1]);
@@ -109,61 +109,70 @@ namespace WindowsFormsApp1
             this.button_Next.Show();//show按鈕，顯示測資個數
             this.button_Next.Text = $"{NodeNumList.Count}";
             RemainDateCount = NodeNumList.Count;
-
         }
 
         private void Next_Click(object sender, EventArgs e)
         {
-            RemainDateCount -- ;
+            RemainDateCount--;
+            int CurrentDataIndex = NodeNumList.Count - RemainDateCount;
+
             if (RemainDateCount == -1)
             {
                 MessageBox.Show("已無資料");
                 this.button_Next.Hide();
             }
             this.button_Next.Text = $"{RemainDateCount}";
-            for (int i = 0; i < NodeNumList.Count; i++)
+
+            var nodeBitmap = get_NodeBitmap();
+            //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            //新增字型用
+            Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);
+            //新增畫筆用於畫線
+            Pen myPen = new Pen(Color.Red, 1);
+
+            for (int i = 0; i < NodeNumList[CurrentDataIndex] - 1; i++)
             {
-                for (int j = 0; j < NodeNumList[0] - 1; j++)
-                {
-                    var bm = get_NodeBitmap();
-                    //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
-                    Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-//                    g.DrawImageUnscaled(bm, e.X, e.Y);       //具体坐标
-                    Pen myPen = new Pen(Color.Red, 1); //新增畫筆
+                g.DrawImageUnscaled(nodeBitmap, NodeList[i].x, NodeList[i].y);
+                g.DrawImageUnscaled(nodeBitmap, NodeList[i+1].x, NodeList[i+1].y);
 
-//                    NodeStruct node = new NodeStruct();//新增點結構
-//                    node.x = e.X;
-//                    node.y = e.Y;
-//                    NodeList.Add(node);//塞到list裡面
-//
-//                    if (NodeList.Count != 1)
-//                    {
-                        g.DrawLine(myPen, NodeList[j].x, NodeList[j].y, NodeList[j+1].x, NodeList[j+1].y);
-//                    }
-                }
+                g.DrawString($"{NodeList[i].x},{NodeList[i].x}", myFont, Brushes.Firebrick, NodeList[i].x, NodeList[i].y);
+                g.DrawString($"{NodeList[i+1].x},{NodeList[i+1].x}", myFont, Brushes.Firebrick, NodeList[i+1].x, NodeList[i+1].y);
 
+                g.DrawLine(myPen, NodeList[i].x, NodeList[i].y, NodeList[i + 1].x, NodeList[i + 1].y);
             }
-
+            //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個
+            for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+            {
+                NodeStruct node = new NodeStruct();//新增點結構
+                node.x = NodeList[0].x;
+                node.y = NodeList[0].y;
+                NodeList.Add(node);//塞到list裡面
+                NodeList.RemoveAt(0);
+            }
         }
 
         private void Output_txt_Click(object sender, EventArgs e)
         {
 
         }
-        
-
         //--------------------------------------------------------------------------------------------------
         //        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
         //        private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
 
-
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
-            var bm = get_NodeBitmap();
+            var nodeBitmap = get_NodeBitmap();
             //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-            g.DrawImageUnscaled(bm, e.X, e.Y);       //具体坐标
-            Pen myPen = new Pen(Color.Red, 1); //新增畫筆
+            //新增字型用
+            Font myFont = new Font(FontFamily.GenericSansSerif,10,FontStyle.Regular);
+            //新增畫筆用於畫線
+            Pen myPen = new Pen(Color.Red, 1);  
+            //點座標
+            g.DrawImageUnscaled(nodeBitmap, e.X, e.Y);     
+            // Draw the $"Coordinate [{e.X},{e.Y}]"
+            g.DrawString($"{e.X},{e.Y}", myFont, Brushes.Firebrick, e.X, e.Y);
 
             NodeStruct node = new NodeStruct();//新增點結構
             node.x = e.X;
@@ -179,15 +188,15 @@ namespace WindowsFormsApp1
         private static Bitmap get_NodeBitmap()
         {
             int NodeSize = 5;
-            Bitmap bm = new Bitmap(NodeSize, NodeSize); //这里调整点的大小   
+            Bitmap nodeBitmap = new Bitmap(NodeSize, NodeSize); //这里调整点的大小   
             for (int i = 0; i < NodeSize; i++)
             {
                 for (int j = 0; j < NodeSize; j++)
                 {
-                    bm.SetPixel(i, j, Color.Black); //设置点的颜色   
+                    nodeBitmap.SetPixel(i, j, Color.Black); //设置点的颜色   
                 }
             }
-            return bm;
+            return nodeBitmap;
         }
 
         private void panel1_Paint(object sender, PaintEventArgs e)
@@ -212,7 +221,7 @@ namespace WindowsFormsApp1
             g.DrawImageUnscaled(bm, 100, 100);       //具体坐标
         }
 
-       
+
     }
 
     public struct NodeStruct
