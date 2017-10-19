@@ -158,7 +158,7 @@ namespace WindowsFormsApp1
             fileStream.Close();
             StreamWriter sw = new StreamWriter(@"..\bbb.txt");
             //將NodeList中的元素跟具x值排序
-            var NodeList_Sort = from a in NodeList 
+            var NodeList_Sort = from a in NodeList
                                 orderby a.x
                                 select a;
 
@@ -167,6 +167,34 @@ namespace WindowsFormsApp1
                 sw.Write("P " + node.x + " " + node.y);
                 sw.Write(System.Environment.NewLine);
             }
+
+            int count = 0;
+            int temp_node_x = 0;
+            int temp_node_y = 0;
+            foreach (var node in NodeList_Sort)
+            {
+                if (count % 2 == 0)
+                {
+                    if (count == 0)
+                        sw.Write("E " + node.x + " " + node.y);
+                    else
+                    {
+                        sw.Write("E " + temp_node_x + " " + temp_node_y);
+                        temp_node_x = node.x;
+                        temp_node_y = node.y;
+                    }
+                }
+                else
+                {
+                    sw.Write(" " + node.x + " " + node.y);
+                    temp_node_x = node.x;
+                    temp_node_y = node.y;
+
+                    sw.Write(System.Environment.NewLine);
+                }
+                count++;
+            }
+
             sw.Close();
             MessageBox.Show("完成輸出txt");
         }
@@ -191,7 +219,8 @@ namespace WindowsFormsApp1
             NodeStruct node = new NodeStruct();//新增點結構
             node.x = e.X;
             node.y = e.Y;
-            NodeList.Add(node);//塞到list裡面
+            NodeList.Add(node);//將點塞到list裡面
+
 
             if (NodeList.Count != 1)
             {
@@ -248,5 +277,4 @@ namespace WindowsFormsApp1
             y = p2;
         }
     }
-
 }
