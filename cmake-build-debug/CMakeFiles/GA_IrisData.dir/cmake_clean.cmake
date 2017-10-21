@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/GA_IrisData.dir/main.cpp.o"
+  "CMakeFiles/GA_IrisData.dir/main.cpp.obj"
   "GA_IrisData.pdb"
-  "GA_IrisData"
+  "GA_IrisData.exe"
+  "GA_IrisData.exe.manifest"
+  "libGA_IrisData.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.
