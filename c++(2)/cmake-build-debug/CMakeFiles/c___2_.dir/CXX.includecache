@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/GitHub/HW_OS_PageReplacement/c++(2)/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+cmath
+-
+thread
+-
+cstring
+-
+
