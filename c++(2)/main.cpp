@@ -17,6 +17,8 @@ void getSample(const char *path);
 
 void FIFO_Randon(const char *path, int FrameSize);
 
+void FIFO_Locality(const char *path, int FrameSize);
+
 const int Ref_str = 350;
 const int Numofmem_ref = 75000;
 
@@ -32,27 +34,32 @@ int main() {
 
     int FrameSize = 5;
     FIFO_Randon(path, FrameSize);
+    //-------------------------------
+    FIFO_Locality(path, FrameSize);
+    //-------------------------------
 
+    return 0;
+}
+
+void FIFO_Locality(const char *path, int FrameSize) {
     int Frame[FrameSize];
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i] = 0;
     }
     string FIFO_Locality = "FIFO_Locality.txt";
     ofstream FIFO( path + FIFO_Locality);
-
     int flag = 0;
     int pagefault = 0;
     for(int i = 0 ;i < Numofmem_ref ; i++){
         FIFO << i;
         FIFO << "\t";
-        int input_Randon = Ref_str_LocalityArray[i];
-        //check是否存在frame裡面
-        bool check ;
+        int input = Ref_str_LocalityArray[i];
+        bool check ; //check是否存在frame裡面
         int count = 0;
         for(int i = 0 ;i < FrameSize ;i++){
-            if( Frame[i]!= input_Randon ){
+            if( Frame[i]!= input ){
                 count++;
-            } else{
+            }else{
                 check = false;
             }
             if(count == FrameSize)
@@ -60,7 +67,7 @@ int main() {
         }
         if(check == 1){//input 不在frame中
             int temp = Frame[flag];
-            Frame[flag] = input_Randon;
+            Frame[flag] = input;
             FIFO << Frame[flag];
             FIFO << "\t";
             for(int k = 0 ;k <FrameSize ;k++) {
@@ -86,11 +93,10 @@ int main() {
             flag = 0 ;
         }
     }
-    printf("pagefault %d",pagefault);
+    printf("\nFIFO Locailty \tpagefault %d",pagefault);
     FIFO << "pagefault : ";
     FIFO << pagefault;
     FIFO.close();
-    return 0;
 }
 
 void FIFO_Randon(const char *path, int FrameSize) {
@@ -106,12 +112,12 @@ void FIFO_Randon(const char *path, int FrameSize) {
     for(int i = 0 ;i < Numofmem_ref ; i++){
         FIFO << i;
         FIFO << "\t";
-        int input_Randon = Ref_str_RandonArray[i];
+        int input = Ref_str_RandonArray[i];
         //check是否存在frame裡面
         bool check ;
         int count = 0;
         for(int i = 0 ;i < FrameSize ;i++){
-            if( Frame[i]!= input_Randon ){
+            if( Frame[i]!= input ){
                 count++;
             } else{
                 check = false;
@@ -121,7 +127,7 @@ void FIFO_Randon(const char *path, int FrameSize) {
         }
         if(check == 1){//input 不在frame中
             int temp = Frame[flag];
-            Frame[flag] = input_Randon;
+            Frame[flag] = input;
             FIFO << Frame[flag];
             FIFO << "\t";
             for(int k = 0 ;k <FrameSize ;k++) {
@@ -147,7 +153,7 @@ void FIFO_Randon(const char *path, int FrameSize) {
             flag = 0 ;
         }
     }
-    printf("pagefault %d",pagefault);
+    printf("FIFO Randon \tpagefault %d",pagefault);
     FIFO << "pagefault : ";
     FIFO << pagefault;
     FIFO.close();
@@ -165,11 +171,11 @@ void LocalitySample(const char *path) {
         int Min =  Ref_str / 6 ;
         int Max =  Ref_str / 4 ;
         int count = 0 ;
-        while (count < 70000){
+        while (count < Numofmem_ref){
             int LocalitySize = get_RandonLocality(Min, Max);//用於曲每次locality大小 350 /6  < LocalitySize < 350 / 4
             int LocalityStart = get_RandonLocality(0, Ref_str - Max); // 0 ~ (350 - Max)
             int LocalityEnd = LocalityStart + LocalitySize ; // ( (0 ~ (350 - Max)) + LocalitySize )< 350
-            for(int i = 0 ; i < LocalitySize ; i ++ ){
+            for(int i = count ; i < count + LocalitySize ; i ++ ){
                 int RandNum = get_RandonLocality(LocalityStart,LocalityEnd);
                 Ref_str_LocalityArray[i] = RandNum;
                 fout_Locality << RandNum;
