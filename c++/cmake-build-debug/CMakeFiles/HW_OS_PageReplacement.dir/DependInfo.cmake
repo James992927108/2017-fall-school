@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "E:/GitHub/HW_OS_PageReplacement/c++/main.cpp" "E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/CMakeFiles/HW_OS_PageReplacement.dir/main.cpp.obj"
+  "C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/main.cpp" "C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/CMakeFiles/HW_OS_PageReplacement.dir/main.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

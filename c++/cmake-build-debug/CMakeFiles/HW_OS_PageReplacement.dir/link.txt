@@ -1,3 +1,3 @@
-"E:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -E remove -f CMakeFiles\HW_OS_PageReplacement.dir/objects.a
-E:\MinGW\bin\ar.exe cr CMakeFiles\HW_OS_PageReplacement.dir/objects.a @CMakeFiles\HW_OS_PageReplacement.dir\objects1.rsp
-E:\MinGW\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\HW_OS_PageReplacement.dir/objects.a -Wl,--no-whole-archive  -o HW_OS_PageReplacement.exe -Wl,--out-implib,libHW_OS_PageReplacement.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\HW_OS_PageReplacement.dir\linklibs.rsp
+"D:\Program Files\JetBrains\CLion 2017.2.3\bin\cmake\bin\cmake.exe" -E remove -f CMakeFiles\HW_OS_PageReplacement.dir/objects.a
+C:\MinGW\bin\ar.exe cr CMakeFiles\HW_OS_PageReplacement.dir/objects.a @CMakeFiles\HW_OS_PageReplacement.dir\objects1.rsp
+C:\MinGW\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\HW_OS_PageReplacement.dir/objects.a -Wl,--no-whole-archive  -o HW_OS_PageReplacement.exe -Wl,--out-implib,libHW_OS_PageReplacement.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\HW_OS_PageReplacement.dir\linklibs.rsp

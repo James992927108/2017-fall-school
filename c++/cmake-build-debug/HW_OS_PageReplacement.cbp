@@ -8,84 +8,82 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug"/>
+				<Option working_dir="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug"/>
+				<Option working_dir="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="HW_OS_PageReplacement">
-				<Option output="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/HW_OS_PageReplacement.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug"/>
+				<Option output="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/HW_OS_PageReplacement.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../mingw32/include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 HW_OS_PageReplacement"/>
-					<CompileFile command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 HW_OS_PageReplacement"/>
+					<CompileFile command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="HW_OS_PageReplacement/fast">
-				<Option output="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/HW_OS_PageReplacement.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug"/>
+				<Option output="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/HW_OS_PageReplacement.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
-					<Add directory="e:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../mingw32/include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
+					<Add directory="c:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 HW_OS_PageReplacement/fast"/>
-					<CompileFile command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 HW_OS_PageReplacement/fast"/>
+					<CompileFile command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug"/>
+				<Option working_dir="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="E:/MinGW/bin/mingw32-make.exe -f &quot;E:/GitHub/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/MinGW/bin/mingw32-make.exe -f &quot;C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="E:/GitHub/HW_OS_PageReplacement/c++/main.cpp">
+		<Unit filename="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/main.cpp">
 			<Option target="HW_OS_PageReplacement"/>
 		</Unit>
-		<Unit filename="E:/GitHub/HW_OS_PageReplacement/c++/CMakeLists.txt">
+		<Unit filename="C:/Users/Antony/Desktop/github/HW_OS_PageReplacement/c++/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>
