@@ -14,6 +14,8 @@ void RandonSample(const char *path);
 
 void LocalitySample(const char *path);
 
+void myDataSample(const char *path);
+
 void getSample(const char *path);
 
 void FIFO(const char *path, int FrameSize,TestData testData);
@@ -33,7 +35,7 @@ int main() {
     char* path = "..\\";
     getSample(path);
 
-    int FrameSize = 50;
+    int FrameSize = 5;
     TestData testData1 = Randon;
     TestData testData2 = Locality;
     //TestData testData3 = myData;
@@ -77,8 +79,18 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
         Frame[i] = 0;
     }
 
-    string OPT_Randon = "OPT_Randon.txt";
-    ofstream WriteToTXT( path + OPT_Randon);
+    string OPT;
+    switch(testData){
+        case Randon:
+            OPT = "OPT_Randon.txt";
+            break;
+        case Locality:
+            OPT = "OPT_Locality.txt";
+            break;
+        case myData:
+            break;
+    }
+    ofstream WriteToTXT( path + OPT);
 
     int pagefault = 0;
 
@@ -231,8 +243,18 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i] = 0;
     }
-    string FIFO_Randon = "FIFO_Randon.txt";
-    ofstream WriteToTXT( path + FIFO_Randon);
+    string FIFO;
+    switch(testData){
+        case Randon:
+            FIFO = "FIFO_Randon.txt";
+            break;
+        case Locality:
+            FIFO = "FIFO_Locality.txt";
+            break;
+        case myData:
+            break;
+    }
+    ofstream WriteToTXT( path + FIFO);
 
     int flag = 0;
     int pagefault = 0;
@@ -309,6 +331,23 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
 void getSample(const char *path) {
     RandonSample(path);
     LocalitySample(path);
+    myDataSample(path);
+}
+void myDataSample(const char *path) {
+    string Sample_Randon = "Sample_myData.txt";
+    ofstream fout_Randon( path + Sample_Randon);
+    if ( fout_Randon ) {
+        for(int i = 0 ; i < Numofmem_ref;i++) {
+            int RandNum = get_RandonNum(Ref_str);
+            Ref_str_RandonArray[i] = RandNum;
+            fout_Randon << RandNum;
+            fout_Randon << "\t";
+        }
+        printf("success Sample_myData.txt\n");
+        fout_Randon.close();
+    } else{
+        printf("fail Sample_myData.txt\n");
+    }
 }
 
 void LocalitySample(const char *path) {

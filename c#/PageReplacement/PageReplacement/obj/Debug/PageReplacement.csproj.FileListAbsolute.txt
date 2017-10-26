@@ -1,6 +1,0 @@
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\bin\Debug\PageReplacement.exe
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\bin\Debug\PageReplacement.pdb
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\obj\Debug\PageReplacement.csprojResolveAssemblyReference.cache
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\obj\Debug\PageReplacement.csproj.CoreCompileInputs.cache
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\obj\Debug\PageReplacement.exe
-E:\GitHub\HW_OS_PageReplacement\c#\PageReplacement\PageReplacement\obj\Debug\PageReplacement.pdb
