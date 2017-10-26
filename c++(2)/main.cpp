@@ -8,6 +8,7 @@ using namespace std;
 int get_RandonNum(int Num);
 int get_RandonLocality(int Min, int Max);
 
+enum TestData { Randon, Locality, myData};
 
 void RandonSample(const char *path);
 
@@ -15,11 +16,9 @@ void LocalitySample(const char *path);
 
 void getSample(const char *path);
 
-void FIFO_Randon(const char *path, int FrameSize);
+void FIFO(const char *path, int FrameSize,TestData testData);
 
-void FIFO_Locality(const char *path, int FrameSize);
-
-void OPT_Randon(const char *path, int FrameSize);
+void OPT(const char *path, int FrameSize, TestData testData);
 
 const int Ref_str = 350;
 const int Numofmem_ref = 75000;
@@ -34,18 +33,24 @@ int main() {
     char* path = "..\\";
     getSample(path);
 
-    int FrameSize = 5;
-    FIFO_Randon(path, FrameSize);
+    int FrameSize = 50;
+    TestData testData1 = Randon;
+    TestData testData2 = Locality;
+    //TestData testData3 = myData;
+
+    FIFO(path, FrameSize , testData1);
     //-------------------------------
-    FIFO_Locality(path, FrameSize);
+    FIFO(path, FrameSize , testData2);
     //-------------------------------
-    OPT_Randon(path, FrameSize);
+    OPT(path, FrameSize, testData1);
+    //-------------------------------
+    OPT(path, FrameSize, testData2);
 
 
     return 0;
 }
 
-void OPT_Randon(const char *path, int FrameSize) {//初始化
+void OPT(const char *path, int FrameSize, TestData testData) {//初始化
     int element_count[Ref_str];
     int element_usestate[Ref_str];
     for(int i = 0 ;i <Ref_str ;i++){
@@ -54,8 +59,18 @@ void OPT_Randon(const char *path, int FrameSize) {//初始化
     }
     //計算每一個數(0~350)出現次數
     for(int i = 0 ;i < Numofmem_ref ;i++){
-        element_count[Ref_str_RandonArray[i]] += 1;
+        switch(testData){
+            case Randon:
+                element_count[Ref_str_RandonArray[i]] += 1;
+                break;
+            case Locality:
+                element_count[Ref_str_LocalityArray[i]] += 1;
+                break;
+            case myData:
+                break;
+        }
     }
+
     //初始化
     int Frame[FrameSize];
     for(int i = 0 ; i < FrameSize ; i ++){
@@ -70,7 +85,17 @@ void OPT_Randon(const char *path, int FrameSize) {//初始化
     for(int i = 0 ;i < Numofmem_ref; i++){
         WriteToTXT << i;
         WriteToTXT << "\t";
-        int input = Ref_str_RandonArray[i];
+        int input = 0;
+        switch(testData){
+            case Randon:
+                input = Ref_str_RandonArray[i];
+                break;
+            case Locality:
+                input = Ref_str_LocalityArray[i];
+                break;
+            case myData:
+                break;
+        }
         //Ref_str_LocalityArray[0]為input範圍為 0~350 之間的數字 ，假設input為100，
         // 先檢查element_usestate[100]是否為0，
         if(element_usestate[input] == 0){//若是0則代表不在frame中
@@ -132,7 +157,18 @@ void OPT_Randon(const char *path, int FrameSize) {//初始化
                         for(int k = i ; k < Numofmem_ref ; k++){
                             //從i往後找Ref_str_LocalityArray[i~Numofmem_ref]，直到找frame[0]的元素，
                             // k - i為距離，記錄在temp_distance[j]中，並跳出。
-                            if(Ref_str_RandonArray[k] == Frame[j]){
+                            int temp = 0;
+                            switch(testData){
+                                case Randon:
+                                    temp = Ref_str_RandonArray[k];
+                                    break;
+                                case Locality:
+                                    temp = Ref_str_LocalityArray[k];
+                                    break;
+                                case myData:
+                                    break;
+                            }
+                            if( temp == Frame[j]){
                                 temp_distance[j] = k - i;
                                 break;
                             }
@@ -176,71 +212,21 @@ void OPT_Randon(const char *path, int FrameSize) {//初始化
             WriteToTXT << "\n";
         }
     }
-    printf("\nOPT Randon \tpagefault %d",pagefault);
+    switch(testData){
+        case Randon:
+            printf("\nOPT Randon \tpagefault %d",pagefault);
+            break;
+        case Locality:
+            printf("\nOPT Locality \tpagefault %d",pagefault);
+            break;
+        case myData:
+            break;
+    }
     WriteToTXT << "pagefault : ";
     WriteToTXT << pagefault;
     WriteToTXT.close();
 }
-
-void FIFO_Locality(const char *path, int FrameSize) {
-    int Frame[FrameSize];
-    for(int i = 0 ; i < FrameSize ; i ++){//初始化
-        Frame[i] = 0;
-    }
-    string FIFO_Locality = "FIFO_Locality.txt";
-    ofstream WriteToTXT( path + FIFO_Locality);
-    int flag = 0;
-    int pagefault = 0;
-    for(int i = 0 ;i < Numofmem_ref ; i++){
-        WriteToTXT << i;
-        WriteToTXT << "\t";
-        int input = Ref_str_LocalityArray[i];
-        bool check ; //check是否存在frame裡面
-        int count = 0;
-        for(int i = 0 ;i < FrameSize ;i++){
-            if( Frame[i]!= input ){
-                count++;
-            }else{
-                check = false;
-            }
-            if(count == FrameSize)
-                check = true;
-        }
-        if(check == 1){//input 不在frame中
-            int temp = Frame[flag];
-            Frame[flag] = input;
-            WriteToTXT << Frame[flag];
-            WriteToTXT << "\t";
-            for(int k = 0 ;k <FrameSize ;k++) {
-                WriteToTXT << Frame[k];
-                WriteToTXT << "\t";
-            }
-            WriteToTXT << "swap out : ";
-            WriteToTXT << temp;
-            WriteToTXT << "\n";
-            pagefault++ ;
-            flag++;
-        }
-        else{//input 在frame中
-            WriteToTXT << Frame[flag];
-            WriteToTXT << "\t";
-            for(int i = 0 ;i <FrameSize ;i++) {
-                WriteToTXT << Frame[i];
-                WriteToTXT << "\t";
-            }
-            WriteToTXT << "\n";
-        }
-        if(flag == 5){
-            flag = 0 ;
-        }
-    }
-    printf("\nFIFO Locailty \tpagefault %d",pagefault);
-    WriteToTXT << "pagefault : ";
-    WriteToTXT << pagefault;
-    WriteToTXT.close();
-}
-
-void FIFO_Randon(const char *path, int FrameSize) {
+void FIFO(const char *path, int FrameSize , TestData testData) {
     int Frame[FrameSize];
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i] = 0;
@@ -253,7 +239,17 @@ void FIFO_Randon(const char *path, int FrameSize) {
     for(int i = 0 ;i < Numofmem_ref ; i++){
         WriteToTXT << i;
         WriteToTXT << "\t";
-        int input = Ref_str_RandonArray[i];
+        int input = 0;
+        switch(testData){
+            case Randon:
+                input = Ref_str_RandonArray[i];
+                break;
+            case Locality:
+                input = Ref_str_LocalityArray[i];
+                break;
+            case myData:
+                break;
+        }
         //check是否存在frame裡面
         bool check ;
         int count = 0;
@@ -294,7 +290,17 @@ void FIFO_Randon(const char *path, int FrameSize) {
             flag = 0 ;
         }
     }
-    printf("FIFO Randon \tpagefault %d",pagefault);
+    switch(testData){
+        case Randon:
+            printf("FIFO Randon \tpagefault %d",pagefault);
+            break;
+        case Locality:
+            printf("\nFIFO Locality \tpagefault %d",pagefault);
+            break;
+        case myData:
+            break;
+    }
+
     WriteToTXT << "pagefault : ";
     WriteToTXT << pagefault;
     WriteToTXT.close();
