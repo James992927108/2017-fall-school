@@ -19,6 +19,8 @@ void FIFO_Randon(const char *path, int FrameSize);
 
 void FIFO_Locality(const char *path, int FrameSize);
 
+void OPT_Randon(const char *path, int FrameSize);
+
 const int Ref_str = 350;
 const int Numofmem_ref = 75000;
 
@@ -37,8 +39,147 @@ int main() {
     //-------------------------------
     FIFO_Locality(path, FrameSize);
     //-------------------------------
+    OPT_Randon(path, FrameSize);
+
 
     return 0;
+}
+
+void OPT_Randon(const char *path, int FrameSize) {//初始化
+    int element_count[Ref_str];
+    int element_usestate[Ref_str];
+    for(int i = 0 ;i <Ref_str ;i++){
+        element_count[i] = 0;
+        element_usestate[i] = 0;
+    }
+    //計算每一個數(0~350)出現次數
+    for(int i = 0 ;i < Numofmem_ref ;i++){
+        element_count[Ref_str_RandonArray[i]] += 1;
+    }
+    //初始化
+    int Frame[FrameSize];
+    for(int i = 0 ; i < FrameSize ; i ++){
+        Frame[i] = 0;
+    }
+
+    string OPT_Randon = "OPT_Randon.txt";
+    ofstream WriteToTXT( path + OPT_Randon);
+
+    int pagefault = 0;
+
+    for(int i = 0 ;i < Numofmem_ref; i++){
+        WriteToTXT << i;
+        WriteToTXT << "\t";
+        int input = Ref_str_RandonArray[i];
+        //Ref_str_LocalityArray[0]為input範圍為 0~350 之間的數字 ，假設input為100，
+        // 先檢查element_usestate[100]是否為0，
+        if(element_usestate[input] == 0){//若是0則代表不在frame中
+            element_usestate[input] = 1 ;//條件成立後在element_usestate[100] 設為 1，避免之後再次放入，swap out 時設為 0
+            //將input 放入 Frame中，先確定要放入哪一格Frame
+            // 即要替換哪一個
+            int swap_index = 0;
+            bool countZero = false;//預設為false ,只有找到有0的才設為true
+            // 1.確認Frame中裡面的每一元素是否有個數只剩下0的，
+            for(int j = 0 ;j < FrameSize ;j ++){
+                if(element_count[Frame[j]] == 0){
+                    swap_index = j;//記錄frame哪一個要被替換
+                    countZero = true;
+                }
+            }
+            // 2.若有個數為0，替換該元素，
+            if(countZero == true){
+                int temp_swap_index = Frame[swap_index];//紀錄要被替換得值
+                Frame[swap_index] = input;
+                element_usestate[temp_swap_index] = 0;//被替換得值 設為0 即不在 frame中
+                element_count[input]--;//確定放入後將element_count[100]個數減1
+                WriteToTXT << input;
+                WriteToTXT << "\t";
+                for(int j = 0 ;j <FrameSize ;j++) {
+                    WriteToTXT << Frame[j];
+                    WriteToTXT << "\t";
+                }
+                WriteToTXT << "zero_swap out : ";
+                WriteToTXT << temp_swap_index;
+                WriteToTXT << "\n";
+                pagefault++ ;
+            } else{// 3.如果沒有0，
+                //要先判斷是否Frame為空，判斷方式為前FrameSize的輸入ex:前5次
+                if(i < FrameSize){
+                    int temp_swap_index = Frame[i];//紀錄要被替換得值
+                    //前FrameSize的輸入若有0的判斷方式依然依序放入Frame[]中
+                    Frame[i] = input;
+                    element_usestate[temp_swap_index] = 0;
+                    element_count[input]--;//確定放入後將element_count[100]個數減1
+
+                    WriteToTXT << input;
+                    WriteToTXT << "\t";
+                    for(int j = 0 ;j <FrameSize ;j++) {
+                        WriteToTXT << Frame[j];
+                        WriteToTXT << "\t";
+                    }
+                    WriteToTXT << "small than FrameSize swap out : ";
+                    WriteToTXT << temp_swap_index;
+                    WriteToTXT << "\n";
+                    pagefault++ ;
+
+                } else{
+                    int temp_distance[FrameSize];
+                    for(int j = 0 ;j <FrameSize ;j++){
+                        temp_distance[FrameSize] = 0;
+                    }
+                    //3.1要計算frame中每一元素下一次出現距離
+                    for(int j = 0 ; j < FrameSize ; j++){//先取得frame[j]的元素
+                        for(int k = i ; k < Numofmem_ref ; k++){
+                            //從i往後找Ref_str_LocalityArray[i~Numofmem_ref]，直到找frame[0]的元素，
+                            // k - i為距離，記錄在temp_distance[j]中，並跳出。
+                            if(Ref_str_RandonArray[k] == Frame[j]){
+                                temp_distance[j] = k - i;
+                                break;
+                            }
+                        }
+                    }
+                    //替換最遠的
+                    double Max = 0;
+                    int Max_index = 0;
+                    for (int j = 0; j < FrameSize ; j++) {
+                        if(temp_distance[j] > Max){
+                            Max = temp_distance[j];
+                            Max_index = j;
+                        }
+                    }
+                    int temp_swap_index = Frame[Max_index];//紀錄要被替換得值
+
+                    Frame[Max_index] = input;//最遠被替換
+                    element_usestate[temp_swap_index] = 0;
+                    element_count[input]--;//確定放入後將element_count[100]個數減1
+
+                    WriteToTXT << Frame[Max_index];
+                    WriteToTXT << "\t";
+                    for(int j = 0 ;j <FrameSize ;j++) {
+                        WriteToTXT << Frame[j];
+                        WriteToTXT << "\t";
+                    }
+                    WriteToTXT << "Max swap out : ";
+                    WriteToTXT << temp_swap_index;
+                    WriteToTXT << "\n";
+                    pagefault++ ;
+                }
+            }
+        } else{//為1則代表在frame中，不替換
+            WriteToTXT << input;
+            WriteToTXT << "\t";
+            for(int j = 0 ;j <FrameSize ;j++) {
+                WriteToTXT << Frame[j];
+                WriteToTXT << "\t";
+            }
+            WriteToTXT << "in Frame";
+            WriteToTXT << "\n";
+        }
+    }
+    printf("\nOPT Randon \tpagefault %d",pagefault);
+    WriteToTXT << "pagefault : ";
+    WriteToTXT << pagefault;
+    WriteToTXT.close();
 }
 
 void FIFO_Locality(const char *path, int FrameSize) {
@@ -47,12 +188,12 @@ void FIFO_Locality(const char *path, int FrameSize) {
         Frame[i] = 0;
     }
     string FIFO_Locality = "FIFO_Locality.txt";
-    ofstream FIFO( path + FIFO_Locality);
+    ofstream WriteToTXT( path + FIFO_Locality);
     int flag = 0;
     int pagefault = 0;
     for(int i = 0 ;i < Numofmem_ref ; i++){
-        FIFO << i;
-        FIFO << "\t";
+        WriteToTXT << i;
+        WriteToTXT << "\t";
         int input = Ref_str_LocalityArray[i];
         bool check ; //check是否存在frame裡面
         int count = 0;
@@ -68,35 +209,35 @@ void FIFO_Locality(const char *path, int FrameSize) {
         if(check == 1){//input 不在frame中
             int temp = Frame[flag];
             Frame[flag] = input;
-            FIFO << Frame[flag];
-            FIFO << "\t";
+            WriteToTXT << Frame[flag];
+            WriteToTXT << "\t";
             for(int k = 0 ;k <FrameSize ;k++) {
-                FIFO << Frame[k];
-                FIFO << "\t";
+                WriteToTXT << Frame[k];
+                WriteToTXT << "\t";
             }
-            FIFO << "swap out : ";
-            FIFO << temp;
-            FIFO << "\n";
+            WriteToTXT << "swap out : ";
+            WriteToTXT << temp;
+            WriteToTXT << "\n";
             pagefault++ ;
             flag++;
         }
         else{//input 在frame中
-            FIFO << Frame[flag];
-            FIFO << "\t";
+            WriteToTXT << Frame[flag];
+            WriteToTXT << "\t";
             for(int i = 0 ;i <FrameSize ;i++) {
-                FIFO << Frame[i];
-                FIFO << "\t";
+                WriteToTXT << Frame[i];
+                WriteToTXT << "\t";
             }
-            FIFO << "\n";
+            WriteToTXT << "\n";
         }
         if(flag == 5){
             flag = 0 ;
         }
     }
     printf("\nFIFO Locailty \tpagefault %d",pagefault);
-    FIFO << "pagefault : ";
-    FIFO << pagefault;
-    FIFO.close();
+    WriteToTXT << "pagefault : ";
+    WriteToTXT << pagefault;
+    WriteToTXT.close();
 }
 
 void FIFO_Randon(const char *path, int FrameSize) {
@@ -105,13 +246,13 @@ void FIFO_Randon(const char *path, int FrameSize) {
         Frame[i] = 0;
     }
     string FIFO_Randon = "FIFO_Randon.txt";
-    ofstream FIFO( path + FIFO_Randon);
+    ofstream WriteToTXT( path + FIFO_Randon);
 
     int flag = 0;
     int pagefault = 0;
     for(int i = 0 ;i < Numofmem_ref ; i++){
-        FIFO << i;
-        FIFO << "\t";
+        WriteToTXT << i;
+        WriteToTXT << "\t";
         int input = Ref_str_RandonArray[i];
         //check是否存在frame裡面
         bool check ;
@@ -128,35 +269,35 @@ void FIFO_Randon(const char *path, int FrameSize) {
         if(check == 1){//input 不在frame中
             int temp = Frame[flag];
             Frame[flag] = input;
-            FIFO << Frame[flag];
-            FIFO << "\t";
+            WriteToTXT << Frame[flag];
+            WriteToTXT << "\t";
             for(int k = 0 ;k <FrameSize ;k++) {
-                FIFO << Frame[k];
-                FIFO << "\t";
+                WriteToTXT << Frame[k];
+                WriteToTXT << "\t";
             }
-            FIFO << "swap out : ";
-            FIFO << temp;
-            FIFO << "\n";
+            WriteToTXT << "swap out : ";
+            WriteToTXT << temp;
+            WriteToTXT << "\n";
             pagefault++ ;
             flag++;
         }
         else{//input 在frame中
-            FIFO << Frame[flag];
-            FIFO << "\t";
+            WriteToTXT << Frame[flag];
+            WriteToTXT << "\t";
             for(int i = 0 ;i <FrameSize ;i++) {
-                FIFO << Frame[i];
-                FIFO << "\t";
+                WriteToTXT << Frame[i];
+                WriteToTXT << "\t";
             }
-            FIFO << "\n";
+            WriteToTXT << "\n";
         }
         if(flag == 5){
             flag = 0 ;
         }
     }
     printf("FIFO Randon \tpagefault %d",pagefault);
-    FIFO << "pagefault : ";
-    FIFO << pagefault;
-    FIFO.close();
+    WriteToTXT << "pagefault : ";
+    WriteToTXT << pagefault;
+    WriteToTXT.close();
 }
 
 void getSample(const char *path) {
