@@ -334,17 +334,18 @@ void getSample(const char *path) {
     myDataSample(path);
 }
 void myDataSample(const char *path) {
-    string Sample_Randon = "Sample_myData.txt";
-    ofstream fout_Randon( path + Sample_Randon);
-    if ( fout_Randon ) {
+    string Sample_myData = "Sample_myData.txt";
+    ofstream fout( path + Sample_myData);
+    if ( fout ) {
         for(int i = 0 ; i < Numofmem_ref;i++) {
             int RandNum = get_RandonNum(Ref_str);
             Ref_str_RandonArray[i] = RandNum;
-            fout_Randon << RandNum;
-            fout_Randon << "\t";
+            fout << RandNum;
+            fout << "\t";
         }
+
         printf("success Sample_myData.txt\n");
-        fout_Randon.close();
+        fout.close();
     } else{
         printf("fail Sample_myData.txt\n");
     }
@@ -352,8 +353,8 @@ void myDataSample(const char *path) {
 
 void LocalitySample(const char *path) {
     string Sample_Locality = "Sample_Locality.txt";
-    ofstream fout_Locality( path + Sample_Locality);
-    if ( fout_Locality ) {
+    ofstream fout( path + Sample_Locality);
+    if ( fout ) {
         int Min =  Ref_str / 6 ;
         int Max =  Ref_str / 4 ;
         int count = 0 ;
@@ -364,13 +365,13 @@ void LocalitySample(const char *path) {
             for(int i = count ; i < count + LocalitySize ; i ++ ){
                 int RandNum = get_RandonLocality(LocalityStart,LocalityEnd);
                 Ref_str_LocalityArray[i] = RandNum;
-                fout_Locality << RandNum;
-                fout_Locality << "\t";
+                fout << RandNum;
+                fout << "\t";
             }
             count += LocalitySize;
         }
         printf("success Sample_Locality.txt\n");
-        fout_Locality.close();
+        fout.close();
     } else{
         printf("fail Sample_Locality\n");
     }
@@ -378,16 +379,16 @@ void LocalitySample(const char *path) {
 
 void RandonSample(const char *path) {
     string Sample_Randon = "Sample_Randon.txt";
-    ofstream fout_Randon( path + Sample_Randon);
-    if ( fout_Randon ) {
+    ofstream fout( path + Sample_Randon);
+    if ( fout ) {
         for(int i = 0 ; i < Numofmem_ref;i++) {
             int RandNum = get_RandonNum(Ref_str);
             Ref_str_RandonArray[i] = RandNum;
-            fout_Randon << RandNum;
-            fout_Randon << "\t";
+            fout << RandNum;
+            fout << "\t";
         }
         printf("success Sample_Randon.txt\n");
-        fout_Randon.close();
+        fout.close();
     } else{
         printf("fail Sample_Randon.txt\n");
     }
