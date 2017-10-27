@@ -29,6 +29,7 @@ int Ref_str_RandonArray[Numofmem_ref];
 
 int Ref_str_LocalityArray[Numofmem_ref];
 
+int Ref_str_myDataArray[Numofmem_ref];
 int main() {
     srand((unsigned)time(NULL));
 
@@ -38,16 +39,16 @@ int main() {
     int FrameSize = 5;
     TestData testData1 = Randon;
     TestData testData2 = Locality;
-    //TestData testData3 = myData;
+    TestData testData3 = myData;
 
     FIFO(path, FrameSize , testData1);
-    //-------------------------------
     FIFO(path, FrameSize , testData2);
+    FIFO(path, FrameSize , testData3);
     //-------------------------------
     OPT(path, FrameSize, testData1);
-    //-------------------------------
     OPT(path, FrameSize, testData2);
-
+    OPT(path, FrameSize, testData3);
+    //-------------------------------
 
     return 0;
 }
@@ -69,6 +70,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                 element_count[Ref_str_LocalityArray[i]] += 1;
                 break;
             case myData:
+                element_count[Ref_str_myDataArray[i]] += 1;
                 break;
         }
     }
@@ -88,6 +90,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
             OPT = "OPT_Locality.txt";
             break;
         case myData:
+            OPT = "OPT_myData.txt";
             break;
     }
     ofstream WriteToTXT( path + OPT);
@@ -106,6 +109,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                 input = Ref_str_LocalityArray[i];
                 break;
             case myData:
+                input = Ref_str_myDataArray[i];
                 break;
         }
         //Ref_str_LocalityArray[0]為input範圍為 0~350 之間的數字 ，假設input為100，
@@ -178,6 +182,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                                     temp = Ref_str_LocalityArray[k];
                                     break;
                                 case myData:
+                                    temp = Ref_str_myDataArray[k];
                                     break;
                             }
                             if( temp == Frame[j]){
@@ -232,6 +237,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
             printf("\nOPT Locality \tpagefault %d",pagefault);
             break;
         case myData:
+            printf("\nOPT myData \tpagefault %d",pagefault);
             break;
     }
     WriteToTXT << "pagefault : ";
@@ -252,6 +258,7 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
             FIFO = "FIFO_Locality.txt";
             break;
         case myData:
+            FIFO = "FIFO_myData.txt";
             break;
     }
     ofstream WriteToTXT( path + FIFO);
@@ -270,6 +277,7 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
                 input = Ref_str_LocalityArray[i];
                 break;
             case myData:
+                input = Ref_str_myDataArray[i];
                 break;
         }
         //check是否存在frame裡面
@@ -320,6 +328,7 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
             printf("\nFIFO Locality \tpagefault %d",pagefault);
             break;
         case myData:
+            printf("\nFIFO myData \tpagefault %d",pagefault);
             break;
     }
 
@@ -334,14 +343,21 @@ void getSample(const char *path) {
     myDataSample(path);
 }
 void myDataSample(const char *path) {
+    //先雖機選一個 process(0~350)然後再隨機產生一個數0 ~ 50作為一個process(0~350)執行次數做多執行50次
     string Sample_myData = "Sample_myData.txt";
     ofstream fout( path + Sample_myData);
     if ( fout ) {
-        for(int i = 0 ; i < Numofmem_ref;i++) {
-            int RandNum = get_RandonNum(Ref_str);
-            Ref_str_RandonArray[i] = RandNum;
-            fout << RandNum;
-            fout << "\t";
+        int count = 0 ;
+        int MaxRunTime = 5;
+        while (count < Numofmem_ref){
+            int process= get_RandonNum(Ref_str);//Ref_str = 350
+            int RunTime = get_RandonNum(MaxRunTime); // MaxRunTime = 5;
+            for(int i = count ; i < count + RunTime ; i ++ ){
+                Ref_str_myDataArray[i] = process;
+                fout << process;
+                fout << "\t";
+            }
+            count += RunTime;
         }
 
         printf("success Sample_myData.txt\n");
