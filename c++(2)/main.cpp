@@ -31,7 +31,7 @@ string creat_File(TestData testData, string FileName);
 int selectSampleArray(TestData testData, int i);
 
 
-void print_pagefault(const TestData &testData, const char *FileName, int pagefault);
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt);
 
 const int Ref_str = 350;
 const int Numofmem_ref = 70000;
@@ -159,10 +159,10 @@ void MyReplacement(const char *path, int FrameSize, TestData testData){
             WriteToTXT << "\n";
         }
     }
-
-    print_pagefault(testData, FileName, pagefault);
-    WriteToTXT << "pagefault : ";
-    WriteToTXT << pagefault;
+    int interrupt = pagefault;
+    print_pagefault(testData, FileName, pagefault,interrupt);
+    WriteToTXT << "pagefault : "<< pagefault << "\t";
+    WriteToTXT << "interrupt : "<< interrupt;
     WriteToTXT.close();
 
 }
@@ -176,7 +176,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
     }
     char FileName[50] = "ESC";
     ofstream WriteToTXT( path + creat_File(testData,FileName));
-    int pagefault = 0, status, flag = 0;
+    int pagefault = 0, interrupt = 0,status, flag = 0;
     int *referenceBits = (int *) malloc(sizeof(int) * FrameSize);
     int *modiftyBits = (int *) malloc(sizeof(int) * FrameSize);
     for (int i = 0; i < FrameSize; ++i) {
@@ -223,7 +223,9 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     temp_swap_index = Frame[flag];
                     Frame[flag] = input;
                     ++pagefault;
-                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyNum = get_RandonNum(2);//隨機產生0 or 1
+                    if(modiftyNum==1)
+                        ++interrupt;
                     modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 1;
                     break;
@@ -232,20 +234,23 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     temp_swap_index = Frame[flag];
                     Frame[flag] = input;
                     ++pagefault;
-                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyNum = get_RandonNum(2);//隨機產生0 or 1
+                    if(modiftyNum==1)
+                        ++interrupt;
                     modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 1;
                     break;
                 }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 0){
-                    temp_swap_index = Frame[flag];
-                    Frame[flag] = input;
-                    ++pagefault;
-                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyNum = get_RandonNum(2);//隨機產生0 or 1
+                    if(modiftyNum==1)
+                        ++interrupt;
                     modiftyBits[flag] = modiftyNum;
-                    referenceBits[flag] = 1;
+                    referenceBits[flag] = 0;
                     break;
                 }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 1){
-                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyNum = get_RandonNum(2);//隨機產生0 or 1
+                    if(modiftyNum==1)
+                        ++interrupt;
                     modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 0;
                 }
@@ -279,10 +284,10 @@ void ESC(const char *path, int FrameSize, TestData testData){
         }
     }
 
-    print_pagefault(testData, FileName, pagefault);
+    print_pagefault(testData, FileName, pagefault,interrupt);
     free(referenceBits);
-    WriteToTXT << "pagefault : ";
-    WriteToTXT << pagefault;
+    WriteToTXT << "pagefault : "<< pagefault << "\t";
+    WriteToTXT << "interrupt : "<< interrupt;
     WriteToTXT.close();
 }
 
@@ -431,9 +436,10 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
             WriteToTXT << "\n";
         }
     }
-    print_pagefault(testData, FileName, pagefault);
-    WriteToTXT << "pagefault : ";
-    WriteToTXT << pagefault;
+    int interrupt = pagefault;
+    print_pagefault(testData, FileName, pagefault,interrupt);
+    WriteToTXT << "pagefault : "<< pagefault << "\t";
+    WriteToTXT << "interrupt : "<< interrupt;
     WriteToTXT.close();
 }
 void FIFO(const char *path, int FrameSize , TestData testData) {
@@ -473,23 +479,23 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
         WriteToTXT << "\n";
     }
 
-    print_pagefault(testData, FileName, pagefault);
-
-    WriteToTXT << "pagefault : ";
-    WriteToTXT << pagefault;
+    int interrupt = pagefault;
+    print_pagefault(testData, FileName, pagefault,interrupt);
+    WriteToTXT << "pagefault : "<< pagefault << "\t";
+    WriteToTXT << "interrupt : "<< interrupt;
     WriteToTXT.close();
 }
 
-void print_pagefault(const TestData &testData, const char *FileName, int pagefault) {
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt) {
     switch(testData){
         case Randon:
-            printf("\n%s\tRandon\t\tpagefault %d",FileName,pagefault);
+            printf("\n%s\tRandon\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
             break;
         case Locality:
-            printf("\n%s\tLocality\tpagefault %d",FileName,pagefault);
+            printf("\n%s\tLocality\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
             break;
         case myData:
-            printf("\n%s\tmyData\t\tpagefault %d",FileName,pagefault);
+            printf("\n%s\tmyData\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
             break;
     }
 }
