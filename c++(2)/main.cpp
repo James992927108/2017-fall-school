@@ -23,6 +23,16 @@ void FIFO(const char *path, int FrameSize,TestData testData);
 void OPT(const char *path, int FrameSize, TestData testData);
 
 void ESC(const char *path, int FrameSize, TestData testData);
+
+void MyReplacement(const char *path, int FrameSize, TestData testData);
+
+string creat_File(TestData testData, string FileName);
+
+int selectSampleArray(TestData testData, int i);
+
+
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault);
+
 const int Ref_str = 350;
 const int Numofmem_ref = 70000;
 
@@ -34,56 +44,144 @@ int Ref_str_myDataArray[Numofmem_ref];
 int main() {
     srand((unsigned)time(NULL));
 
+    TestData testData1 = Randon;
+    TestData testData2 = Locality;
+    TestData testData3 = myData;
+    int select_algo = 0;
+    int FrameSize = 10;
     char* path = "..\\";
     getSample(path);
+
     printf("\nDataSize %d", Numofmem_ref);
-    int FrameSize = 0;
-    for(int i = 10 ;i <= 70 ; i+=10) {
-        FrameSize = i;
-        printf("\n\nFrameSize %d\n", FrameSize);
-        TestData testData1 = Randon;
-        TestData testData2 = Locality;
-        TestData testData3 = myData;
-//
+    for(FrameSize ; FrameSize <= 70 ; FrameSize+=10) {
+        printf("\n%d\n",FrameSize);
         FIFO(path, FrameSize, testData1);
-        OPT(path, FrameSize, testData1);
-        ESC(path, FrameSize, testData1);
-
-        //-------------------------------
         FIFO(path, FrameSize, testData2);
-        OPT(path, FrameSize, testData2);
-        ESC(path, FrameSize, testData2);
-        //-------------------------------
-
         FIFO(path, FrameSize, testData3);
+        OPT(path, FrameSize, testData1);
+        OPT(path, FrameSize, testData2);
         OPT(path, FrameSize, testData3);
+        ESC(path, FrameSize, testData1);
+        ESC(path, FrameSize, testData2);
         ESC(path, FrameSize, testData3);
+        MyReplacement(path, FrameSize, testData1);
+        MyReplacement(path, FrameSize, testData2);
+        MyReplacement(path, FrameSize, testData3);
     }
+    system("pause");
     return 0;
 }
+void MyReplacement(const char *path, int FrameSize, TestData testData){
+    int Frame[FrameSize];
+    for(int i = 0 ; i < FrameSize ; i ++){//初始化
+        Frame[i] = -1;
+    }
+    char FileName[50] = "MyReplacment";
+    ofstream WriteToTXT( path + creat_File(testData, FileName));
+    int pagefault = 0;
+    int status;
+    for(int i = 0 ;i < Numofmem_ref ; i++){
+        WriteToTXT << i;
+        WriteToTXT << "\t";
+        status = 0;
+        int input = 0;
+        input = selectSampleArray(testData, i);
+        int temp_swap_index = 0;
+        for (int j = 0; j < FrameSize; ++j) {
+            if (Frame[j] == input) {//存在Frame中
+                status = 1;//直接輸出不做任何事
+                break;
+            } else if (Frame[j] == -1) {//Frame中都還未使用
+                temp_swap_index = Frame[j];
+                Frame[j] = input;
+                ++pagefault;
+                status = 2;
+                break;
+            }
+        }
+        if (status == 0) {
+            //撈出Frame的元素
+            //往前比對100筆資料,如果i < 100 就從 0 開始比對
+            int FrameElementCount[FrameSize];
+            for(int j = 0 ; j < FrameSize ; j++){
+                FrameElementCount[j] = 0;
+            }
+            for(int j = 0 ; j < FrameSize ; j++) {
+                if(i>3500) {
+                    for (int k = i - 3500; k < i; k++) {
+                        if (Ref_str_RandonArray[k] == Frame[j]) {
+                            FrameElementCount[j]++;
+                        }
+                    }
+                }else{
+                    for (int k = 0 ; k < i; k++) {
+                        if (Ref_str_RandonArray[k] == Frame[j]) {
+                            FrameElementCount[j]++;
+                        }
+                    }
+                }
+            }
+            //比較FrameElementCount[]大小，替換最小的
+            int Min = 10000;
+            int Min_index = 0;
+            for(int j = 0 ;j < FrameSize ; j++){
+                if(FrameElementCount[j] < Min ){
+                    Min = FrameElementCount[j];
+                    Min_index = j;
+                }
+            }
+
+            Frame[Min_index] = input;//替換最小
+            ++pagefault;
+            WriteToTXT << input;
+            WriteToTXT << "\t";
+            for (int k = 0; k < FrameSize; ++k) {
+                WriteToTXT << Frame[k];
+                WriteToTXT << "\t";
+            }
+            WriteToTXT << "swap out : ";
+            WriteToTXT << temp_swap_index;
+            WriteToTXT << "\n";
+        }
+        else if (status == 1){
+            WriteToTXT << input;
+            WriteToTXT << "\n";
+        }
+        else if (status == 2){
+            WriteToTXT << input;
+            WriteToTXT << "\t";
+            for (int k = 0; k < FrameSize; ++k) {
+                WriteToTXT << Frame[k];
+                WriteToTXT << "\t";
+            }
+            WriteToTXT << "swap out : ";
+            WriteToTXT << temp_swap_index;
+            WriteToTXT << "\n";
+        }
+    }
+
+    print_pagefault(testData, FileName, pagefault);
+    WriteToTXT << "pagefault : ";
+    WriteToTXT << pagefault;
+    WriteToTXT.close();
+
+}
+
+
 void ESC(const char *path, int FrameSize, TestData testData){
 
     int Frame[FrameSize];
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i]= -1;
     }
-    string ESC;
-    switch(testData){
-        case Randon:
-            ESC = "ESC_Randon.txt";
-            break;
-        case Locality:
-            ESC = "ESC_Locality.txt";
-            break;
-        case myData:
-            ESC = "ESC_myData.txt";
-            break;
-    }
-    ofstream WriteToTXT( path + ESC);
+    char FileName[50] = "ESC";
+    ofstream WriteToTXT( path + creat_File(testData,FileName));
     int pagefault = 0, status, flag = 0;
     int *referenceBits = (int *) malloc(sizeof(int) * FrameSize);
+    int *modiftyBits = (int *) malloc(sizeof(int) * FrameSize);
     for (int i = 0; i < FrameSize; ++i) {
         referenceBits[i] = 0;
+        modiftyBits[i] = 0;
     }
 
     for (int i = 0; i < Numofmem_ref; ++i) {
@@ -91,17 +189,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
         WriteToTXT << "\t";
         status = 0;
         int input = 0;
-        switch(testData){
-            case Randon:
-                input = Ref_str_RandonArray[i];
-                break;
-            case Locality:
-                input = Ref_str_LocalityArray[i];
-                break;
-            case myData:
-                input = Ref_str_myDataArray[i];
-                break;
-        }
+        input = selectSampleArray(testData, i);
         //先段判是是否在Frame中，
         // 若在
         //    則將referenceBits設為1，直接輸出
@@ -110,14 +198,19 @@ void ESC(const char *path, int FrameSize, TestData testData){
         // 若不在
         //    看referencebit為0 or 1，找維0的替換
         int temp_swap_index = 0;
+        int modiftyNum = 0;
         for (int j = 0; j < FrameSize; ++j) {
             if (Frame[j] == input) {
+                modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                modiftyBits[j] = modiftyNum;
                 referenceBits[j] = 1;
                 status = 1;//直接輸出不做任何事
                 break;
             } else if (Frame[j] == -1) {//Frame中都還未使用
                 temp_swap_index = Frame[j];
                 Frame[j] = input;
+                modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                modiftyBits[j] = modiftyNum;
                 referenceBits[j] = 1;
                 ++pagefault;
                 status = 2;
@@ -126,13 +219,34 @@ void ESC(const char *path, int FrameSize, TestData testData){
         }
         if (status == 0) {
             while (1) {
-                if (referenceBits[flag] == 0) {
+                if (referenceBits[flag] == 0 && modiftyBits[flag] == 0) {
                     temp_swap_index = Frame[flag];
                     Frame[flag] = input;
                     ++pagefault;
+                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 1;
                     break;
-                } else {
+                }
+                else if(referenceBits[flag] == 0 && modiftyBits[flag] == 1){
+                    temp_swap_index = Frame[flag];
+                    Frame[flag] = input;
+                    ++pagefault;
+                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyBits[flag] = modiftyNum;
+                    referenceBits[flag] = 1;
+                    break;
+                }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 0){
+                    temp_swap_index = Frame[flag];
+                    Frame[flag] = input;
+                    ++pagefault;
+                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyBits[flag] = modiftyNum;
+                    referenceBits[flag] = 1;
+                    break;
+                }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 1){
+                    modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                    modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 0;
                 }
                 flag = (flag + 1) % FrameSize;
@@ -165,17 +279,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
         }
     }
 
-    switch(testData){
-        case Randon:
-            printf("\nESC\tRandon\t\tpagefault %d",pagefault);
-            break;
-        case Locality:
-            printf("\nESC\tLocality\tpagefault %d",pagefault);
-            break;
-        case myData:
-            printf("\nESC\tmyData\t\tpagefault %d",pagefault);
-            break;
-    }
+    print_pagefault(testData, FileName, pagefault);
     free(referenceBits);
     WriteToTXT << "pagefault : ";
     WriteToTXT << pagefault;
@@ -210,19 +314,8 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
         Frame[i] = 0;
     }
 
-    string OPT;
-    switch(testData){
-        case Randon:
-            OPT = "OPT_Randon.txt";
-            break;
-        case Locality:
-            OPT = "OPT_Locality.txt";
-            break;
-        case myData:
-            OPT = "OPT_myData.txt";
-            break;
-    }
-    ofstream WriteToTXT( path + OPT);
+    char FileName[50] = "OPT";
+    ofstream WriteToTXT( path + creat_File(testData,FileName));
 
     int pagefault = 0;
 
@@ -230,17 +323,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
         WriteToTXT << i;
         WriteToTXT << "\t";
         int input = 0;
-        switch(testData){
-            case Randon:
-                input = Ref_str_RandonArray[i];
-                break;
-            case Locality:
-                input = Ref_str_LocalityArray[i];
-                break;
-            case myData:
-                input = Ref_str_myDataArray[i];
-                break;
-        }
+        input = selectSampleArray(testData, i);
         //Ref_str_LocalityArray[0]為input範圍為 0~350 之間的數字 ，假設input為100，
         // 先檢查element_usestate[100]是否為0，
         if(element_usestate[input] == 0){//若是0則代表不在frame中
@@ -268,7 +351,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                     WriteToTXT << Frame[j];
                     WriteToTXT << "\t";
                 }
-                WriteToTXT << "zero_swap out : ";
+                WriteToTXT << "swap out : ";
                 WriteToTXT << temp_swap_index;
                 WriteToTXT << "\n";
                 pagefault++ ;
@@ -287,7 +370,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                         WriteToTXT << Frame[j];
                         WriteToTXT << "\t";
                     }
-                    WriteToTXT << "small than FrameSize swap out : ";
+                    WriteToTXT << "swap out : ";
                     WriteToTXT << temp_swap_index;
                     WriteToTXT << "\n";
                     pagefault++ ;
@@ -303,17 +386,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                             //從i往後找Ref_str_LocalityArray[i~Numofmem_ref]，直到找frame[0]的元素，
                             // k - i為距離，記錄在temp_distance[j]中，並跳出。
                             int temp = 0;
-                            switch(testData){
-                                case Randon:
-                                    temp = Ref_str_RandonArray[k];
-                                    break;
-                                case Locality:
-                                    temp = Ref_str_LocalityArray[k];
-                                    break;
-                                case myData:
-                                    temp = Ref_str_myDataArray[k];
-                                    break;
-                            }
+                            temp = selectSampleArray(testData, k);
                             if( temp == Frame[j]){
                                 temp_distance[j] = k - i;
                                 break;
@@ -341,7 +414,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
                         WriteToTXT << Frame[j];
                         WriteToTXT << "\t";
                     }
-                    WriteToTXT << "Max swap out : ";
+                    WriteToTXT << "swap out : ";
                     WriteToTXT << temp_swap_index;
                     WriteToTXT << "\n";
                     pagefault++ ;
@@ -358,18 +431,7 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
             WriteToTXT << "\n";
         }
     }
-    switch(testData){
-        case Randon:
-            printf("\nOPT\tRandon\t\tpagefault %d",pagefault);
-            break;
-        case Locality:
-            printf("\nOPT\tLocality\tpagefault %d",pagefault);
-            break;
-        case myData:
-            printf("\nOPT\tmyData\t\tpagefault %d",pagefault);
-            break;
-            break;
-    }
+    print_pagefault(testData, FileName, pagefault);
     WriteToTXT << "pagefault : ";
     WriteToTXT << pagefault;
     WriteToTXT.close();
@@ -379,40 +441,21 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i] = 0;
     }
-    string FIFO;
-    switch(testData){
-        case Randon:
-            FIFO = "FIFO_Randon.txt";
-            break;
-        case Locality:
-            FIFO = "FIFO_Locality.txt";
-            break;
-        case myData:
-            FIFO = "FIFO_myData.txt";
-            break;
-    }
-    ofstream WriteToTXT( path + FIFO);
+    char FileName[50] = "FIFO";
+    ofstream WriteToTXT( path + creat_File(testData,FileName));
     int flag = 0;
     int pagefault = 0;
+    int swap_out_temp = 0;
     for(int i = 0 ;i < Numofmem_ref ; i++){
         WriteToTXT << i;
         WriteToTXT << "\t";
         int input = 0;
-        switch(testData){
-            case Randon:
-                input = Ref_str_RandonArray[i];
-                break;
-            case Locality:
-                input = Ref_str_LocalityArray[i];
-                break;
-            case myData:
-                input = Ref_str_myDataArray[i];
-                break;
-        }
+        input = selectSampleArray(testData, i);
         for (int j = 0; j < FrameSize; ++j) {
             if (Frame[j] == input) goto out;
         }
         ++pagefault;
+        swap_out_temp = Frame[flag];
         Frame[flag] = input;
         flag = (flag + 1) % FrameSize;
         WriteToTXT << input;
@@ -421,27 +464,66 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
             WriteToTXT << Frame[k];
             WriteToTXT << "\t";
         }
+        WriteToTXT << "Swap out : ";
+        WriteToTXT << swap_out_temp;
         WriteToTXT << "\n";
         continue;
         out:;
         WriteToTXT << input;
         WriteToTXT << "\n";
     }
-    switch(testData){
-        case Randon:
-            printf("\nFIFO\tRandon\t\tpagefault %d",pagefault);
-            break;
-        case Locality:
-            printf("\nFIFO\tLocality\tpagefault %d",pagefault);
-            break;
-        case myData:
-            printf("\nFIFO\tmyData\t\tpagefault %d",pagefault);
-            break;
-    }
+
+    print_pagefault(testData, FileName, pagefault);
 
     WriteToTXT << "pagefault : ";
     WriteToTXT << pagefault;
     WriteToTXT.close();
+}
+
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault) {
+    switch(testData){
+        case Randon:
+            printf("\n%s\tRandon\t\tpagefault %d",FileName,pagefault);
+            break;
+        case Locality:
+            printf("\n%s\tLocality\tpagefault %d",FileName,pagefault);
+            break;
+        case myData:
+            printf("\n%s\tmyData\t\tpagefault %d",FileName,pagefault);
+            break;
+    }
+}
+
+int selectSampleArray(TestData testData, int i) {
+    int input;
+    switch(testData){
+        case Randon:
+            input = Ref_str_RandonArray[i];
+            break;
+        case Locality:
+            input = Ref_str_LocalityArray[i];
+            break;
+        case myData:
+            input = Ref_str_myDataArray[i];
+            break;
+    }
+    return input;
+}
+
+string creat_File(TestData testData, string FileName) {
+    string FileNameAndtestData;
+    switch(testData){
+        case Randon:
+            FileNameAndtestData = FileName + "_Randon.txt";
+            break;
+        case Locality:
+            FileNameAndtestData = FileName + "_Locality.txt";
+            break;
+        case myData:
+            FileNameAndtestData = FileName + "_myData.txt";
+            break;
+    }
+    return FileNameAndtestData;
 }
 
 void getSample(const char *path) {
