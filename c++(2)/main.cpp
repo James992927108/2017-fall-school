@@ -48,25 +48,62 @@ int main() {
     TestData testData2 = Locality;
     TestData testData3 = myData;
     int select_algo = 0;
-    int FrameSize = 10;
+    int FrameSize = 0;
     char* path = "..\\";
     getSample(path);
 
+    printf("0->FIFO\n");
+    printf("1->OPT\n");
+    printf("2->SEC\n");
+    printf("3->MyReplacement\n");
+    printf("4->all\n");
+    printf("Please select algorithm\n");
+    scanf("%d",&select_algo);
+    if(select_algo!=4){
+        printf("Please enter FrameSize(10,20,30,40,50,60,70)\n");
+        scanf("%d",&FrameSize);
+        if(FrameSize == 0){
+            FrameSize = 10;
+        }
+    }
     printf("\nDataSize %d", Numofmem_ref);
-    for(FrameSize ; FrameSize <= 70 ; FrameSize+=10) {
-        printf("\n%d\n",FrameSize);
-        FIFO(path, FrameSize, testData1);
-        FIFO(path, FrameSize, testData2);
-        FIFO(path, FrameSize, testData3);
-        OPT(path, FrameSize, testData1);
-        OPT(path, FrameSize, testData2);
-        OPT(path, FrameSize, testData3);
-        ESC(path, FrameSize, testData1);
-        ESC(path, FrameSize, testData2);
-        ESC(path, FrameSize, testData3);
-        MyReplacement(path, FrameSize, testData1);
-        MyReplacement(path, FrameSize, testData2);
-        MyReplacement(path, FrameSize, testData3);
+    switch (select_algo){
+        case 0:
+            FIFO(path, FrameSize, testData1);
+            FIFO(path, FrameSize, testData2);
+            FIFO(path, FrameSize, testData3);
+            break;
+        case 1:
+            OPT(path, FrameSize, testData1);
+            OPT(path, FrameSize, testData2);
+            OPT(path, FrameSize, testData3);
+            break;
+        case 2:
+            ESC(path, FrameSize, testData1);
+            ESC(path, FrameSize, testData2);
+            ESC(path, FrameSize, testData3);
+            break;
+        case 3:
+            break;
+        case 4:
+            for(int i = 10 ;i <= 70 ; i+=10) {
+                FrameSize = i;
+                printf("\n\nFrameSize %d\n", FrameSize);
+
+                FIFO(path, FrameSize, testData1);
+                OPT(path, FrameSize, testData1);
+                ESC(path, FrameSize, testData1);
+
+                //-------------------------------
+                FIFO(path, FrameSize, testData2);
+                OPT(path, FrameSize, testData2);
+                ESC(path, FrameSize, testData2);
+                //-------------------------------
+
+                FIFO(path, FrameSize, testData3);
+                OPT(path, FrameSize, testData3);
+                ESC(path, FrameSize, testData3);
+            }
     }
     system("pause");
     return 0;
@@ -130,7 +167,7 @@ void MyReplacement(const char *path, int FrameSize, TestData testData){
                     Min_index = j;
                 }
             }
-
+            temp_swap_index = Frame[Min_index];
             Frame[Min_index] = input;//替換最小
             ++pagefault;
             WriteToTXT << input;
@@ -241,6 +278,9 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     referenceBits[flag] = 1;
                     break;
                 }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 0){
+                    temp_swap_index = Frame[flag];
+                    Frame[flag] = input;
+                    ++pagefault;
                     modiftyNum = get_RandonNum(2);//隨機產生0 or 1
                     if(modiftyNum==1)
                         ++interrupt;
