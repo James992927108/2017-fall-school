@@ -84,6 +84,9 @@ int main() {
             ESC(path, FrameSize, testData3);
             break;
         case 3:
+            MyReplacement(path, FrameSize, testData1);
+            MyReplacement(path, FrameSize, testData2);
+            MyReplacement(path, FrameSize, testData3);
             break;
         case 4:
             for(int i = 10 ;i <= 70 ; i+=10) {
@@ -93,16 +96,18 @@ int main() {
                 FIFO(path, FrameSize, testData1);
                 OPT(path, FrameSize, testData1);
                 ESC(path, FrameSize, testData1);
-
+                MyReplacement(path, FrameSize, testData1);
                 //-------------------------------
                 FIFO(path, FrameSize, testData2);
                 OPT(path, FrameSize, testData2);
                 ESC(path, FrameSize, testData2);
+                MyReplacement(path, FrameSize, testData2);
                 //-------------------------------
-
                 FIFO(path, FrameSize, testData3);
                 OPT(path, FrameSize, testData3);
                 ESC(path, FrameSize, testData3);
+                MyReplacement(path, FrameSize, testData2);
+
             }
     }
     system("pause");
@@ -247,6 +252,8 @@ void ESC(const char *path, int FrameSize, TestData testData){
                 temp_swap_index = Frame[j];
                 Frame[j] = input;
                 modiftyNum = get_RandonNum(1);//隨機產生0 or 1
+                if(modiftyNum==1)
+                    ++interrupt;
                 modiftyBits[j] = modiftyNum;
                 referenceBits[j] = 1;
                 ++pagefault;
@@ -256,6 +263,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
         }
         if (status == 0) {
             while (1) {
+//                printf("\n%d\t%d\t%d\n",flag,referenceBits[flag],modiftyBits[flag]);
                 if (referenceBits[flag] == 0 && modiftyBits[flag] == 0) {
                     temp_swap_index = Frame[flag];
                     Frame[flag] = input;
@@ -267,26 +275,18 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     referenceBits[flag] = 1;
                     break;
                 }
-                else if(referenceBits[flag] == 0 && modiftyBits[flag] == 1){
-                    temp_swap_index = Frame[flag];
-                    Frame[flag] = input;
-                    ++pagefault;
+                else if(referenceBits[flag] == 0 && modiftyBits[flag] == 1){//
                     modiftyNum = get_RandonNum(2);//隨機產生0 or 1
                     if(modiftyNum==1)
                         ++interrupt;
                     modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 1;
-                    break;
                 }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 0){
-                    temp_swap_index = Frame[flag];
-                    Frame[flag] = input;
-                    ++pagefault;
                     modiftyNum = get_RandonNum(2);//隨機產生0 or 1
                     if(modiftyNum==1)
                         ++interrupt;
                     modiftyBits[flag] = modiftyNum;
                     referenceBits[flag] = 0;
-                    break;
                 }else if(referenceBits[flag] == 1 && modiftyBits[flag] == 1){
                     modiftyNum = get_RandonNum(2);//隨機產生0 or 1
                     if(modiftyNum==1)
@@ -295,8 +295,10 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     referenceBits[flag] = 0;
                 }
                 flag = (flag + 1) % FrameSize;
+//                printf("\n--%d",flag);
             }
             flag = (flag + 1) % FrameSize;
+//            printf("\n**%d",flag);
             WriteToTXT << input;
             WriteToTXT << "\t";
             for (int k = 0; k < FrameSize; ++k) {
