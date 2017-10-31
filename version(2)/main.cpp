@@ -15,9 +15,36 @@ struct GloabStruct{
     double GloabParticle[Dimension];
     double GloabFitness = 0;
 };
+
 double get_Randon(double Min, double Max){
     double rand_num = (Max - Min) * rand() / RAND_MAX + (Min);
     return rand_num;
+}
+double cal_Fitness(ParticleStruct ParticleArray_index){
+    int temp = 10 * Dimension;
+    double temp1 = 0;
+    for (int i = 0; i < Dimension; i++) {
+        double xi_square = ParticleArray_index.Particle[i] * ParticleArray_index.Particle[i];
+        double yi = 10 * cos(2 * M_PI * ParticleArray_index.Particle[i]);
+        temp1 = temp1 + (xi_square - yi);
+    }
+    return  temp + temp1;
+}
+void print_ParticleArray(int ParticleSize,ParticleStruct ParticleArray[]){
+    for (int i = 0; i < ParticleSize; i++) {
+        printf("\n%d\t", i);
+        for (int j = 0; j < Dimension; j++) {
+            printf("%f\t", ParticleArray[i].Particle[j]);
+        }
+        printf("%f\t", ParticleArray[i].Fitness);
+        for (int j = 0; j < Dimension; j++) {
+            printf("%f\t", ParticleArray[i].BestParticle[j]);
+        }
+        printf("%f\t", ParticleArray[i].BestFitness);
+        for (int j = 0; j < Dimension; j++) {
+            printf("%f\t", ParticleArray[i].Speed[j]);
+        }
+    }
 }
 
 int main() {
@@ -54,18 +81,11 @@ int main() {
         }
     }
     //----------------------------------------------------------------------------
-    for(int RunTime = 0 ; RunTime < 10000 ;RunTime++) {
+    for(int RunTime = 0 ; RunTime < 100 ;RunTime++) {
         //計算ParticleArray中每一個Fitness
         //fitness = 10d +sum (particle[d]*particle[d] - 10 cos(2 pi * particle[d])
         for (int index = 0; index < ParticleSize; index++) {
-            int temp = 10 * Dimension;
-            double temp1 = 0;
-            for (int i = 0; i < Dimension; i++) {
-                double xi_square = ParticleArray[index].Particle[i] * ParticleArray[index].Particle[i];
-                double yi = 10 * cos(2 * M_PI * ParticleArray[index].Particle[i]);
-                temp1 = temp1 + (xi_square - yi);
-            }
-            ParticleArray[index].Fitness = temp + temp1;
+            ParticleArray[index].Fitness = cal_Fitness(ParticleArray[index]);
         }
         //----------------------------------------------------------------------------
 
@@ -120,25 +140,13 @@ int main() {
         //----------------------------------------------------------------------------
 
         //印出ParticleArray
-        for (int i = 0; i < ParticleSize; i++) {
-            printf("\n%d\t", i);
-            for (int j = 0; j < Dimension; j++) {
-                printf("%f\t", ParticleArray[i].Particle[j]);
-            }
-            printf("%f\t", ParticleArray[i].Fitness);
-            for (int j = 0; j < Dimension; j++) {
-                printf("%f\t", ParticleArray[i].BestParticle[j]);
-            }
-            printf("%f\t", ParticleArray[i].BestFitness);
-            for (int j = 0; j < Dimension; j++) {
-                printf("%f\t", ParticleArray[i].Speed[j]);
-            }
-        }
+        print_ParticleArray(ParticleSize,ParticleArray);
     }
-    printf("\nGloab\n");
+    printf("\nGloabParticle\n");
     for(int i = 0 ;i < Dimension ; i++){
         printf("%f\t",Gloab.GloabParticle[i]);
     }
+    printf("\nGloabFitness\n");
     printf("%f\t",Gloab.GloabFitness);
 
     //----------------------------------------------------------------------------
