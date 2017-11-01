@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/PSO.dir/main.cpp.o"
+  "CMakeFiles/PSO.dir/main.cpp.obj"
   "PSO.pdb"
-  "PSO"
+  "PSO.exe"
+  "PSO.exe.manifest"
+  "libPSO.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

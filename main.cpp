@@ -1,27 +1,28 @@
 #include <iostream>
 #include <cmath>
-//#include <process.h>
+#include <process.h>
 #include <time.h>
-#include <zconf.h>
+//#include <zconf.h>
 
-const int Dimension = 2;
-struct ParticleStruct{
+const int Dimension = 10;
+struct ParticleStruct {
     double Particle[Dimension];
     double Fitness = 0;
     double BestParticle[Dimension];
     double BestFitness = 0;
     double Speed[Dimension];
 };
-struct GloabStruct{
+struct GloabStruct {
     double GloabParticle[Dimension];
     double GloabFitness = 0;
 };
 
-double get_Randon(double Min, double Max){
+double get_Randon(double Min, double Max) {
     double rand_num = (Max - Min) * rand() / RAND_MAX + (Min);
     return rand_num;
 }
-double cal_Fitness(ParticleStruct ParticleArray_index){
+
+double cal_Fitness(ParticleStruct ParticleArray_index) {
     int temp = 10 * Dimension;
     double temp1 = 0;
     for (int i = 0; i < Dimension; i++) {
@@ -29,9 +30,10 @@ double cal_Fitness(ParticleStruct ParticleArray_index){
         double yi = 10 * cos(2 * M_PI * ParticleArray_index.Particle[i]);
         temp1 = temp1 + (xi_square - yi);
     }
-    return  temp + temp1;
+    return temp + temp1;
 }
-void print_ParticleArray(int ParticleSize,ParticleStruct ParticleArray[]){
+
+void print_ParticleArray(int ParticleSize, ParticleStruct ParticleArray[]) {
     for (int i = 0; i < ParticleSize; i++) {
         printf("\n%d\t", i);
         for (int j = 0; j < Dimension; j++) {
@@ -49,23 +51,22 @@ void print_ParticleArray(int ParticleSize,ParticleStruct ParticleArray[]){
 }
 
 int main() {
-
     srand((unsigned) time(NULL) + getpid());
-    time_t start,finish;
+    time_t start, finish;
     start = clock();
-    int RunTime = 1000000;
-    int ParticleSize = 20 ;    //宣告一個一個大小維20的array or vector 使用ParticleStruct 型態
+    int RunTime = 1000;
+    int ParticleSize = 100;    //宣告一個一個大小維20的array or vector 使用ParticleStruct 型態
     ParticleStruct ParticleArray[ParticleSize];
     GloabStruct Gloab;
     //----------------------------------------------------------------------------
     //inital ParticleArray
-    for(int i = 0 ;i <ParticleSize ; i++) {
+    for (int i = 0; i < ParticleSize; i++) {
         for (int j = 0; j < Dimension; j++) {
-           ParticleArray[i].Particle[j] = 0;
+            ParticleArray[i].Particle[j] = 0;
         }
         ParticleArray[i].Fitness = 0;
         for (int j = 0; j < Dimension; j++) {
-             ParticleArray[i].BestParticle[j] = 0;
+            ParticleArray[i].BestParticle[j] = 0;
         }
         ParticleArray[i].BestFitness = 1000;
         for (int j = 0; j < Dimension; j++) {
@@ -73,20 +74,20 @@ int main() {
         }
     }
     // intital Gloab
-    for(int i = 0 ;i < Dimension ; i++){
-        Gloab.GloabParticle[i] = 0 ;
+    for (int i = 0; i < Dimension; i++) {
+        Gloab.GloabParticle[i] = 0;
     }
     Gloab.GloabFitness = 1000;
 
     //----------------------------------------------------------------------------
     //取得ParticleArray中每一個particle的每一維度資料
-    for(int i = 0 ; i < ParticleSize ;i ++){
-        for(int j = 0;j < Dimension ; j++) {
-            ParticleArray[i].Particle[j] = get_Randon(-5.12 , 5.12);
+    for (int i = 0; i < ParticleSize; i++) {
+        for (int j = 0; j < Dimension; j++) {
+            ParticleArray[i].Particle[j] = get_Randon(-5.12, 5.12);
         }
     }
     //----------------------------------------------------------------------------
-    for(int i1 = 0 ; i1 < RunTime ;i1++) {
+    for (int i1 = 0; i1 < RunTime; i1++) {
         //計算ParticleArray中每一個Fitness
         //fitness = 10d +sum (particle[d]*particle[d] - 10 cos(2 pi * particle[d])
         for (int index = 0; index < ParticleSize; index++) {
@@ -118,8 +119,8 @@ int main() {
             }
         }
 
-        int w = 1;
-        double c1 = 0.4, c2 = 0.4;
+        double w = 1;
+        double c1 = 0.5, c2 = 0.4;
         //----------------------------------------------------------------------------
         //更新ParticleArray[i].Particle[j]對應的ParticleArray[i].Speed[j]
         for (int i = 0; i < ParticleSize; i++) {
@@ -145,18 +146,19 @@ int main() {
         //----------------------------------------------------------------------------
 
         //印出ParticleArray
-        //print_ParticleArray(ParticleSize,ParticleArray);
     }
+    print_ParticleArray(ParticleSize,ParticleArray);
+
     printf("\nGloabParticle\n");
-    for(int i = 0 ;i < Dimension ; i++){
-        printf("%f\t",Gloab.GloabParticle[i]);
+    for (int i = 0; i < Dimension; i++) {
+        printf("%f\t", Gloab.GloabParticle[i]);
     }
     printf("\nGloabFitness\n");
-    printf("%f\t",Gloab.GloabFitness);
+    printf("%f\t", Gloab.GloabFitness);
 
     finish = clock(); //结束
-    double duration = ((double)(finish-start))/CLOCKS_PER_SEC; // 计算时间
-    printf("\ntime :%lfs.\n",duration);
+    double duration = ((double) (finish - start)) / CLOCKS_PER_SEC; // 计算时间
+    printf("\ntime :%lfs.\n", duration);
 
     //----------------------------------------------------------------------------
     return 0;
