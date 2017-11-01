@@ -31,7 +31,7 @@ string creat_File(TestData testData, string FileName);
 int selectSampleArray(TestData testData, int i);
 
 
-void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt);
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt,int DiskWrite);
 
 const int Ref_str = 350;
 const int Numofmem_ref = 70000;
@@ -106,8 +106,7 @@ int main() {
                 FIFO(path, FrameSize, testData3);
                 OPT(path, FrameSize, testData3);
                 ESC(path, FrameSize, testData3);
-                MyReplacement(path, FrameSize, testData2);
-
+                MyReplacement(path, FrameSize, testData3);
             }
     }
     system("pause");
@@ -118,7 +117,7 @@ void MyReplacement(const char *path, int FrameSize, TestData testData){
     for(int i = 0 ; i < FrameSize ; i ++){//初始化
         Frame[i] = -1;
     }
-    char FileName[50] = "MyReplacment";
+    char FileName[50] = "MyAlgo";
     ofstream WriteToTXT( path + creat_File(testData, FileName));
     int pagefault = 0;
     int status;
@@ -201,10 +200,12 @@ void MyReplacement(const char *path, int FrameSize, TestData testData){
             WriteToTXT << "\n";
         }
     }
-    int interrupt = pagefault;
-    print_pagefault(testData, FileName, pagefault,interrupt);
+    int interrupt = pagefault * 2;
+    int DiskWrite = pagefault ;
+    print_pagefault(testData, FileName, pagefault,interrupt,DiskWrite);
     WriteToTXT << "pagefault : "<< pagefault << "\t";
-    WriteToTXT << "interrupt : "<< interrupt;
+    WriteToTXT << "interrupt : "<< interrupt << "\t";
+    WriteToTXT << "DiskWrite : "<< DiskWrite;
     WriteToTXT.close();
 
 }
@@ -218,7 +219,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
     }
     char FileName[50] = "ESC";
     ofstream WriteToTXT( path + creat_File(testData,FileName));
-    int pagefault = 0, interrupt = 0,status, flag = 0;
+    int pagefault = 0, interrupt = 0, DiskWrite = 0,status, flag = 0;
     int *referenceBits = (int *) malloc(sizeof(int) * FrameSize);
     int *modiftyBits = (int *) malloc(sizeof(int) * FrameSize);
     for (int i = 0; i < FrameSize; ++i) {
@@ -295,6 +296,7 @@ void ESC(const char *path, int FrameSize, TestData testData){
                     referenceBits[flag] = 0;
                 }
                 flag = (flag + 1) % FrameSize;
+                ++interrupt;
 //                printf("\n--%d",flag);
             }
             flag = (flag + 1) % FrameSize;
@@ -325,11 +327,12 @@ void ESC(const char *path, int FrameSize, TestData testData){
             WriteToTXT << "\n";
         }
     }
-
-    print_pagefault(testData, FileName, pagefault,interrupt);
+    DiskWrite = interrupt - pagefault ;
+    print_pagefault(testData, FileName, pagefault,interrupt,DiskWrite);
     free(referenceBits);
     WriteToTXT << "pagefault : "<< pagefault << "\t";
-    WriteToTXT << "interrupt : "<< interrupt;
+    WriteToTXT << "interrupt : "<< interrupt << "\t";
+    WriteToTXT << "DiskWrite : "<< DiskWrite ;
     WriteToTXT.close();
 }
 
@@ -478,10 +481,12 @@ void OPT(const char *path, int FrameSize, TestData testData) {//初始化
             WriteToTXT << "\n";
         }
     }
-    int interrupt = pagefault;
-    print_pagefault(testData, FileName, pagefault,interrupt);
+    int interrupt = pagefault * 2;
+    int DiskWrite = pagefault ;
+    print_pagefault(testData, FileName, pagefault,interrupt,DiskWrite);
     WriteToTXT << "pagefault : "<< pagefault << "\t";
-    WriteToTXT << "interrupt : "<< interrupt;
+    WriteToTXT << "interrupt : "<< interrupt << "\t";
+    WriteToTXT << "DiskWrite : "<< DiskWrite;
     WriteToTXT.close();
 }
 void FIFO(const char *path, int FrameSize , TestData testData) {
@@ -521,24 +526,35 @@ void FIFO(const char *path, int FrameSize , TestData testData) {
         WriteToTXT << "\n";
     }
 
-    int interrupt = pagefault;
-    print_pagefault(testData, FileName, pagefault,interrupt);
+    int interrupt = pagefault * 2;
+    int DiskWrite = pagefault ;
+    print_pagefault(testData, FileName, pagefault,interrupt,DiskWrite);
     WriteToTXT << "pagefault : "<< pagefault << "\t";
-    WriteToTXT << "interrupt : "<< interrupt;
+    WriteToTXT << "interrupt : "<< interrupt << "\t";
+    WriteToTXT << "DiskWrite : "<< DiskWrite;
     WriteToTXT.close();
 }
 
-void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt) {
+void print_pagefault(const TestData &testData, const char *FileName, int pagefault,int interrupt,int DiskWrite) {
     switch(testData){
         case Randon:
-            printf("\n%s\tRandon\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+            printf("\n%s\t\tRandon\t%d\t%d\t%d",FileName,pagefault,interrupt,DiskWrite);
             break;
         case Locality:
-            printf("\n%s\tLocality\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+            printf("\n%s\t\tLocality\t%d\t%d\t%d",FileName,pagefault,interrupt,DiskWrite);
             break;
         case myData:
-            printf("\n%s\tmyData\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+            printf("\n%s\t\tmyData\t%d\t%d\t%d",FileName,pagefault,interrupt,DiskWrite);
             break;
+//        case Randon:
+//            printf("\n%s\tRandon\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+//            break;
+//        case Locality:
+//            printf("\n%s\tLocality\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+//            break;
+//        case myData:
+//            printf("\n%s\tmyData\t\tpagefault %d\t interrupt %d",FileName,pagefault,interrupt);
+//            break;
     }
 }
 
