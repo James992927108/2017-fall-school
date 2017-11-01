@@ -1,3 +1,0 @@
-E:/GitHub/PSO/version(2)/cmake-build-debug/CMakeFiles/version_2_.dir
-E:/GitHub/PSO/version(2)/cmake-build-debug/CMakeFiles/edit_cache.dir
-E:/GitHub/PSO/version(2)/cmake-build-debug/CMakeFiles/rebuild_cache.dir
