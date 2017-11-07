@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows;
 //1.匯入命名空間System.Drawing
 using System.Drawing;
 using System.IO;
@@ -70,23 +71,15 @@ namespace WindowsFormsApp1
             string line;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                System.IO.StreamReader file = new
-                    System.IO.StreamReader(openFileDialog1.FileName);
-                //FileStream fileStream = new FileStream(@"..\aaaa.txt", FileMode.Create);
-                //fileStream.Close();
-                //StreamWriter sw = new StreamWriter(@"..\aaaa.txt");
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
                 while ((line = file.ReadLine()) != null)
                 {
                     string[] lineArray = line.Select(o => o.ToString()).ToArray();
                     if (lineArray.Length != 0 && lineArray[0] != "#")
                     {
                         ReadFileArrayList.Add(line);
-                        //                        sw.Write(line);
-                        //                        sw.Write(System.Environment.NewLine);
                     }
                 }
-                //sw.Close();
-                //MessageBox.Show(file.ReadToEnd());
                 file.Close();
             }
             for (int i = 0; i < ReadFileArrayList.Count; i++)
@@ -219,14 +212,102 @@ namespace WindowsFormsApp1
             NodeStruct node = new NodeStruct();//新增點結構
             node.x = e.X;
             node.y = e.Y;
+
             NodeList.Add(node);//將點塞到list裡面
 
-
-            if (NodeList.Count != 1)
+            if (NodeList.Count > 2)//三點時要找外心
             {
-                g.DrawLine(myPen, NodeList[NodeList.Count - 2].x, NodeList[NodeList.Count - 2].y, e.X, e.Y);
+                //少判斷3點共線
+
+                //三點時要找外心
+                NodeStruct Excenter = new NodeStruct();
+                Excenter = GetTriangleExcenter(
+                    NodeList[NodeList.Count - 3],
+                    NodeList[NodeList.Count - 2],
+                    NodeList[NodeList.Count - 1]);
+                g.DrawImageUnscaled(nodeBitmap, Excenter.x, Excenter.y);
+
+                //找完外心找3條線的中點
+
+                //判斷點位於哪一側，例如AB兩點得一直線y，若c點位於y的右側則將中垂腺過y線中點由外心畫向y線左側畫
+                //DetermineLastNodeIsRorL(NodeList[0], NodeList[1], NodeList[2] , Excenter);
+
+                //取的中點
+                NodeStruct MidNode = new NodeStruct();
+                MidNode = GetMidNode(NodeList[0], NodeList[1]);
+                //取的中點與外心之斜率
+                int K = (MidNode.y - Excenter.y) / (MidNode.x - Excenter.x);
+
+                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
             }
         }
+
+        private void DetermineLastNodeIsRorL(NodeStruct A, NodeStruct B, NodeStruct C, NodeStruct Excenter)
+        {
+            //由AB兩點得兩點式（Ｘ2-Ｘ1)(Ｙ-Ｙ1)=(Ｙ2-Ｙ1)(Ｘ-Ｘ1)
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            Pen myPen = new Pen(Color.Red, 1);
+
+            //            //取的中點
+            //            NodeStruct MidNode = new NodeStruct();
+            //            MidNode = GetMidNode(NodeList[0], NodeList[1]);
+            //
+            //            int temp_C_x  = (B.x - A.x) * (C.y - A.y) / (B.y - A.y)  + A.x;
+            //            //取的中點與外心之斜率
+            //            int K = (MidNode.y - Excenter.y) / (MidNode.x - Excenter.x);
+            //            int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
+            //             g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
+            //
+
+
+            //            int temp_x = 0;
+            //            temp_x  = (B.x - A.x) * (C.y - A.y) / (B.y - A.y)  + A.x;
+            //            if (temp_x > C.x)//點在線的左邊
+            //            {   //取一個右邊線的點
+            //                int temp_x_ForDrawLine = temp_x + 1;
+            //                //取的中點到外心的直線
+            //                //取的temp_y_ForDrawLine
+            //                int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
+            //                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x,Excenter.y);
+            //            }
+            //            else if (temp_x < C.x)//點在線的右邊
+            //            {
+            //                //取一個左邊線的點
+            //                int temp_x_ForDrawLine = temp_x - 1;
+            //                int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
+            //                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
+            //            }
+            //            else//點在線上
+            //            {
+            //            }
+        }
+        private NodeStruct GetMidNode(NodeStruct A, NodeStruct B)
+        {
+            NodeStruct MidNode = new NodeStruct();//新增點結構
+            double x = (A.x + B.x) / 2;
+            double y = (A.y + B.y) / 2;
+            MidNode = new NodeStruct(Convert.ToInt32(x), Convert.ToInt32(y));
+            return MidNode;
+        }
+
+        private NodeStruct GetTriangleExcenter(NodeStruct A, NodeStruct B, NodeStruct C)
+        {
+            NodeStruct Excenter = new NodeStruct();//新增點結構
+            //same point
+            if (A.x == B.x && A.y == B.y && A.x == C.x && A.y == C.y)
+            {
+                Excenter = A;
+                return Excenter;
+            }
+            double x1 = A.x, x2 = B.x, x3 = C.x, y1 = A.y, y2 = B.y, y3 = C.y;
+            double C1 = Math.Pow(x1, 2) + Math.Pow(y1, 2) - Math.Pow(x2, 2) - Math.Pow(y2, 2);
+            double C2 = Math.Pow(x2, 2) + Math.Pow(y2, 2) - Math.Pow(x3, 2) - Math.Pow(y3, 2);
+            double centery = (C1 * (x2 - x3) - C2 * (x1 - x2)) / (2 * (y1 - y2) * (x2 - x3) - 2 * (y2 - y3) * (x1 - x2));
+            double centerx = (C1 - 2 * centery * (y1 - y2)) / (2 * (x1 - x2));
+            Excenter = new NodeStruct(Convert.ToInt32(centerx), Convert.ToInt32(centery));
+            return Excenter;
+        }
+
 
         private static Bitmap get_NodeBitmap()
         {
