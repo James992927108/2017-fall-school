@@ -46,7 +46,6 @@ namespace WindowsFormsApp1
             gra.DrawArc(myPen, 10, 20, 70, 80, 123, 233);
             //4.4繪製一矩形
             gra.DrawRectangle(myPen, 50, 60, 110, 120);
-
         }
 
         private void Clean_Click(object sender, EventArgs e)
@@ -67,11 +66,9 @@ namespace WindowsFormsApp1
         {
 
         }
-
         private void OpenFile_Click(object sender, EventArgs e)
         {
             clean_function();
-
             string line;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -110,37 +107,35 @@ namespace WindowsFormsApp1
 
         private void Next_Click(object sender, EventArgs e)
         {
+            clean_function();
             int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;
-
-            if (RemainDateCount == -1)
+            if (RemainDateCount == 0)
             {
                 MessageBox.Show("已無資料");
                 this.button_Next.Hide();
             }
-            this.button_Next.Text = $"{RemainDateCount}";
-
-            var nodeBitmap = get_NodeBitmap();
-            //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
-            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-            
-            DrawVerticalLine(g, NodeNumList[CurrentDataIndex]);
-            //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
-            for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+            else
             {
-                NodeStruct node = new NodeStruct();//新增點結構
-                node.X = NodeList[0].X;
-                node.Y = NodeList[0].Y;
-                NodeList.Add(node);//塞到list裡面
-                NodeList.RemoveAt(0);
+                this.button_Next.Text = $"{RemainDateCount}";
+                DrawVerticalLine(NodeNumList[CurrentDataIndex]);
+                //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
+                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+                {
+                    NodeStruct node = new NodeStruct();//新增點結構
+                    node.X = NodeList[0].X;
+                    node.Y = NodeList[0].Y;
+                    NodeList.Add(node);//塞到list裡面
+                    NodeList.RemoveAt(0);
+                }
+                RemainDateCount--;
             }
-            RemainDateCount--;
         }
 
         private void Output_txt_Click(object sender, EventArgs e)
         {
-            FileStream fileStream = new FileStream(@"..\bbb.txt", FileMode.Create);
+            FileStream fileStream = new FileStream(@"..\..\..\..\bbb.txt", FileMode.Create);
             fileStream.Close();
-            StreamWriter sw = new StreamWriter(@"..\bbb.txt");
+            StreamWriter sw = new StreamWriter(@"..\..\..\..\bbb.txt");
             //將NodeList中的元素跟具x值排序
             var NodeList_Sort = from a in NodeList
                                 orderby a.X
@@ -183,42 +178,67 @@ namespace WindowsFormsApp1
             MessageBox.Show("完成輸出txt");
         }
         //--------------------------------------------------------------------------------------------------
-        //        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
-        //        private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
+        //private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
+        //private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
 
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
-            //画在哪里 ( Graphics.FromHwnd(this.panel1.Handle) = this.panel1.CreateGraphics();)     
-            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
-            g.DrawImageUnscaled(get_NodeBitmap(), e.X, e.Y);
-            g.DrawString($"{e.X},{e.Y}", myFont, Brushes.Firebrick, e.X, e.Y);
-
             NodeStruct node = new NodeStruct();//新增點結構
             node.X = e.X;
             node.Y = e.Y;
-
             NodeList.Add(node);//將點塞到list裡面
-            DrawVerticalLine(g, NodeList.Count);//-1暫時
+
+            clean_function();//每次都要先清空畫布
+            DrawVerticalLine(NodeList.Count);
         }
 
-
-        private void DrawVerticalLine(Graphics g, int NodeCount)
+        private void DrawVerticalLine(int NodeCount)
         {
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            DrawNode(NodeCount);//根據點數量，先畫出點
+            if (NodeCount == 2)
+            {
+                NodeStruct A = NodeList[0];
+                NodeStruct B = NodeList[1];
+                NodeStruct Mid = new NodeStruct();
+                if (A.X == B.X && A.Y != B.Y)//垂直
+                {
+                    Mid.Y = (A.Y + B.Y) / 2;
+                    g.DrawLine(myPen, 0, Mid.Y, 600, Mid.Y);
+                }
+                if (A.Y == B.Y && A.X != B.X)//水平
+                {
+                    Mid.X = (A.X + B.X) / 2;
+                    g.DrawLine(myPen, Mid.X, 0, Mid.X, 600);
+                }
+                if (A.X != B.X && A.Y != B.Y)//不同點
+                {
+                    NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
+                    normal_vector.X = A.Y - B.Y;
+                    normal_vector.Y = -(A.X - B.X);
+                    Mid.X = (A.X + B.X) / 2;
+                    Mid.Y = (A.Y + B.Y) / 2;
+                    int K = 10000;
+                    NodeStruct topNode = new NodeStruct();
+                    topNode.X = Mid.X + K * normal_vector.X;
+                    topNode.Y = Mid.Y + K * normal_vector.Y;
+                    NodeStruct downNode = new NodeStruct();
+                    downNode.X = Mid.X - K * normal_vector.X;
+                    downNode.Y = Mid.Y - K * normal_vector.Y;
+                    g.DrawLine(myPen, topNode.X, topNode.Y, downNode.X, downNode.Y);
+                }
+            }
             if (NodeCount == 3) //三點時要找外心
             {
-                //少判斷3點共線
-                //三點時要找外心
-                NodeStruct Excenter = new NodeStruct();
-                Excenter = GetTriangleExcenter(
-                    NodeList[0],
-                    NodeList[1],
-                    NodeList[2]);
+                ClockwiseSortPoints();
+
+                NodeStruct Excenter = new NodeStruct();//三點時要找外心
+                Excenter = GetTriangleExcenter(NodeList[0], NodeList[1], NodeList[2]);
+
                 if (Excenter.X != 0 && Excenter.Y != 0)//有找到外心時
                 {
                     g.DrawImageUnscaled(get_NodeBitmap(), Excenter.X, Excenter.Y);
 
-                    ClockwiseSortPoints();
                     //做逆時針排序，用於找每一條邊的法向量
                     //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
 
@@ -257,11 +277,72 @@ namespace WindowsFormsApp1
                     {
                         g.DrawLine(myPen, Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
                     }
-                }           
+                }
+                else//沒有外心時
+                {
+                    NodeStruct Mid1 = new NodeStruct();
+                    NodeStruct Mid2 = new NodeStruct();
+                    if (NodeList[0].X == NodeList[1].X && NodeList[0].X == NodeList[2].X)//垂直
+                    {
+                        List<int> tempList = new List<int>();
+                        tempList.Add(NodeList[0].Y);
+                        tempList.Add(NodeList[1].Y);
+                        tempList.Add(NodeList[2].Y);
+                        tempList.Sort();
+                        //找2中點做2條水平線，對y軸要排序
+                        Mid1.Y = (tempList[0] + tempList[1]) / 2;
+                        Mid2.Y = (tempList[1] + tempList[2]) / 2;
+
+                        g.DrawLine(myPen, 0, Mid1.Y, 600, Mid1.Y);
+                        g.DrawLine(myPen, 0, Mid2.Y, 600, Mid2.Y);
+                    }
+                    if (NodeList[0].Y == NodeList[1].Y && NodeList[0].Y == NodeList[2].Y)//水平
+                    {
+                        //找2中點做2條水平線，對x軸要排序
+                        List<int> tempList = new List<int>();
+                        tempList.Add(NodeList[0].X);
+                        tempList.Add(NodeList[1].X);
+                        tempList.Add(NodeList[2].X);
+                        tempList.Sort();
+                        Mid1.X = (tempList[0] + tempList[1]) / 2;
+                        Mid2.X = (tempList[1] + tempList[2]) / 2;
+
+                        g.DrawLine(myPen, Mid1.X, 0, Mid1.X, 600);
+                        g.DrawLine(myPen, Mid2.X, 0, Mid2.X, 600);
+                    }
+                    if ((NodeList[0].Y / NodeList[0].X) == (NodeList[1].Y / NodeList[1].X) && (NodeList[0].Y / NodeList[0].X) == (NodeList[2].Y / NodeList[2].X))//為一直線
+                    {
+                        NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
+                        normal_vector.X = NodeList[0].Y - NodeList[1].Y;
+                        normal_vector.Y = -(NodeList[0].X - NodeList[1].X);
+                        int K = 10000;
+
+                        Mid1.X = (NodeList[0].X + NodeList[1].X) / 2;
+                        Mid1.Y = (NodeList[0].Y + NodeList[1].Y) / 2;
+                        NodeStruct topNode1 = new NodeStruct();
+                        topNode1.X = Mid1.X + K * normal_vector.X;
+                        topNode1.Y = Mid1.Y + K * normal_vector.Y;
+                        NodeStruct downNode1 = new NodeStruct();
+                        downNode1.X = Mid1.X - K * normal_vector.X;
+                        downNode1.Y = Mid1.Y - K * normal_vector.Y;
+
+                        g.DrawLine(myPen, topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
+
+                        Mid2.X = (NodeList[2].X + NodeList[1].X) / 2;
+                        Mid2.Y = (NodeList[2].Y + NodeList[1].Y) / 2;
+                        NodeStruct topNode2 = new NodeStruct();
+                        topNode2.X = Mid2.X + K * normal_vector.X;
+                        topNode2.Y = Mid2.Y + K * normal_vector.Y;
+                        NodeStruct downNode2 = new NodeStruct();
+                        downNode2.X = Mid2.X - K * normal_vector.X;
+                        downNode2.Y = Mid2.Y - K * normal_vector.Y;
+
+                        g.DrawLine(myPen, topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
+                    }
+                }
             }
         }
         //--------------------------------------------------------------------------------------------------
-
         private void ClockwiseSortPoints()
         {
             NodeStruct center;
@@ -310,7 +391,6 @@ namespace WindowsFormsApp1
         {
             NodeStruct Excenter = new NodeStruct();//新增點結構
             NodeStruct noExcenter = new NodeStruct(0,0);//用於不存在外心時回傳
-
             //same point
             if (A.X == B.X && A.Y == B.Y && A.X == C.X && A.Y == C.Y)
             {
@@ -320,57 +400,6 @@ namespace WindowsFormsApp1
             //三點共線，利用面積，判断 (ax-cx)*(by-cy) == (bx-cx)*(ay-cy)
             if ((A.X - C.X) * (B.Y - C.Y) == (B.X - C.X) * (A.Y - C.Y))
             {
-                NodeStruct Mid1 = new NodeStruct();
-                NodeStruct Mid2 = new NodeStruct();
-
-                Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
-                //需在判斷垂直或水平
-                if (A.X == B.X && A.X == C.X)//垂直
-                {
-                    List<int> tempList = new List<int>();
-                    tempList.Add(A.Y);
-                    tempList.Add(B.Y);
-                    tempList.Add(C.Y);
-                    tempList.Sort();
-                    //找2中點做2條水平線，對y軸要排序
-                    Mid1.Y = (tempList[0] + tempList[1]) / 2;
-                    Mid2.Y = (tempList[1] + tempList[2]) / 2;
-
-                    g.DrawImageUnscaled(get_NodeBitmap(), A.X, A.Y);
-                    g.DrawImageUnscaled(get_NodeBitmap(), B.X, B.Y);
-                    g.DrawImageUnscaled(get_NodeBitmap(), C.X, C.Y);
-
-                    g.DrawString($"{A.X},{A.Y}", myFont, Brushes.Firebrick, A.X, A.Y);
-                    g.DrawString($"{B.X},{B.Y}", myFont, Brushes.Firebrick, B.X, B.Y);
-                    g.DrawString($"{C.X},{C.Y}", myFont, Brushes.Firebrick, C.X, C.Y);
-
-                    g.DrawLine(myPen, 0, Mid1.Y, 600, Mid1.Y);
-                    g.DrawLine(myPen, 0, Mid2.Y, 600, Mid2.Y);
-                }
-                if (A.Y == B.Y && A.Y == C.Y)//水平
-                {
-                    //找2中點做2條水平線，對x軸要排序
-                    List<int> tempList = new List<int>();
-                    tempList.Add(A.X);
-                    tempList.Add(B.X);
-                    tempList.Add(C.X);
-                    tempList.Sort();
-                    Mid1.X = (tempList[0] + tempList[1]) / 2;
-                    Mid2.X = (tempList[1] + tempList[2]) / 2;
-
-                    g.DrawImageUnscaled(get_NodeBitmap(), A.X, A.Y);
-                    g.DrawImageUnscaled(get_NodeBitmap(), B.X, B.Y);
-                    g.DrawImageUnscaled(get_NodeBitmap(), C.X, C.Y);
-
-                    g.DrawString($"{A.X},{A.Y}", myFont, Brushes.Firebrick, A.X, A.Y);
-                    g.DrawString($"{B.X},{B.Y}", myFont, Brushes.Firebrick, B.X, B.Y);
-                    g.DrawString($"{C.X},{C.Y}", myFont, Brushes.Firebrick, C.X, C.Y);
-
-                    g.DrawLine(myPen, Mid1.X , 0 , Mid1.X, 600 );
-                    g.DrawLine(myPen, Mid2.X , 0 , Mid2.X, 600);
-
-                }
                 return noExcenter;
             }
             double x1 = A.X, x2 = B.X, x3 = C.X, y1 = A.Y, y2 = B.Y, y3 = C.Y;
@@ -381,9 +410,7 @@ namespace WindowsFormsApp1
             Excenter = new NodeStruct(Convert.ToInt32(centerx), Convert.ToInt32(centery));
             return Excenter;
         }
-
         //--------------------------------------------------------------------------------------------------
-
         private static Bitmap get_NodeBitmap()
         {
             int NodeSize = 5;
@@ -398,21 +425,29 @@ namespace WindowsFormsApp1
             return nodeBitmap;
         }
         //--------------------------------------------------------------------------------------------------
+        private void DrawNode(int NodeCount)
+        {
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            for (int i = 0; i < NodeCount; i++)
+            {
+                g.DrawImageUnscaled(get_NodeBitmap(), NodeList[i].X, NodeList[i].Y);
+                g.DrawString($"{NodeList[i].X},{NodeList[i].Y}", myFont, Brushes.Firebrick, NodeList[i].X, NodeList[i].Y);
+            }
+        }
+        //--------------------------------------------------------------------------------------------------
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
-
         //--------------------------------------------------------------------------------------------------
-
         private void TEST_Click(object sender, EventArgs e)
         {
-            int a = 5;
-            Bitmap bm = new Bitmap(a, a);     //这里调整点的大小   
-            for (int i = 0; i < a; i++)
+            int size = 5;
+            Bitmap bm = new Bitmap(size, size);     //这里调整点的大小   
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < a; j++)
+                for (int j = 0; j < size; j++)
                 {
                     bm.SetPixel(i, j, Color.Black);       //设置点的颜色   
                 }
@@ -425,7 +460,6 @@ namespace WindowsFormsApp1
     public struct NodeStruct
     {
         public int X, Y;
-
         public NodeStruct(int p1, int p2)
         {
             X = p1;
