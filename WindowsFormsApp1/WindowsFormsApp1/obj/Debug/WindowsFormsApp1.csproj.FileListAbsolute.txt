@@ -38,3 +38,13 @@ C:\Users\Antony\Desktop\github\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1
 C:\Users\Antony\Desktop\github\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
 C:\Users\Antony\Desktop\github\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 C:\Users\Antony\Desktop\github\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WindowsFormsApp1.exe.config
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WindowsFormsApp1.exe
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\WindowsFormsApp1.pdb
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csprojResolveAssemblyReference.cache
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.Form1.resources
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.Properties.Resources.resources
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.GenerateResource.Cache
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
+E:\GitHub\HW_Algo_Voronoi\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb

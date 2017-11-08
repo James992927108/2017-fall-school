@@ -94,8 +94,8 @@ namespace WindowsFormsApp1
                 else//為座標放入NodeList裡面
                 {
                     NodeStruct node = new NodeStruct();//新增點結構
-                    node.x = Convert.ToInt32(substrings[0]);
-                    node.y = Convert.ToInt32(substrings[1]);
+                    node.X = Convert.ToInt32(substrings[0]);
+                    node.Y = Convert.ToInt32(substrings[1]);
                     NodeList.Add(node);//塞到list裡面                   
                 }
             }
@@ -125,20 +125,20 @@ namespace WindowsFormsApp1
 
             for (int i = 0; i < NodeNumList[CurrentDataIndex] - 1; i++)
             {
-                g.DrawImageUnscaled(nodeBitmap, NodeList[i].x, NodeList[i].y);
-                g.DrawImageUnscaled(nodeBitmap, NodeList[i + 1].x, NodeList[i + 1].y);
+                g.DrawImageUnscaled(nodeBitmap, NodeList[i].X, NodeList[i].Y);
+                g.DrawImageUnscaled(nodeBitmap, NodeList[i + 1].X, NodeList[i + 1].Y);
 
-                g.DrawString($"{NodeList[i].x},{NodeList[i].y}", myFont, Brushes.Firebrick, NodeList[i].x, NodeList[i].y);
-                g.DrawString($"{NodeList[i + 1].x},{NodeList[i + 1].y}", myFont, Brushes.Firebrick, NodeList[i + 1].x, NodeList[i + 1].y);
+                g.DrawString($"{NodeList[i].X},{NodeList[i].Y}", myFont, Brushes.Firebrick, NodeList[i].X, NodeList[i].Y);
+                g.DrawString($"{NodeList[i + 1].X},{NodeList[i + 1].Y}", myFont, Brushes.Firebrick, NodeList[i + 1].X, NodeList[i + 1].Y);
 
-                g.DrawLine(myPen, NodeList[i].x, NodeList[i].y, NodeList[i + 1].x, NodeList[i + 1].y);
+                g.DrawLine(myPen, NodeList[i].X, NodeList[i].Y, NodeList[i + 1].X, NodeList[i + 1].Y);
             }
             //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
             for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
             {
                 NodeStruct node = new NodeStruct();//新增點結構
-                node.x = NodeList[0].x;
-                node.y = NodeList[0].y;
+                node.X = NodeList[0].X;
+                node.Y = NodeList[0].Y;
                 NodeList.Add(node);//塞到list裡面
                 NodeList.RemoveAt(0);
             }
@@ -152,12 +152,12 @@ namespace WindowsFormsApp1
             StreamWriter sw = new StreamWriter(@"..\bbb.txt");
             //將NodeList中的元素跟具x值排序
             var NodeList_Sort = from a in NodeList
-                                orderby a.x
+                                orderby a.X
                                 select a;
 
             foreach (var node in NodeList_Sort)
             {
-                sw.Write("P " + node.x + " " + node.y);
+                sw.Write("P " + node.X + " " + node.Y);
                 sw.Write(System.Environment.NewLine);
             }
 
@@ -169,19 +169,19 @@ namespace WindowsFormsApp1
                 if (count % 2 == 0)
                 {
                     if (count == 0)
-                        sw.Write("E " + node.x + " " + node.y);
+                        sw.Write("E " + node.X + " " + node.Y);
                     else
                     {
                         sw.Write("E " + temp_node_x + " " + temp_node_y);
-                        temp_node_x = node.x;
-                        temp_node_y = node.y;
+                        temp_node_x = node.X;
+                        temp_node_y = node.Y;
                     }
                 }
                 else
                 {
-                    sw.Write(" " + node.x + " " + node.y);
-                    temp_node_x = node.x;
-                    temp_node_y = node.y;
+                    sw.Write(" " + node.X + " " + node.Y);
+                    temp_node_x = node.X;
+                    temp_node_y = node.Y;
 
                     sw.Write(System.Environment.NewLine);
                 }
@@ -210,8 +210,8 @@ namespace WindowsFormsApp1
             g.DrawString($"{e.X},{e.Y}", myFont, Brushes.Firebrick, e.X, e.Y);
 
             NodeStruct node = new NodeStruct();//新增點結構
-            node.x = e.X;
-            node.y = e.Y;
+            node.X = e.X;
+            node.Y = e.Y;
 
             NodeList.Add(node);//將點塞到list裡面
 
@@ -225,67 +225,100 @@ namespace WindowsFormsApp1
                     NodeList[NodeList.Count - 3],
                     NodeList[NodeList.Count - 2],
                     NodeList[NodeList.Count - 1]);
-                g.DrawImageUnscaled(nodeBitmap, Excenter.x, Excenter.y);
+                g.DrawImageUnscaled(nodeBitmap, Excenter.X, Excenter.Y);
 
-                //找完外心找3條線的中點
+                ClockwiseSortPoints();//做逆時針排序，用於找每一條邊的法向量
+                                      //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
 
-                //判斷點位於哪一側，例如AB兩點得一直線y，若c點位於y的右側則將中垂腺過y線中點由外心畫向y線左側畫
-                //DetermineLastNodeIsRorL(NodeList[0], NodeList[1], NodeList[2] , Excenter);
+                List<NodeStruct> normal_vector_List = new List<NodeStruct>();
 
-                //取的中點
-                NodeStruct MidNode = new NodeStruct();
-                MidNode = GetMidNode(NodeList[0], NodeList[1]);
-                //取的中點與外心之斜率
-                int K = (MidNode.y - Excenter.y) / (MidNode.x - Excenter.x);
+                //法向量為，若ab向量為(x,y)->法向量為(y,-x)
+               
+                for (int i = 0; i < 3; i++)
+                {
+                    NodeStruct normal_vector = new NodeStruct();
+                    normal_vector.X = NodeList[(i+1)%3].Y - NodeList[i].Y;
+                    normal_vector.Y = -(NodeList[(i+1)%3].X - NodeList[i].X);
+                    normal_vector_List.Add(normal_vector);
+                }
 
-                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
+                //取的法向量後，找出每邊依法向量方向過每邊中點到邊界的點，預設找一點*k倍法向量
+                List<NodeStruct> MidNode_List = new List<NodeStruct>();
+                for (int i = 0; i < 3; i++)
+                {
+                    NodeStruct MidNode = new NodeStruct();
+                    MidNode.X = (NodeList[(i + 1) % 3].X + NodeList[i].X) / 2;
+                    MidNode.Y = (NodeList[(i + 1) % 3].Y + NodeList[i].Y) / 2;
+                    MidNode_List.Add(MidNode);
+                }
+
+                List<NodeStruct> Vertical_line_List = new List<NodeStruct>();
+                int K = 10000; 
+                for (int i = 0; i < 3; i++)
+                {
+                    NodeStruct Vertical_line = new NodeStruct();
+                    Vertical_line.X = MidNode_List[i].X + K * normal_vector_List[i].X;
+                    Vertical_line.Y = MidNode_List[i].Y + K * normal_vector_List[i].Y;
+                    Vertical_line_List.Add(Vertical_line);
+                }
+
+              
+                for (int i = 0; i < 3; i++)
+                {
+                    g.DrawLine(myPen, Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
+                }
             }
         }
 
-        private void DetermineLastNodeIsRorL(NodeStruct A, NodeStruct B, NodeStruct C, NodeStruct Excenter)
+        private void ClockwiseSortPoints()
         {
-            //由AB兩點得兩點式（Ｘ2-Ｘ1)(Ｙ-Ｙ1)=(Ｙ2-Ｙ1)(Ｘ-Ｘ1)
-            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-            Pen myPen = new Pen(Color.Red, 1);
+            NodeStruct center;
+            double x = 0, y = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                x += NodeList[i].X;
+                y += NodeList[i].Y;
+            }
+            center.X = (int)x / 3;
+            center.Y = (int)y / 3;
 
-            //            //取的中點
-            //            NodeStruct MidNode = new NodeStruct();
-            //            MidNode = GetMidNode(NodeList[0], NodeList[1]);
-            //
-            //            int temp_C_x  = (B.x - A.x) * (C.y - A.y) / (B.y - A.y)  + A.x;
-            //            //取的中點與外心之斜率
-            //            int K = (MidNode.y - Excenter.y) / (MidNode.x - Excenter.x);
-            //            int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
-            //             g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
-            //
-
-
-            //            int temp_x = 0;
-            //            temp_x  = (B.x - A.x) * (C.y - A.y) / (B.y - A.y)  + A.x;
-            //            if (temp_x > C.x)//點在線的左邊
-            //            {   //取一個右邊線的點
-            //                int temp_x_ForDrawLine = temp_x + 1;
-            //                //取的中點到外心的直線
-            //                //取的temp_y_ForDrawLine
-            //                int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
-            //                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x,Excenter.y);
-            //            }
-            //            else if (temp_x < C.x)//點在線的右邊
-            //            {
-            //                //取一個左邊線的點
-            //                int temp_x_ForDrawLine = temp_x - 1;
-            //                int temp_y_ForDrawLine = K * temp_x_ForDrawLine;
-            //                g.DrawLine(myPen, temp_x_ForDrawLine, temp_y_ForDrawLine, Excenter.x, Excenter.y);
-            //            }
-            //            else//點在線上
-            //            {
-            //            }
+            //冒泡排序
+            for (int i = 0; i < 3 - 1; i++)
+            {
+                for (int j = 0; j < 3 - i - 1; j++)
+                {
+                    if (PointCmp(NodeList[j], NodeList[j + 1], center))
+                    {
+                        NodeStruct tmp = NodeList[j];
+                        NodeList[j] = NodeList[j + 1];
+                        NodeList[j + 1] = tmp;
+                    }
+                }
+            }
         }
+        bool PointCmp(NodeStruct a, NodeStruct b, NodeStruct center)
+        {
+            if (a.X >= 0 && b.X < 0)
+                return true;
+            if (a.X == 0 && b.X == 0)
+                return a.Y > b.Y;
+            //向量OA和向量OB的叉积
+            int det = (a.X - center.X) * (b.Y - center.Y) - (b.X - center.X) * (a.Y - center.Y);
+            if (det < 0)
+                return true;
+            if (det > 0)
+                return false;
+            //向量OA和向量OB共线，以距离判断大小
+            int d1 = (a.X - center.X) * (a.X - center.X) + (a.Y - center.Y) * (a.Y - center.Y);
+            int d2 = (b.X - center.X) * (b.X - center.Y) + (b.Y - center.Y) * (b.Y - center.Y);
+            return d1 > d2;
+        }
+
         private NodeStruct GetMidNode(NodeStruct A, NodeStruct B)
         {
             NodeStruct MidNode = new NodeStruct();//新增點結構
-            double x = (A.x + B.x) / 2;
-            double y = (A.y + B.y) / 2;
+            double x = (A.X + B.X) / 2;
+            double y = (A.Y + B.Y) / 2;
             MidNode = new NodeStruct(Convert.ToInt32(x), Convert.ToInt32(y));
             return MidNode;
         }
@@ -293,13 +326,13 @@ namespace WindowsFormsApp1
         private NodeStruct GetTriangleExcenter(NodeStruct A, NodeStruct B, NodeStruct C)
         {
             NodeStruct Excenter = new NodeStruct();//新增點結構
-            //same point
-            if (A.x == B.x && A.y == B.y && A.x == C.x && A.y == C.y)
+                                                   //same point
+            if (A.X == B.X && A.Y == B.Y && A.X == C.X && A.Y == C.Y)
             {
                 Excenter = A;
                 return Excenter;
             }
-            double x1 = A.x, x2 = B.x, x3 = C.x, y1 = A.y, y2 = B.y, y3 = C.y;
+            double x1 = A.X, x2 = B.X, x3 = C.X, y1 = A.Y, y2 = B.Y, y3 = C.Y;
             double C1 = Math.Pow(x1, 2) + Math.Pow(y1, 2) - Math.Pow(x2, 2) - Math.Pow(y2, 2);
             double C2 = Math.Pow(x2, 2) + Math.Pow(y2, 2) - Math.Pow(x3, 2) - Math.Pow(y3, 2);
             double centery = (C1 * (x2 - x3) - C2 * (x1 - x2)) / (2 * (y1 - y2) * (x2 - x3) - 2 * (y2 - y3) * (x1 - x2));
@@ -350,12 +383,12 @@ namespace WindowsFormsApp1
 
     public struct NodeStruct
     {
-        public int x, y;
+        public int X, Y;
 
         public NodeStruct(int p1, int p2)
         {
-            x = p1;
-            y = p2;
+            X = p1;
+            Y = p2;
         }
     }
 }
