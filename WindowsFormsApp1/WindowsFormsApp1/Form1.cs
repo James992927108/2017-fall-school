@@ -22,6 +22,7 @@ namespace WindowsFormsApp1
         List<EdgeStruct> EdgeList = new List<EdgeStruct>(); //紀錄所有的Edge
 
         private int RemainDateCount = 0;//用於紀錄測資剩餘次數
+        private int CurrentDataIndex = 0;//用於讀取NodeNumList中第幾個值
         Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);//新增字型用
         Pen myPen = new Pen(Color.Red, 1);//新增畫筆用於畫線
         bool IsReadFile = false;
@@ -30,19 +31,26 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
-        private void Clean_Click(object sender, EventArgs e)
+        private void CleanNode_Click(object sender, EventArgs e)
         {
-            clean_function();
+            int temp = NodeList.Count;
+            for (int i = 0; i < temp; i++)
+            {
+                NodeList.RemoveAt(0);
+            }
         }
 
-        public void clean_function()
+        private void CleanEdge_Click(object sender, EventArgs e)
         {
-            //            NodeList.Clear();//清空有問題
-            //            NodeNumList.Clear();
-            //            this.button_Next.Hide();
+            Clean_function();
+        }
+
+        public void Clean_function()
+        {
             if (EdgeList.Count() != 0)
             {
-                for (int i = 0; i < EdgeList.Count() + 1; i++)
+                int temp = EdgeList.Count();
+                for (int i = 0; i < temp; i++)
                 {
                     EdgeList.RemoveAt(0);
                 }
@@ -50,101 +58,11 @@ namespace WindowsFormsApp1
             this.panel1.Refresh();
         }
 
-        //--------------------------------------------------------------------------------------------------
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-
-        }
-        private void OpenFile_Click(object sender, EventArgs e)
-        {
-            IsReadFile = true;//用於輸出
-            clean_function();
-
-            ArrayList ReadFileArrayList = new ArrayList();//讀檔用
-            string line;
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
-                while ((line = file.ReadLine()) != null)
-                {
-                    string[] lineArray = line.Select(o => o.ToString()).ToArray();
-                    if (lineArray.Length != 0 && lineArray[0] != "#")
-                    {
-                        ReadFileArrayList.Add(line);
-                    }
-                }
-                file.Close();
-            }
-            for (int i = 0; i < ReadFileArrayList.Count; i++)
-            {
-                Char delimiter = ' ';
-                String[] substrings = ReadFileArrayList[i].ToString().Split(delimiter);
-                if (substrings.Length == 1)
-                {
-                    //NodeNumList的值代表有幾個點
-                    NodeNumList.Add(Convert.ToInt32(ReadFileArrayList[i]));
-                }
-                else//為座標放入NodeList裡面
-                {
-                    NodeStruct node = new NodeStruct();//新增點結構
-                    node.X = Convert.ToInt32(substrings[0]);
-                    node.Y = Convert.ToInt32(substrings[1]);
-                    NodeList.Add(node);//塞到list裡面                   
-                }
-            }
-            this.button_Next.Show();//show按鈕，顯示測資個數
-            this.button_Next.Text = $"{NodeNumList.Count}";
-            RemainDateCount = NodeNumList.Count;
-        }
-
-        private void Output_txt_Click(object sender, EventArgs e)
-        {
-            FileStream fileStream = new FileStream(@"..\..\..\bbb.txt", FileMode.Create);
-            fileStream.Close();
-            StreamWriter sw = new StreamWriter(@"..\..\..\bbb.txt");
-            //當前點個數
-
-            if (IsReadFile != true)
-            {
-                //將NodeList中的元素跟具x值排序
-                var NodeList_Sort = NodeList.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
-                foreach (var node in NodeList_Sort)
-                {
-                    sw.Write("P " + node.X + " " + node.Y);
-                    sw.Write(System.Environment.NewLine);
-                }          
-            }
-            else
-            {
-                List<NodeStruct> NodeListCopy = new List<NodeStruct>();
-                int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;//總數-剩餘次數即，為當前index
-                for (int i = 0 ; i < NodeNumList[CurrentDataIndex - 1]; i++)
-                {
-                    NodeStruct temp = new NodeStruct();
-                    temp = NodeList[i];
-                    NodeListCopy.Add(temp);
-                }
-                var NodeList_Sort = NodeListCopy.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
-                foreach (var node in NodeList_Sort)
-                {
-                    sw.Write("P " + node.X + " " + node.Y);
-                    sw.Write(System.Environment.NewLine);
-                }
-            }
-            var EdgeList_Sort = EdgeList.OrderBy(a => a.X1).ThenBy(b => b.Y1).ThenBy(c => c.X2).ThenBy(d => d.Y2).ToList();
-            foreach (var edge in EdgeList_Sort)
-            {
-                sw.Write("E " + edge.X1 + " " + edge.Y1 + " " + edge.X2 + " " + edge.Y2);
-                sw.Write(System.Environment.NewLine);
-            }
-            sw.Close();
-            MessageBox.Show("完成輸出txt");
-        }
-
         private void Next_Click(object sender, EventArgs e)
         {
-            clean_function();
-            int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;//總數-剩餘次數即，為當前index
+            Clean_function();
+            CurrentDataIndex = NodeNumList.Count - RemainDateCount;//總數-剩餘次數即，為當前index
+            RemainDateCount--;
             //每次進來前先將上次的點刪除
             if (CurrentDataIndex != 0)//第一次不須移除
             {
@@ -153,7 +71,6 @@ namespace WindowsFormsApp1
                     NodeList.RemoveAt(0);
                 }
             }
-            
             if (RemainDateCount == 0)
             {
                 MessageBox.Show("已無資料");
@@ -162,29 +79,34 @@ namespace WindowsFormsApp1
             else
             {
                 this.button_Next.Text = $"{RemainDateCount}";
-                DrawVerticalLine(NodeNumList[CurrentDataIndex]);
-                RemainDateCount--;
+                DrawNode(NodeNumList[CurrentDataIndex]);//根據點數量，先畫出點
             }
         }
-
         //--------------------------------------------------------------------------------------------------
-        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
-        private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
-
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
             IsReadFile = false;
-            NodeStruct node = new NodeStruct(e.X,e.Y);//新增點結構
+            NodeStruct node = new NodeStruct(e.X, e.Y);//新增點結構
             NodeList.Add(node);//將點塞到list裡面
-            clean_function();//每次都要先清空畫布
-            
-            DrawVerticalLine(NodeList.Count);
+            DrawNode(NodeList.Count);//根據點數量，先畫出點
         }
+
+        private void Run_Click(object sender, EventArgs e)
+        {
+            if (IsReadFile == false)
+            {
+                DrawVerticalLine(NodeList.Count);
+            }
+            else
+            {
+                DrawVerticalLine(NodeNumList[CurrentDataIndex]);
+            }
+        }
+        //--------------------------------------------------------------------------------------------------
 
         private void DrawVerticalLine(int NodeCount)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-            DrawNode(NodeCount);//根據點數量，先畫出點
             if (NodeCount == 2)
             {
                 NodeStruct A = NodeList[0];
@@ -335,7 +257,7 @@ namespace WindowsFormsApp1
                         g.DrawLine(myPen, topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
                         EdgeStruct edge1 = new EdgeStruct(topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
                         EdgeList.Add(edge1);
-                        
+
                         Mid2.X = (NodeList[2].X + NodeList[1].X) / 2;
                         Mid2.Y = (NodeList[2].Y + NodeList[1].Y) / 2;
                         NodeStruct topNode2 = new NodeStruct();
@@ -400,7 +322,7 @@ namespace WindowsFormsApp1
         private NodeStruct GetTriangleExcenter(NodeStruct A, NodeStruct B, NodeStruct C)
         {
             NodeStruct Excenter = new NodeStruct();//新增點結構
-            NodeStruct noExcenter = new NodeStruct(0,0);//用於不存在外心時回傳
+            NodeStruct noExcenter = new NodeStruct(0, 0);//用於不存在外心時回傳
             //same point
             if (A.X == B.X && A.Y == B.Y && A.X == C.X && A.Y == C.Y)
             {
@@ -445,13 +367,107 @@ namespace WindowsFormsApp1
             }
         }
         //--------------------------------------------------------------------------------------------------
+        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
+        private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void StepByStep_Click(object sender, EventArgs e)
+        {
+
+        }
+        //--------------------------------------------------------------------------------------------------
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+
+        }
+        private void OpenFile_Click(object sender, EventArgs e)
+        {
+            IsReadFile = true;//用於輸出
+            ArrayList ReadFileArrayList = new ArrayList();//讀檔用
+            string line;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
+                while ((line = file.ReadLine()) != null)
+                {
+                    string[] lineArray = line.Select(o => o.ToString()).ToArray();
+                    if (lineArray.Length != 0 && lineArray[0] != "#")
+                    {
+                        ReadFileArrayList.Add(line);
+                    }
+                }
+                file.Close();
+            }
+            for (int i = 0; i < ReadFileArrayList.Count; i++)
+            {
+                Char delimiter = ' ';
+                String[] substrings = ReadFileArrayList[i].ToString().Split(delimiter);
+                if (substrings.Length == 1)
+                {
+                    //NodeNumList的值代表有幾個點
+                    NodeNumList.Add(Convert.ToInt32(ReadFileArrayList[i]));
+                }
+                else//為座標放入NodeList裡面
+                {
+                    NodeStruct node = new NodeStruct();//新增點結構
+                    node.X = Convert.ToInt32(substrings[0]);
+                    node.Y = Convert.ToInt32(substrings[1]);
+                    NodeList.Add(node);//塞到list裡面                   
+                }
+            }
+            this.button_Next.Show();//show按鈕，顯示測資個數
+            this.button_Next.Text = $"{NodeNumList.Count}";
+            RemainDateCount = NodeNumList.Count;
+        }
+
+        private void Output_txt_Click(object sender, EventArgs e)
+        {
+            FileStream fileStream = new FileStream(@"..\..\..\bbb.txt", FileMode.Create);
+            fileStream.Close();
+            StreamWriter sw = new StreamWriter(@"..\..\..\bbb.txt");
+            //當前點個數
+
+            if (IsReadFile != true)
+            {
+                //將NodeList中的元素跟具x值排序
+                var NodeList_Sort = NodeList.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
+                foreach (var node in NodeList_Sort)
+                {
+                    sw.Write("P " + node.X + " " + node.Y);
+                    sw.Write(System.Environment.NewLine);
+                }
+            }
+            else
+            {
+                List<NodeStruct> NodeListCopy = new List<NodeStruct>();
+                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+                {
+                    NodeStruct temp = new NodeStruct();
+                    temp = NodeList[i];
+                    NodeListCopy.Add(temp);
+                }
+                var NodeList_Sort = NodeListCopy.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
+                foreach (var node in NodeList_Sort)
+                {
+                    sw.Write("P " + node.X + " " + node.Y);
+                    sw.Write(System.Environment.NewLine);
+                }
+            }
+            var EdgeList_Sort = EdgeList.OrderBy(a => a.X1).ThenBy(b => b.Y1).ThenBy(c => c.X2).ThenBy(d => d.Y2).ToList();
+            foreach (var edge in EdgeList_Sort)
+            {
+                sw.Write("E " + edge.X1 + " " + edge.Y1 + " " + edge.X2 + " " + edge.Y2);
+                sw.Write(System.Environment.NewLine);
+            }
+            sw.Close();
+            MessageBox.Show("完成輸出txt");
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
         }
