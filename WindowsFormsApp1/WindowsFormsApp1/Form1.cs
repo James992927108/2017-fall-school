@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
-//1.匯入命名空間System.Drawing
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -20,12 +19,12 @@ namespace WindowsFormsApp1
     {
         List<int> NodeNumList = new List<int>();
         List<NodeStruct> NodeList = new List<NodeStruct>(); //紀錄所有的Node
-        ArrayList ReadFileArrayList = new ArrayList();//讀檔用
+        List<EdgeStruct> EdgeList = new List<EdgeStruct>(); //紀錄所有的Edge
+
         private int RemainDateCount = 0;//用於紀錄測資剩餘次數
-        //新增字型用
-        Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);
-        //新增畫筆用於畫線
-        Pen myPen = new Pen(Color.Red, 1);
+        Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);//新增字型用
+        Pen myPen = new Pen(Color.Red, 1);//新增畫筆用於畫線
+        bool IsReadFile = false;
         public Form1()
         {
             InitializeComponent();
@@ -58,6 +57,13 @@ namespace WindowsFormsApp1
             //            NodeList.Clear();//清空有問題
             //            NodeNumList.Clear();
             //            this.button_Next.Hide();
+            if (EdgeList.Count() != 0)
+            {
+                for (int i = 0; i < EdgeList.Count() + 1; i++)
+                {
+                    EdgeList.RemoveAt(0);
+                }
+            }
             this.panel1.Refresh();
         }
 
@@ -68,7 +74,10 @@ namespace WindowsFormsApp1
         }
         private void OpenFile_Click(object sender, EventArgs e)
         {
+            IsReadFile = true;//用於輸出
             clean_function();
+
+            ArrayList ReadFileArrayList = new ArrayList();//讀檔用
             string line;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -105,9 +114,56 @@ namespace WindowsFormsApp1
             RemainDateCount = NodeNumList.Count;
         }
 
+        private void Output_txt_Click(object sender, EventArgs e)
+        {
+            FileStream fileStream = new FileStream(@"..\..\..\bbb.txt", FileMode.Create);
+            fileStream.Close();
+            StreamWriter sw = new StreamWriter(@"..\..\..\bbb.txt");
+            //當前點個數
+
+            if (IsReadFile != true)
+            {
+                //將NodeList中的元素跟具x值排序
+                var NodeList_Sort = NodeList.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
+                foreach (var node in NodeList_Sort)
+                {
+                    sw.Write("P " + node.X + " " + node.Y);
+                    sw.Write(System.Environment.NewLine);
+                }
+                
+            }
+            else
+            {
+                int CurrentDataIndex = (NodeNumList.Count) - ( RemainDateCount + 1);//此處要+1在Next_Click()中RemainDateCount已先被-1
+                List<NodeStruct> NodeListCopy = new List<NodeStruct>();
+                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+                {
+                    NodeStruct temp = new NodeStruct();
+                    temp = NodeList[i];
+                    NodeListCopy.Add(temp);
+                }
+                var NodeList_Sort = NodeListCopy.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
+                foreach (var node in NodeList_Sort)
+                {
+                    sw.Write("P " + node.X + " " + node.Y);
+                    sw.Write(System.Environment.NewLine);
+                }
+            }
+
+            var EdgeList_Sort = EdgeList.OrderBy(a => a.X1).ThenBy(b => b.Y1).ThenBy(c => c.X2).ThenBy(d => d.Y2).ToList();
+            foreach (var edge in EdgeList_Sort)
+            {
+                sw.Write("E " + edge.X1 + " " + edge.Y1 + " " + edge.X2 + " " + edge.Y2);
+                sw.Write(System.Environment.NewLine);
+            }
+            sw.Close();
+            MessageBox.Show("完成輸出txt");
+        }
+
         private void Next_Click(object sender, EventArgs e)
         {
             clean_function();
+            
             int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;
             if (RemainDateCount == 0)
             {
@@ -121,9 +177,7 @@ namespace WindowsFormsApp1
                 //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
                 for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
                 {
-                    NodeStruct node = new NodeStruct();//新增點結構
-                    node.X = NodeList[0].X;
-                    node.Y = NodeList[0].Y;
+                    NodeStruct node = new NodeStruct(NodeList[0].X, NodeList[0].Y);//新增點結構
                     NodeList.Add(node);//塞到list裡面
                     NodeList.RemoveAt(0);
                 }
@@ -131,64 +185,17 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void Output_txt_Click(object sender, EventArgs e)
-        {
-            FileStream fileStream = new FileStream(@"..\..\..\..\bbb.txt", FileMode.Create);
-            fileStream.Close();
-            StreamWriter sw = new StreamWriter(@"..\..\..\..\bbb.txt");
-            //將NodeList中的元素跟具x值排序
-            var NodeList_Sort = from a in NodeList
-                                orderby a.X
-                                select a;
-
-            foreach (var node in NodeList_Sort)
-            {
-                sw.Write("P " + node.X + " " + node.Y);
-                sw.Write(System.Environment.NewLine);
-            }
-
-            int count = 0;
-            int temp_node_x = 0;
-            int temp_node_y = 0;
-            foreach (var node in NodeList_Sort)
-            {
-                if (count % 2 == 0)
-                {
-                    if (count == 0)
-                        sw.Write("E " + node.X + " " + node.Y);
-                    else
-                    {
-                        sw.Write("E " + temp_node_x + " " + temp_node_y);
-                        temp_node_x = node.X;
-                        temp_node_y = node.Y;
-                    }
-                }
-                else
-                {
-                    sw.Write(" " + node.X + " " + node.Y);
-                    temp_node_x = node.X;
-                    temp_node_y = node.Y;
-
-                    sw.Write(System.Environment.NewLine);
-                }
-                count++;
-            }
-
-            sw.Close();
-            MessageBox.Show("完成輸出txt");
-        }
         //--------------------------------------------------------------------------------------------------
         //private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
         //private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
 
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
-            NodeStruct node = new NodeStruct();//新增點結構
-            node.X = e.X;
-            node.Y = e.Y;
+            IsReadFile = false;
+            NodeStruct node = new NodeStruct(e.X,e.Y);//新增點結構
             NodeList.Add(node);//將點塞到list裡面
-
             clean_function();//每次都要先清空畫布
+            
             DrawVerticalLine(NodeList.Count);
         }
 
@@ -205,11 +212,15 @@ namespace WindowsFormsApp1
                 {
                     Mid.Y = (A.Y + B.Y) / 2;
                     g.DrawLine(myPen, 0, Mid.Y, 600, Mid.Y);
+                    EdgeStruct edge = new EdgeStruct(0, Mid.Y, 600, Mid.Y);
+                    EdgeList.Add(edge);
                 }
                 if (A.Y == B.Y && A.X != B.X)//水平
                 {
                     Mid.X = (A.X + B.X) / 2;
                     g.DrawLine(myPen, Mid.X, 0, Mid.X, 600);
+                    EdgeStruct edge = new EdgeStruct(Mid.X, 0, Mid.X, 600);
+                    EdgeList.Add(edge);
                 }
                 if (A.X != B.X && A.Y != B.Y)//不同點
                 {
@@ -226,6 +237,8 @@ namespace WindowsFormsApp1
                     downNode.X = Mid.X - K * normal_vector.X;
                     downNode.Y = Mid.Y - K * normal_vector.Y;
                     g.DrawLine(myPen, topNode.X, topNode.Y, downNode.X, downNode.Y);
+                    EdgeStruct edge = new EdgeStruct(topNode.X, topNode.Y, downNode.X, downNode.Y);
+                    EdgeList.Add(edge);
                 }
             }
             if (NodeCount == 3) //三點時要找外心
@@ -234,7 +247,6 @@ namespace WindowsFormsApp1
 
                 NodeStruct Excenter = new NodeStruct();//三點時要找外心
                 Excenter = GetTriangleExcenter(NodeList[0], NodeList[1], NodeList[2]);
-
                 if (Excenter.X != 0 && Excenter.Y != 0)//有找到外心時
                 {
                     g.DrawImageUnscaled(get_NodeBitmap(), Excenter.X, Excenter.Y);
@@ -276,6 +288,8 @@ namespace WindowsFormsApp1
                     for (int i = 0; i < 3; i++)
                     {
                         g.DrawLine(myPen, Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
+                        EdgeStruct edge = new EdgeStruct(Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
+                        EdgeList.Add(edge);
                     }
                 }
                 else//沒有外心時
@@ -295,6 +309,11 @@ namespace WindowsFormsApp1
 
                         g.DrawLine(myPen, 0, Mid1.Y, 600, Mid1.Y);
                         g.DrawLine(myPen, 0, Mid2.Y, 600, Mid2.Y);
+
+                        EdgeStruct edge1 = new EdgeStruct(0, Mid1.Y, 600, Mid1.Y);
+                        EdgeList.Add(edge1);
+                        EdgeStruct edge2 = new EdgeStruct(0, Mid2.Y, 600, Mid2.Y);
+                        EdgeList.Add(edge2);
                     }
                     if (NodeList[0].Y == NodeList[1].Y && NodeList[0].Y == NodeList[2].Y)//水平
                     {
@@ -309,6 +328,11 @@ namespace WindowsFormsApp1
 
                         g.DrawLine(myPen, Mid1.X, 0, Mid1.X, 600);
                         g.DrawLine(myPen, Mid2.X, 0, Mid2.X, 600);
+
+                        EdgeStruct edge1 = new EdgeStruct(Mid1.X, 0, Mid1.X, 600);
+                        EdgeList.Add(edge1);
+                        EdgeStruct edge2 = new EdgeStruct(Mid2.X, 0, Mid2.X, 600);
+                        EdgeList.Add(edge2);
                     }
                     if ((NodeList[0].Y / NodeList[0].X) == (NodeList[1].Y / NodeList[1].X) && (NodeList[0].Y / NodeList[0].X) == (NodeList[2].Y / NodeList[2].X))//為一直線
                     {
@@ -327,7 +351,9 @@ namespace WindowsFormsApp1
                         downNode1.Y = Mid1.Y - K * normal_vector.Y;
 
                         g.DrawLine(myPen, topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
-
+                        EdgeStruct edge1 = new EdgeStruct(topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
+                        EdgeList.Add(edge1);
+                        
                         Mid2.X = (NodeList[2].X + NodeList[1].X) / 2;
                         Mid2.Y = (NodeList[2].Y + NodeList[1].Y) / 2;
                         NodeStruct topNode2 = new NodeStruct();
@@ -338,6 +364,8 @@ namespace WindowsFormsApp1
                         downNode2.Y = Mid2.Y - K * normal_vector.Y;
 
                         g.DrawLine(myPen, topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
+                        EdgeStruct edge2 = new EdgeStruct(topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
+                        EdgeList.Add(edge2);
                     }
                 }
             }
@@ -464,6 +492,17 @@ namespace WindowsFormsApp1
         {
             X = p1;
             Y = p2;
+        }
+    }
+    public struct EdgeStruct
+    {
+        public int X1, Y1, X2, Y2;
+        public EdgeStruct(int p1, int p2, int p3, int p4)
+        {
+            X1 = p1;
+            Y1 = p2;
+            X2 = p3;
+            Y2 = p4;
         }
     }
 }
