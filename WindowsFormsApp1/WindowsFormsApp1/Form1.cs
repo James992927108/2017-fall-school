@@ -136,7 +136,8 @@ namespace WindowsFormsApp1
             {
                 int CurrentDataIndex = (NodeNumList.Count) - ( RemainDateCount + 1);//此處要+1在Next_Click()中RemainDateCount已先被-1
                 List<NodeStruct> NodeListCopy = new List<NodeStruct>();
-                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+                //由後往前讀
+                for (int i = NodeList.Count - 1; i > NodeList.Count - 1 - NodeNumList[CurrentDataIndex]; i--)
                 {
                     NodeStruct temp = new NodeStruct();
                     temp = NodeList[i];
