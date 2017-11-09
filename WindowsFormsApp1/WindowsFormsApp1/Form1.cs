@@ -30,23 +30,6 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
-        private void Run_Click(object sender, EventArgs e)
-        {
-            //2.建立控制項的Graphic物件，將這動作想像是開啟一個空白畫布
-            Graphics gra = this.panel1.CreateGraphics();
-            //3.新增Pen物件，想像他是一隻筆
-            Pen myPen = new Pen(Color.Red, 1);
-            //4.在控制項上繪製，想像你在空白畫布上畫東西
-            //4.1繪製直線
-            gra.DrawLine(myPen, 1, 1, 100, 100);
-            //4.2繪製正方形
-            gra.DrawRectangle(myPen, 10, 20, 80, 80);
-            //4.3繪製一拋物線
-            gra.DrawArc(myPen, 10, 20, 70, 80, 123, 233);
-            //4.4繪製一矩形
-            gra.DrawRectangle(myPen, 50, 60, 110, 120);
-        }
-
         private void Clean_Click(object sender, EventArgs e)
         {
             clean_function();
@@ -129,15 +112,13 @@ namespace WindowsFormsApp1
                 {
                     sw.Write("P " + node.X + " " + node.Y);
                     sw.Write(System.Environment.NewLine);
-                }
-                
+                }          
             }
             else
             {
-                int CurrentDataIndex = (NodeNumList.Count) - ( RemainDateCount + 1);//此處要+1在Next_Click()中RemainDateCount已先被-1
                 List<NodeStruct> NodeListCopy = new List<NodeStruct>();
-                //由後往前讀
-                for (int i = NodeList.Count - 1; i > NodeList.Count - 1 - NodeNumList[CurrentDataIndex]; i--)
+                int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;//總數-剩餘次數即，為當前index
+                for (int i = 0 ; i < NodeNumList[CurrentDataIndex - 1]; i++)
                 {
                     NodeStruct temp = new NodeStruct();
                     temp = NodeList[i];
@@ -150,7 +131,6 @@ namespace WindowsFormsApp1
                     sw.Write(System.Environment.NewLine);
                 }
             }
-
             var EdgeList_Sort = EdgeList.OrderBy(a => a.X1).ThenBy(b => b.Y1).ThenBy(c => c.X2).ThenBy(d => d.Y2).ToList();
             foreach (var edge in EdgeList_Sort)
             {
@@ -164,8 +144,16 @@ namespace WindowsFormsApp1
         private void Next_Click(object sender, EventArgs e)
         {
             clean_function();
+            int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;//總數-剩餘次數即，為當前index
+            //每次進來前先將上次的點刪除
+            if (CurrentDataIndex != 0)//第一次不須移除
+            {
+                for (int i = 0; i < NodeNumList[CurrentDataIndex - 1]; i++)
+                {
+                    NodeList.RemoveAt(0);
+                }
+            }
             
-            int CurrentDataIndex = (NodeNumList.Count) - RemainDateCount;
             if (RemainDateCount == 0)
             {
                 MessageBox.Show("已無資料");
@@ -175,20 +163,13 @@ namespace WindowsFormsApp1
             {
                 this.button_Next.Text = $"{RemainDateCount}";
                 DrawVerticalLine(NodeNumList[CurrentDataIndex]);
-                //NodeList[0].x, NodeList[0].y => node放到nodelist後面，並移除nodelist的第一個，用於下一次計算
-                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
-                {
-                    NodeStruct node = new NodeStruct(NodeList[0].X, NodeList[0].Y);//新增點結構
-                    NodeList.Add(node);//塞到list裡面
-                    NodeList.RemoveAt(0);
-                }
                 RemainDateCount--;
             }
         }
 
         //--------------------------------------------------------------------------------------------------
-        //private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
-        //private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
+        private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
+        private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
 
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
@@ -469,21 +450,12 @@ namespace WindowsFormsApp1
         {
 
         }
-        //--------------------------------------------------------------------------------------------------
-        private void TEST_Click(object sender, EventArgs e)
+
+        private void button2_Click(object sender, EventArgs e)
         {
-            int size = 5;
-            Bitmap bm = new Bitmap(size, size);     //这里调整点的大小   
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    bm.SetPixel(i, j, Color.Black);       //设置点的颜色   
-                }
-            }
-            Graphics g = Graphics.FromHwnd(this.panel1.Handle);     //画在哪里     
-            g.DrawImageUnscaled(bm, 100, 100);       //具体坐标
+
         }
+        //--------------------------------------------------------------------------------------------------
     }
 
     public struct NodeStruct
