@@ -31,21 +31,12 @@ namespace WindowsFormsApp1
             InitializeComponent();
         }
 
-        private void CleanNode_Click(object sender, EventArgs e)
-        {
-            int temp = NodeList.Count;
-            for (int i = 0; i < temp; i++)
-            {
-                NodeList.RemoveAt(0);
-            }
-        }
-
-        private void CleanEdge_Click(object sender, EventArgs e)
+        private void Clean_Click(object sender, EventArgs e)
         {
             Clean_function();
         }
 
-        public void Clean_function()
+        public void Clean_function()//清除當前邊與點
         {
             if (EdgeList.Count() != 0)
             {
@@ -55,22 +46,33 @@ namespace WindowsFormsApp1
                     EdgeList.RemoveAt(0);
                 }
             }
+            if (IsReadFile == true)
+            {
+                if (CurrentDataIndex != 0) //第一次不須移除
+                {
+                    for (int i = 0; i < NodeNumList[CurrentDataIndex - 1]; i++)
+                    {
+                        NodeList.RemoveAt(0);
+                    }
+                }
+            }
+            else
+            {
+                int temp = NodeList.Count();
+
+                for (int i = 0; i < temp; i++)
+                {
+                    NodeList.RemoveAt(0);
+                }
+            }
             this.panel1.Refresh();
         }
 
         private void Next_Click(object sender, EventArgs e)
         {
-            Clean_function();
             CurrentDataIndex = NodeNumList.Count - RemainDateCount;//總數-剩餘次數即，為當前index
-            RemainDateCount--;
-            //每次進來前先將上次的點刪除
-            if (CurrentDataIndex != 0)//第一次不須移除
-            {
-                for (int i = 0; i < NodeNumList[CurrentDataIndex - 1]; i++)
-                {
-                    NodeList.RemoveAt(0);
-                }
-            }
+            //每次要先清除上次的
+            Clean_function();
             if (RemainDateCount == 0)
             {
                 MessageBox.Show("已無資料");
@@ -78,6 +80,7 @@ namespace WindowsFormsApp1
             }
             else
             {
+                RemainDateCount--;
                 this.button_Next.Text = $"{RemainDateCount}";
                 DrawNode(NodeNumList[CurrentDataIndex]);//根據點數量，先畫出點
             }
