@@ -337,7 +337,17 @@ namespace WindowsFormsApp1
             {
                 return noExcenter;
             }
-            double x1 = A.X, x2 = B.X, x3 = C.X, y1 = A.Y, y2 = B.Y, y3 = C.Y;
+            //判斷直角三角形
+            //必須讓AB平行於x軸(在球centerx時，若垂直x軸會出現(y1-y2 = 0)，必須先找哪兩點平行x軸)
+            if (A.Y != B.Y)
+            {
+                NodeStruct temp = new NodeStruct();
+                temp = C;
+                C = B;
+                B = A;
+                A = temp;
+            }
+            double x1 = A.X, y1 = A.Y, x2 = B.X, y2 = A.Y, x3 = C.X, y3 = C.Y;
             double C1 = Math.Pow(x1, 2) + Math.Pow(y1, 2) - Math.Pow(x2, 2) - Math.Pow(y2, 2);
             double C2 = Math.Pow(x2, 2) + Math.Pow(y2, 2) - Math.Pow(x3, 2) - Math.Pow(y3, 2);
             double centery = (C1 * (x2 - x3) - C2 * (x1 - x2)) / (2 * (y1 - y2) * (x2 - x3) - 2 * (y2 - y3) * (x1 - x2));
