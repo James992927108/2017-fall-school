@@ -439,9 +439,9 @@ namespace WindowsFormsApp1
 
         private void Output_txt_Click(object sender, EventArgs e)
         {
-            FileStream fileStream = new FileStream(@"..\..\..\bbb.txt", FileMode.Create);
+            FileStream fileStream = new FileStream(@"..\..\..\Output.txt", FileMode.Create);
             fileStream.Close();
-            StreamWriter sw = new StreamWriter(@"..\..\..\bbb.txt");
+            StreamWriter sw = new StreamWriter(@"..\..\..\Output.txt");
             //當前點個數
 
             if (IsReadFile != true)
