@@ -203,7 +203,8 @@ namespace WindowsFormsApp1
                 {
                     NodeStruct Mid1 = new NodeStruct();
                     NodeStruct Mid2 = new NodeStruct();
-                    if (NodeList[0].X == NodeList[1].X && NodeList[0].X == NodeList[2].X)//垂直
+                    //垂直
+                    if (NodeList[0].X == NodeList[1].X && NodeList[0].X == NodeList[2].X)
                     {
                         List<int> tempList = new List<int>();
                         tempList.Add(NodeList[0].Y);
@@ -222,7 +223,8 @@ namespace WindowsFormsApp1
                         EdgeStruct edge2 = new EdgeStruct(0, Mid2.Y, 600, Mid2.Y);
                         EdgeList.Add(edge2);
                     }
-                    if (NodeList[0].Y == NodeList[1].Y && NodeList[0].Y == NodeList[2].Y)//水平
+                    //水平
+                    if (NodeList[0].Y == NodeList[1].Y && NodeList[0].Y == NodeList[2].Y)
                     {
                         //找2中點做2條水平線，對x軸要排序
                         List<int> tempList = new List<int>();
@@ -241,15 +243,23 @@ namespace WindowsFormsApp1
                         EdgeStruct edge2 = new EdgeStruct(Mid2.X, 0, Mid2.X, 600);
                         EdgeList.Add(edge2);
                     }
-                    if ((NodeList[0].Y / NodeList[0].X) == (NodeList[1].Y / NodeList[1].X) && (NodeList[0].Y / NodeList[0].X) == (NodeList[2].Y / NodeList[2].X))//為一直線
+                    //為一直線
+                    if ((NodeList[0].Y / NodeList[0].X) == (NodeList[1].Y / NodeList[1].X) && (NodeList[0].Y / NodeList[0].X) == (NodeList[2].Y / NodeList[2].X))
                     {
+
                         NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
                         normal_vector.X = NodeList[0].Y - NodeList[1].Y;
                         normal_vector.Y = -(NodeList[0].X - NodeList[1].X);
                         int K = 10000;
-
-                        Mid1.X = (NodeList[0].X + NodeList[1].X) / 2;
-                        Mid1.Y = (NodeList[0].Y + NodeList[1].Y) / 2;
+                        List<NodeStruct> tempList = new List<NodeStruct>();
+                        for (int i = 0; i < 3; i++)
+                        {
+                            tempList.Add(NodeList[i]);
+                        }
+                        var NodeList_Sort = tempList.OrderBy(a => a.X).ToList();//共線時，3點等比，比較x的大小，由小到大依序排序，因此可得到正確的中點
+                        //例如 a(200 200)b(100 100)c(300 300) ->sort b a c 
+                        Mid1.X = (NodeList_Sort[0].X + NodeList_Sort[1].X) / 2;
+                        Mid1.Y = (NodeList_Sort[0].Y + NodeList_Sort[1].Y) / 2;
                         NodeStruct topNode1 = new NodeStruct();
                         topNode1.X = Mid1.X + K * normal_vector.X;
                         topNode1.Y = Mid1.Y + K * normal_vector.Y;
@@ -261,8 +271,8 @@ namespace WindowsFormsApp1
                         EdgeStruct edge1 = new EdgeStruct(topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
                         EdgeList.Add(edge1);
 
-                        Mid2.X = (NodeList[2].X + NodeList[1].X) / 2;
-                        Mid2.Y = (NodeList[2].Y + NodeList[1].Y) / 2;
+                        Mid2.X = (NodeList_Sort[2].X + NodeList_Sort[1].X) / 2;
+                        Mid2.Y = (NodeList_Sort[2].Y + NodeList_Sort[1].Y) / 2;
                         NodeStruct topNode2 = new NodeStruct();
                         topNode2.X = Mid2.X + K * normal_vector.X;
                         topNode2.Y = Mid2.Y + K * normal_vector.Y;
@@ -317,7 +327,7 @@ namespace WindowsFormsApp1
                 return false;
             //向量OA和向量OB共线，以距离判断大小
             int d1 = (a.X - center.X) * (a.X - center.X) + (a.Y - center.Y) * (a.Y - center.Y);
-            int d2 = (b.X - center.X) * (b.X - center.Y) + (b.Y - center.Y) * (b.Y - center.Y);
+            int d2 = (b.X - center.X) * (b.X - center.X) + (b.Y - center.Y) * (b.Y - center.Y);
             return d1 > d2;
         }
         //--------------------------------------------------------------------------------------------------
