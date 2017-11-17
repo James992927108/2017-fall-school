@@ -26,6 +26,7 @@ namespace WindowsFormsApp1
         Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);//新增字型用
         Pen myPen = new Pen(Color.Red, 1);//新增畫筆用於畫線
         bool IsReadFile = false;
+        int K = 1000;
         public Form1()
         {
             InitializeComponent();
@@ -136,7 +137,7 @@ namespace WindowsFormsApp1
                     normal_vector.Y = -(A.X - B.X);
                     Mid.X = (A.X + B.X) / 2;
                     Mid.Y = (A.Y + B.Y) / 2;
-                    int K = 10000;
+                    
                     NodeStruct topNode = new NodeStruct();
                     topNode.X = Mid.X + K * normal_vector.X;
                     topNode.Y = Mid.Y + K * normal_vector.Y;
@@ -184,7 +185,7 @@ namespace WindowsFormsApp1
                     }
 
                     List<NodeStruct> Vertical_line_List = new List<NodeStruct>();
-                    int K = 10000;
+                  
                     for (int i = 0; i < 3; i++)
                     {
                         NodeStruct Vertical_line = new NodeStruct();
@@ -250,7 +251,7 @@ namespace WindowsFormsApp1
                         NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
                         normal_vector.X = NodeList[0].Y - NodeList[1].Y;
                         normal_vector.Y = -(NodeList[0].X - NodeList[1].X);
-                        int K = 10000;
+                        
                         List<NodeStruct> tempList = new List<NodeStruct>();
                         for (int i = 0; i < 3; i++)
                         {
@@ -347,7 +348,7 @@ namespace WindowsFormsApp1
             {
                 return noExcenter;
             }
-            if (A.Y != B.Y && A.X == B.X)
+            if (A.Y != B.Y && A.X == B.X)//判斷直角三型
             {
                 NodeStruct temp = new NodeStruct();
                 temp = C;
@@ -416,6 +417,10 @@ namespace WindowsFormsApp1
                 while ((line = file.ReadLine()) != null)
                 {
                     string[] lineArray = line.Select(o => o.ToString()).ToArray();
+                    if (lineArray.Length != 0 && lineArray[0] == "0" )
+                    {
+                        break;
+                    }
                     if (lineArray.Length != 0 && lineArray[0] != "#")
                     {
                         ReadFileArrayList.Add(line);
@@ -443,6 +448,31 @@ namespace WindowsFormsApp1
             this.button_Next.Show();//show按鈕，顯示測資個數
             this.button_Next.Text = $"{NodeNumList.Count}";
             RemainDateCount = NodeNumList.Count;
+        }
+        private void OpenOutputFile_Clic(object sender, EventArgs e)
+        {
+            string line;
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog1.FileName);
+                while ((line = file.ReadLine()) != null)
+                {
+                    Char delimiter = ' ';
+                    String[] substrings = line.Split(delimiter);
+                    if (substrings[0] == "P")
+                    {
+                        g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(substrings[1]), Convert.ToInt32(substrings[2]));
+                        g.DrawString($"{substrings[1]},{substrings[2]}", myFont, Brushes.Firebrick, Convert.ToInt32(substrings[1]), Convert.ToInt32(substrings[2]));
+                    }
+                    if (substrings[0] == "E")
+                    {
+                        g.DrawLine(myPen, Convert.ToInt32(substrings[1]), Convert.ToInt32(substrings[2]), Convert.ToInt32(substrings[3]), Convert.ToInt32(substrings[4]));
+                    }
+                }
+                file.Close();
+            }
         }
 
         private void Output_txt_Click(object sender, EventArgs e)
@@ -492,6 +522,8 @@ namespace WindowsFormsApp1
         {
 
         }
+
+        
         //--------------------------------------------------------------------------------------------------
     }
 
