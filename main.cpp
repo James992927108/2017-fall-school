@@ -8,8 +8,12 @@
 #include <process.h>
 #include <time.h>
 using namespace std;
+typedef vector<double> double_1d;
+typedef vector<vector<double>> double_2d;
+typedef vector<FileFont> FileFont_1d;
+typedef vector<Path> Path_1d;
 
-int NodeCount = 50 ;
+const int CityCount = 50 ;
 struct NodeInfo{
     int Index = 0;
     int X = 0;
@@ -30,17 +34,44 @@ struct Path{
     Path(int index,int x,int y,double lnn):Index(index),X(x),Y(y),Lnn(lnn) {}
 };
 
-typedef vector<double> double_1d;
-typedef vector<vector<double>> double_2d;
-typedef vector<FileFont> FileFont_1d;
-typedef vector<Path> Path_1d;
+struct city_info{
+    double_2d tau_vector;//線段 ij 在時間 t 之費洛蒙濃度_
+    double_2d delta_tau_vector;//線段 ij 在時間 t 之費洛蒙濃度_
+    double_2d eta_vector;//代表期望値，通常為線段 ij 長度之倒數
+};
+class ant_info{
+private:
+    int allowed_city[CityCount];//the left cities which ant can go
+private:
+    int choose_next_city();
+public:
+    int route[CityCount];
+public:
+    ant_info();
+    void move();
+};
+ant_info::ant_info() {
+    for (int i = 0; i < CityCount; i++)
+    {
+        allowed_city[i] = 1;//1 = can go, 0 = can't
+    }
+}
+void ant_info::move(){
+    int n = choose_next_city();
+    add_city(n);
+}
+int ant_info::choose_next_city(){
+
+    return 1;
+}
+
 
 void reafFile(FileFont_1d &FileVector) {
-    string line[NodeCount];//store each line in txt
-    string temp[NodeCount][3];//save txt.
+    string line[CityCount];//store each line in txt
+    string temp[CityCount][3];//save txt.
     ifstream file;//read only
     file.open("eil51.txt", ios::in);//read only mode
-        for (int i = 0; i < NodeCount; i++) {
+        for (int i = 0; i < CityCount; i++) {
             getline(file, line[i]);
             stringstream ss_line(line[i]);//ex 1 37 52
             for (int j = 0; j < 3; j++)
@@ -58,56 +89,19 @@ double get_Randon(double Min, double Max) {
     double rand_num = (Max - Min) * rand() / RAND_MAX + (Min);
     return rand_num;
 }
-double cal_Distance(FileFont_1d FileVector,int node1, int node2) {
-    int x1 = FileVector[node1].X;
-    int y1 = FileVector[node1].Y;
-    int x2 = FileVector[node2].X;
-    int y2 = FileVector[node2].Y;
+double cal_Distance(FileFont_1d File_Vector,int node1, int node2) {
+    int x1 = File_Vector[node1].X;
+    int y1 = File_Vector[node1].Y;
+    int x2 = File_Vector[node2].X;
+    int y2 = File_Vector[node2].Y;
     return sqrt(pow(x1-x2,2)+pow(y1-y2,2));
 }
-void print_FileVecter(FileFont_1d FileVector) {
-    cout << "FileVecter\n";
-    for(int i = 0 ; i < FileVector.size() ; i ++){
-        cout << i <<"\t"<< FileVector[i].Index <<"\t"<< FileVector[i].X <<"\t"<<FileVector[i].Y <<"\t"<<FileVector[i].Vaild_bit<<"\n" ;
-    }
-}
-
-void print_PathArray(Path_1d PathArray) {
-    cout << "PathArray\n";
-    for(int i = 0 ;i < PathArray.size() ;i++){
-        cout <<i<<"\t"
-             <<"select\t"<<PathArray[i].Index<<"\t"
-             <<PathArray[i].X<<"\t"
-             <<PathArray[i].Y<<"\t"
-             <<"totaldistance\t"<< PathArray[i].Lnn <<"\n";
-    }
-}
-int main(){
-    FileFont_1d FileVector;//所有點資料
-    reafFile(FileVector);
-    cout << FileVector.size()<<"\n" ;
-
-    print_FileVecter(FileVector);
-
-    srand((unsigned) time(NULL) + getpid());
-    //1.起始状態及參數設定
-    double_1d row;
-    row.assign(NodeCount,0.0);
-
-    double_2d pheromone_2d;
-    pheromone_2d.assign(NodeCount,row);
-
-    double pheromone_fallrate = 0.8;
-    int ant_count = 50 ;
-    double alpha = 0.5;
-    double beta = 0.5;
-    int T_max  = 10;
+double get_Lnn(FileFont_1d FileVector){
     //初始pheromone[50][50]，τ ij = τ 0 = (NLnn )-1，N為總線段數，
     //求 Lnn 想法 : 隨機取一點作為起點，利用(貪心解法) 所求出的一個可能路徑之路徑總距離
     //求 路徑長
     Path_1d PathArray;
-
-    int index = get_Randon(0,NodeCount-1);
+    int index = get_Randon(0,CityCount-1);
     int x = FileVector[index].X;
     int y = FileVector[index].Y;
     double Lnn = 0 ;
@@ -133,9 +127,76 @@ int main(){
         PathArray.push_back(Path(index,x,y,Lnn));
         FileVector[index].Vaild_bit = 1;
     }
-    print_PathArray(PathArray);
-    print_FileVecter(FileVector);
+//    cout << Lnn <<"\n";
+    return Lnn;
+}
 
+void print_FileVecter(FileFont_1d FileVector) {
+    cout << "FileVecter\n";
+    for(int i = 0 ; i < FileVector.size() ; i ++){
+        cout << i <<"\t"<< FileVector[i].Index <<"\t"<< FileVector[i].X <<"\t"<<FileVector[i].Y <<"\t"<<FileVector[i].Vaild_bit<<"\n" ;
+    }
+}
+
+void print_PathArray(Path_1d PathArray) {
+    cout << "PathArray\n";
+    for(int i = 0 ;i < PathArray.size() ;i++){
+        cout <<i<<"\t"
+             <<"select\t"<<PathArray[i].Index<<"\t"
+             <<PathArray[i].X<<"\t"
+             <<PathArray[i].Y<<"\t"
+             <<"totaldistance\t"<< PathArray[i].Lnn <<"\n";
+    }
+}
+int main(){
+    FileFont_1d File_Vector;//所有點資料
+    reafFile(File_Vector);
+//    print_FileVecter(File_Vector);
+    srand((unsigned) time(NULL) + getpid());
+
+    //1.起始状態及參數設定
+    double pheromone_fallrate = 0.8;
+    int ant_count = 50 ;
+    double alpha = 0.5;//須測試
+    double beta = 0.5;//須測試
+    int T_max  = 10;
+
+    int N = ( CityCount * (CityCount - 1)) / 2;//線段總數
+    double tau = 1 / (N * get_Lnn(File_Vector));
+
+    city_info city;
+    //初始tau array ,eta array ,transition probability array
+    for(int i = 0 ; i < CityCount ; i ++){
+        for(int j = 0 ;j < CityCount ; j++ ){
+            if(i==j){
+                city.tau_vector[i][j] = 0;
+                city.eta_vector[i][j] = 0;
+            }else{
+                city.tau_vector[i][j] = tau;
+                city.delta_tau_vector[i][j] = 0;
+                city.eta_vector[i][j] = cal_Distance(File_Vector,i,j);
+            }
+        }
+    }
+    //初始螞蟻
+    ant_info ants[ant_count];
+    for (int i = 0; i < ant_count; i++){//初始每一隻螞蟻的起始位置，且不重複
+        do{
+            ants[i].route[0] = rand() % CityCount;//螞蟻的起始範圍為城市個數
+
+            for (int j = 0; j < i; j++){
+                if (ants[i].route[0]==ants[j].route[0]) {
+                    ants[i].route[0] = 0;
+                    break;
+                }
+            }
+        }while(ants[i].route[0]==0);
+    }
+    for(int i = 0 ;i < ant_count ; i ++ ){
+        for(int j = 0 ; j < CityCount - 1 ; j++){//每隻螞蟻移動 CityCount - 1 初始的第一次
+            ants[i].move();
+        }
+    }
 
     return 0;
 }
