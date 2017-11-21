@@ -136,7 +136,6 @@ int main() {
 //    print_FileVecter(File_Vector);
     srand((unsigned) time(NULL) + getpid());
 
-
     //1.起始状態及參數設定
     double pheromone_fallrate = 0.9;
     int ant_count = 50;
@@ -174,9 +173,24 @@ int main() {
         ants[i].allowed_city = int_1d(CityCount, 0);
         ants[i].probability = double_1d(CityCount, 0.0);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
     for(int q = 0 ; q < 1000 ; q++){
+
+        //------------------------------------------------------------------------------
         for (int i = 0; i < ant_count; i++) {
-            //每一隻皆要與剩下的點做計算
+            //每一隻皆要與剩下的點做計算，找下一個點
             for (int j = 0; j < CityCount; j++) {
                 double denominator = 0.0;
                 double prob_total = 0;
@@ -191,14 +205,14 @@ int main() {
                     //先算分母
                     for (int k = 0; k < CityCount; k++) {
                         if (ants[i].allowed_city[k] == 0) {
-                            denominator = denominator + pow((1.0 / city.Eta_vector[ants[i].route[j - 1]][k]), beta) *
+                            denominator = denominator + pow((city.Eta_vector[ants[i].route[j - 1]][k]), beta) *
                                                         pow((city.Tau_vector[ants[i].route[j - 1]][k]), alpha);
                         }
                     }
                     //再算分子
                     for (int k = 0; k < CityCount; k++) {
                         if (ants[i].allowed_city[k] == 0) {
-                            ants[i].probability[k] = pow((1.0 / city.Eta_vector[ants[i].route[j - 1]][k]), beta) *
+                            ants[i].probability[k] = pow((city.Eta_vector[ants[i].route[j - 1]][k]), beta) *
                                                      pow((city.Tau_vector[ants[i].route[j - 1]][k]), alpha) / denominator;
                             prob_total += ants[i].probability[k];
                         } else
@@ -223,6 +237,7 @@ int main() {
                     }
                 }
             }
+
             //計算每一隻螞蟻的 總路徑長
             double total_distance = 0;
             for (int j = 0; j < CityCount - 1; j++) {
@@ -233,9 +248,9 @@ int main() {
             }
             total_distance += cal_Distance(File_Vector, ants[i].route[0], ants[i].route[CityCount-1]);
             ants[i].fitness = total_distance;
-
-
         }
+
+        //------------------------------------------------------------------------------
         //更新費洛蒙
         //找出50隻最好路徑的那隻
         double Min = 10000;
@@ -255,11 +270,20 @@ int main() {
             bestAnt.index = Min_index;
         }
 
-
         for (int j = 0; j < CityCount; j++) {
             for (int k = 0; k < CityCount; k++) {
                 city.Tau_vector[j][k] = pheromone_fallrate * city.Tau_vector[j][k];
             }
+        }
+
+        for (int i = 0; i < ant_count; i++) {
+
+            for (int j = 0; j < CityCount - 1; j++) {
+                int node1 = ants[i].route[j];
+                int node2 = ants[i].route[j + 1];
+                city.Tau_vector[node1][node2] += (Q / ants[i].fitness);
+            }
+            city.Tau_vector[ants[i].route[CityCount - 1]][ants[i].route[0]] += ( Q / ants[i].fitness);
         }
 
         for (int j = 0; j < CityCount - 1; j++) {
@@ -267,7 +291,7 @@ int main() {
             int node2 = bestAnt.route[j + 1];
             city.Tau_vector[node1][node2] += (Q / bestAnt.fitness);
         }
-        city.Tau_vector[bestAnt.route[0]][bestAnt.route[CityCount - 1]] += ( Q / bestAnt.fitness);
+        city.Tau_vector[bestAnt.route[CityCount - 1]][bestAnt.route[0]] += ( Q / bestAnt.fitness);
         //cout << "\n" << "fitness" << "\n";
         cout << bestAnt.fitness << "\t"<<endl;
 
@@ -280,6 +304,9 @@ int main() {
             }
             ants[i].fitness = 0;
         }
+
+
+        //------------------------------------------------------------------------------
     }
 
     return 0;
