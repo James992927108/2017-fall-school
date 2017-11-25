@@ -18,13 +18,15 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         List<int> NodeNumList = new List<int>();
-        List<NodeStruct> NodeList = new List<NodeStruct>(); //紀錄所有的Node
-        List<EdgeStruct> EdgeList = new List<EdgeStruct>(); //紀錄所有的Edge
+        List<DataStruct.Node> NodeList = new List<DataStruct.Node>(); //紀錄所有的Node
+        List<DataStruct.Edge> EdgeList = new List<DataStruct.Edge>(); //紀錄所有的Edge
 
         private int RemainDateCount = 0;//用於紀錄測資剩餘次數
         private int CurrentDataIndex = 0;//用於讀取NodeNumList中第幾個值
         Font myFont = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular);//新增字型用
         Pen myPen = new Pen(Color.Red, 1);//新增畫筆用於畫線
+        Pen myPen1 = new Pen(Color.Blue, 1);//新增畫筆用於畫線
+
         bool IsReadFile = false;
         int K = 1000;
         public Form1()
@@ -90,7 +92,7 @@ namespace WindowsFormsApp1
         private void OnPanelMouseDown(object sender, MouseEventArgs e)
         {
             IsReadFile = false;
-            NodeStruct node = new NodeStruct(e.X, e.Y);//新增點結構
+            DataStruct.Node node = new DataStruct.Node(e.X, e.Y);//新增點結構
             NodeList.Add(node);//將點塞到list裡面
             DrawNode(NodeList.Count);//根據點數量，先畫出點
         }
@@ -107,196 +109,301 @@ namespace WindowsFormsApp1
             }
         }
         //--------------------------------------------------------------------------------------------------
+        private void StepByStep_Click(object sender, EventArgs e)
+        {
+            
+        }
 
-        private void DrawVerticalLine(int NodeCount)
+        //--------------------------------------------------------------------------------------------------
+        DataStruct.Node[] CH = new DataStruct.Node[20000];
+        private void Get_ConvexHull(List<DataStruct.Node> tempList)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+
+            MergeSort(0, tempList.Count - 1, tempList);
+            int m = 0;
+            for (int i = 0; i < tempList.Count; i++)
+            {
+                while (m >= 2 && cross(CH[m - 2], CH[m - 1], tempList[i]) <= 0) m--;
+                CH[m++] = tempList[i];
+            }
+            for (int i = tempList.Count - 2, t = m + 1; i >= 0; i--)
+            {
+                while (m >= t && cross(CH[m - 2], CH[m - 1], tempList[i]) <= 0) m--;
+                CH[m++] = tempList[i];
+            }
+            for (int i = 1; i < m; i++)
+                g.DrawLine(myPen1, CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
+        }
+        private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
+        {
+            return (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
+        }
+        private bool cmp(DataStruct.Node a, DataStruct.Node b)
+        {
+            return (a.Y < b.Y) || (a.Y == b.Y && a.X < b.X);
+        }
+        private void MergeSort(int left, int right, List<DataStruct.Node> tempList)
+        {
+            if (left < right)
+            {
+                int mid = (left + right) / 2;
+                MergeSort(left, mid,tempList);
+                MergeSort(mid + 1, right,tempList);
+                Merge(left, mid, right,tempList);
+            }
+        }
+        private void Merge(int left, int mid, int right, List<DataStruct.Node> tempList)
+        {
+            int i = left, j = mid + 1, top = 0;
+            DataStruct.Node[] data = new DataStruct.Node[10000];
+            while (i <= mid && j <= right)
+            {
+                if (cmp(tempList[i], tempList[j])) data[top++] = tempList[i++];
+                else data[top++] = tempList[j++];
+            }
+            while (i <= mid) data[top++] = tempList[i++];
+            while (j <= right) data[top++] = tempList[j++];
+            for (i = 0, j = left; i < top; i++, j++)
+                tempList[j] = data[i];
+        }
+        //--------------------------------------------------------------------------------------------------
+        private void DrawVerticalLine(int NodeCount)
+        {
+            List<DataStruct.Node> tempList = new List<DataStruct.Node>();
+            for (int i = 0; i < NodeCount; i++)
+            {
+                tempList.Add(NodeList[i]);
+            }
             if (NodeCount == 2)
             {
-                NodeStruct A = NodeList[0];
-                NodeStruct B = NodeList[1];
-                NodeStruct Mid = new NodeStruct();
-                if (A.X == B.X && A.Y != B.Y)//垂直
+                TwoNodeFun(tempList);
+            }
+            //--------------------------------------------------------------------------------------------------
+            if (NodeCount == 3) //三點時要找外心
+            {
+                ThreeNodeFun(tempList);
+            }
+            //--------------------------------------------------------------------------------------------------
+            if (NodeCount > 3)
+            {
+                Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+
+                //先取得有幾個點，找中線讓點分成兩邊均勻(若點很多，要遞迴，先做4個點)，將點先排序，根據x值大小
+
+                Get_ConvexHull(tempList);
+
+                var tempListSort = tempList.OrderBy(a => a.X).ToList();
+                var tempList_L = tempListSort.GetRange(0, NodeCount / 2);
+                var tempList_R = tempListSort.GetRange(NodeCount / 2, NodeCount - (NodeCount / 2));
+
+
+                for (int i = 0; i < tempList_L.Count - 1; i++)
                 {
-                    Mid.Y = (A.Y + B.Y) / 2;
-                    g.DrawLine(myPen, 0, Mid.Y, 600, Mid.Y);
-                    EdgeStruct edge = new EdgeStruct(0, Mid.Y, 600, Mid.Y);
-                    EdgeList.Add(edge);
+                    g.DrawLine(myPen, tempList_L[i].X, tempList_L[i].Y,
+                        tempList_L[i + 1].X, tempList_L[i + 1].Y);
                 }
-                if (A.Y == B.Y && A.X != B.X)//水平
+                g.DrawLine(myPen, tempList_L[0].X, tempList_L[0].Y,
+                    tempList_L[tempList_L.Count - 1].X, tempList_L[tempList_L.Count - 1].Y);
+                for (int i = 0; i < tempList_R.Count - 1; i++)
                 {
-                    Mid.X = (A.X + B.X) / 2;
-                    g.DrawLine(myPen, Mid.X, 0, Mid.X, 600);
-                    EdgeStruct edge = new EdgeStruct(Mid.X, 0, Mid.X, 600);
-                    EdgeList.Add(edge);
+                    g.DrawLine(myPen, tempList_R[i].X, tempList_R[i].Y,
+                        tempList_R[i + 1].X, tempList_R[i + 1].Y);
                 }
-                if (A.X != B.X && A.Y != B.Y)//不同點
+                g.DrawLine(myPen, tempList_R[0].X, tempList_R[0].Y,
+                    tempList_R[tempList_R.Count - 1].X, tempList_R[tempList_R.Count - 1].Y);
+            }
+        }
+
+        private void ThreeNodeFun(List<DataStruct.Node> tempList)
+        {
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+
+            ClockwiseSortPoints(tempList);
+            DataStruct.Node Excenter = new DataStruct.Node(); //三點時要找外心
+            Excenter = GetTriangleExcenter(tempList[0], tempList[1], tempList[2]);
+            if (Excenter.X != 0 && Excenter.Y != 0) //有找到外心時
+            {
+                g.DrawImageUnscaled(get_NodeBitmap(), Excenter.X, Excenter.Y);
+
+                //做逆時針排序，用於找每一條邊的法向量
+                //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
+
+                List<DataStruct.Node> normal_vector_List = new List<DataStruct.Node>();
+
+                //法向量為，若ab向量為(x,y)->法向量為(y,-x)
+
+                for (int i = 0; i < 3; i++)
                 {
-                    NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
-                    normal_vector.X = A.Y - B.Y;
-                    normal_vector.Y = -(A.X - B.X);
-                    Mid.X = (A.X + B.X) / 2;
-                    Mid.Y = (A.Y + B.Y) / 2;
-                    
-                    NodeStruct topNode = new NodeStruct();
-                    topNode.X = Mid.X + K * normal_vector.X;
-                    topNode.Y = Mid.Y + K * normal_vector.Y;
-                    NodeStruct downNode = new NodeStruct();
-                    downNode.X = Mid.X - K * normal_vector.X;
-                    downNode.Y = Mid.Y - K * normal_vector.Y;
-                    g.DrawLine(myPen, topNode.X, topNode.Y, downNode.X, downNode.Y);
-                    EdgeStruct edge = new EdgeStruct(topNode.X, topNode.Y, downNode.X, downNode.Y);
+                    DataStruct.Node normal_vector = new DataStruct.Node();
+                    normal_vector.X = tempList[(i + 1) % 3].Y - tempList[i].Y;
+                    normal_vector.Y = -(tempList[(i + 1) % 3].X - tempList[i].X);
+                    normal_vector_List.Add(normal_vector);
+                }
+
+                //取的法向量後，找出每邊依法向量方向過每邊中點到邊界的點，預設找一點*k倍法向量
+                List<DataStruct.Node> MidNode_List = new List<DataStruct.Node>();
+                for (int i = 0; i < 3; i++)
+                {
+                    DataStruct.Node MidNode = new DataStruct.Node();
+                    MidNode.X = (tempList[(i + 1) % 3].X + tempList[i].X) / 2;
+                    MidNode.Y = (tempList[(i + 1) % 3].Y + tempList[i].Y) / 2;
+                    MidNode_List.Add(MidNode);
+                }
+
+                List<DataStruct.Node> Vertical_line_List = new List<DataStruct.Node>();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    DataStruct.Node Vertical_line = new DataStruct.Node();
+                    Vertical_line.X = MidNode_List[i].X + K * normal_vector_List[i].X;
+                    Vertical_line.Y = MidNode_List[i].Y + K * normal_vector_List[i].Y;
+                    Vertical_line_List.Add(Vertical_line);
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    g.DrawLine(myPen, Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
+                    DataStruct.Edge edge = new DataStruct.Edge(Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
                     EdgeList.Add(edge);
                 }
             }
-            if (NodeCount == 3) //三點時要找外心
+            else //沒有外心時
             {
-                ClockwiseSortPoints();
-
-                NodeStruct Excenter = new NodeStruct();//三點時要找外心
-                Excenter = GetTriangleExcenter(NodeList[0], NodeList[1], NodeList[2]);
-                if (Excenter.X != 0 && Excenter.Y != 0)//有找到外心時
+                DataStruct.Node Mid1 = new DataStruct.Node();
+                DataStruct.Node Mid2 = new DataStruct.Node();
+                //垂直
+                if (tempList[0].X == tempList[1].X && tempList[0].X == tempList[2].X)
                 {
-                    g.DrawImageUnscaled(get_NodeBitmap(), Excenter.X, Excenter.Y);
+                    List<int> tempList1 = new List<int>();
+                    tempList1.Add(tempList[0].Y);
+                    tempList1.Add(tempList[1].Y);
+                    tempList1.Add(tempList[2].Y);
+                    tempList1.Sort();
+                    //找2中點做2條水平線，對y軸要排序
+                    Mid1.Y = (tempList1[0] + tempList1[1]) / 2;
+                    Mid2.Y = (tempList1[1] + tempList1[2]) / 2;
 
-                    //做逆時針排序，用於找每一條邊的法向量
-                    //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
+                    g.DrawLine(myPen, 0, Mid1.Y, 600, Mid1.Y);
+                    g.DrawLine(myPen, 0, Mid2.Y, 600, Mid2.Y);
 
-                    List<NodeStruct> normal_vector_List = new List<NodeStruct>();
-
-                    //法向量為，若ab向量為(x,y)->法向量為(y,-x)
-
-                    for (int i = 0; i < 3; i++)
-                    {
-                        NodeStruct normal_vector = new NodeStruct();
-                        normal_vector.X = NodeList[(i + 1) % 3].Y - NodeList[i].Y;
-                        normal_vector.Y = -(NodeList[(i + 1) % 3].X - NodeList[i].X);
-                        normal_vector_List.Add(normal_vector);
-                    }
-
-                    //取的法向量後，找出每邊依法向量方向過每邊中點到邊界的點，預設找一點*k倍法向量
-                    List<NodeStruct> MidNode_List = new List<NodeStruct>();
-                    for (int i = 0; i < 3; i++)
-                    {
-                        NodeStruct MidNode = new NodeStruct();
-                        MidNode.X = (NodeList[(i + 1) % 3].X + NodeList[i].X) / 2;
-                        MidNode.Y = (NodeList[(i + 1) % 3].Y + NodeList[i].Y) / 2;
-                        MidNode_List.Add(MidNode);
-                    }
-
-                    List<NodeStruct> Vertical_line_List = new List<NodeStruct>();
-                  
-                    for (int i = 0; i < 3; i++)
-                    {
-                        NodeStruct Vertical_line = new NodeStruct();
-                        Vertical_line.X = MidNode_List[i].X + K * normal_vector_List[i].X;
-                        Vertical_line.Y = MidNode_List[i].Y + K * normal_vector_List[i].Y;
-                        Vertical_line_List.Add(Vertical_line);
-                    }
-                    for (int i = 0; i < 3; i++)
-                    {
-                        g.DrawLine(myPen, Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
-                        EdgeStruct edge = new EdgeStruct(Vertical_line_List[i].X, Vertical_line_List[i].Y, Excenter.X, Excenter.Y);
-                        EdgeList.Add(edge);
-                    }
+                    DataStruct.Edge edge1 = new DataStruct.Edge(0, Mid1.Y, 600, Mid1.Y);
+                    EdgeList.Add(edge1);
+                    DataStruct.Edge edge2 = new DataStruct.Edge(0, Mid2.Y, 600, Mid2.Y);
+                    EdgeList.Add(edge2);
                 }
-                else//沒有外心時
+                //水平
+                if (tempList[0].Y == tempList[1].Y && tempList[0].Y == tempList[2].Y)
                 {
-                    NodeStruct Mid1 = new NodeStruct();
-                    NodeStruct Mid2 = new NodeStruct();
-                    //垂直
-                    if (NodeList[0].X == NodeList[1].X && NodeList[0].X == NodeList[2].X)
+                    //找2中點做2條水平線，對x軸要排序
+                    List<int> tempList1 = new List<int>();
+                    tempList1.Add(tempList[0].X);
+                    tempList1.Add(tempList[1].X);
+                    tempList1.Add(tempList[2].X);
+                    tempList1.Sort();
+                    Mid1.X = (tempList1[0] + tempList1[1]) / 2;
+                    Mid2.X = (tempList1[1] + tempList1[2]) / 2;
+
+                    g.DrawLine(myPen, Mid1.X, 0, Mid1.X, 600);
+                    g.DrawLine(myPen, Mid2.X, 0, Mid2.X, 600);
+
+                    DataStruct.Edge edge1 = new DataStruct.Edge(Mid1.X, 0, Mid1.X, 600);
+                    EdgeList.Add(edge1);
+                    DataStruct.Edge edge2 = new DataStruct.Edge(Mid2.X, 0, Mid2.X, 600);
+                    EdgeList.Add(edge2);
+                }
+                //為一直線
+                if ((tempList[0].Y / tempList[0].X) == (tempList[1].Y / tempList[1].X) &&
+                    (tempList[0].Y / tempList[0].X) == (tempList[2].Y / tempList[2].X))
+                {
+                    DataStruct.Node normal_vector = new DataStruct.Node(); //得ab法向量(y,-x)
+                    normal_vector.X = tempList[0].Y - tempList[1].Y;
+                    normal_vector.Y = -(tempList[0].X - tempList[1].X);
+
+                    List<DataStruct.Node> tempList3 = new List<DataStruct.Node>();
+                    for (int i = 0; i < 3; i++)
                     {
-                        List<int> tempList = new List<int>();
-                        tempList.Add(NodeList[0].Y);
-                        tempList.Add(NodeList[1].Y);
-                        tempList.Add(NodeList[2].Y);
-                        tempList.Sort();
-                        //找2中點做2條水平線，對y軸要排序
-                        Mid1.Y = (tempList[0] + tempList[1]) / 2;
-                        Mid2.Y = (tempList[1] + tempList[2]) / 2;
-
-                        g.DrawLine(myPen, 0, Mid1.Y, 600, Mid1.Y);
-                        g.DrawLine(myPen, 0, Mid2.Y, 600, Mid2.Y);
-
-                        EdgeStruct edge1 = new EdgeStruct(0, Mid1.Y, 600, Mid1.Y);
-                        EdgeList.Add(edge1);
-                        EdgeStruct edge2 = new EdgeStruct(0, Mid2.Y, 600, Mid2.Y);
-                        EdgeList.Add(edge2);
+                        tempList3.Add(tempList[i]);
                     }
-                    //水平
-                    if (NodeList[0].Y == NodeList[1].Y && NodeList[0].Y == NodeList[2].Y)
-                    {
-                        //找2中點做2條水平線，對x軸要排序
-                        List<int> tempList = new List<int>();
-                        tempList.Add(NodeList[0].X);
-                        tempList.Add(NodeList[1].X);
-                        tempList.Add(NodeList[2].X);
-                        tempList.Sort();
-                        Mid1.X = (tempList[0] + tempList[1]) / 2;
-                        Mid2.X = (tempList[1] + tempList[2]) / 2;
+                    var NodeList_Sort = tempList3.OrderBy(a => a.X).ToList(); //共線時，3點等比，比較x的大小，由小到大依序排序，因此可得到正確的中點
+                    //例如 a(200 200)b(100 100)c(300 300) ->sort b a c 
+                    Mid1.X = (NodeList_Sort[0].X + NodeList_Sort[1].X) / 2;
+                    Mid1.Y = (NodeList_Sort[0].Y + NodeList_Sort[1].Y) / 2;
+                    DataStruct.Node topNode1 = new DataStruct.Node();
+                    topNode1.X = Mid1.X + K * normal_vector.X;
+                    topNode1.Y = Mid1.Y + K * normal_vector.Y;
+                    DataStruct.Node downNode1 = new DataStruct.Node();
+                    downNode1.X = Mid1.X - K * normal_vector.X;
+                    downNode1.Y = Mid1.Y - K * normal_vector.Y;
 
-                        g.DrawLine(myPen, Mid1.X, 0, Mid1.X, 600);
-                        g.DrawLine(myPen, Mid2.X, 0, Mid2.X, 600);
+                    g.DrawLine(myPen, topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
+                    DataStruct.Edge edge1 = new DataStruct.Edge(topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
+                    EdgeList.Add(edge1);
 
-                        EdgeStruct edge1 = new EdgeStruct(Mid1.X, 0, Mid1.X, 600);
-                        EdgeList.Add(edge1);
-                        EdgeStruct edge2 = new EdgeStruct(Mid2.X, 0, Mid2.X, 600);
-                        EdgeList.Add(edge2);
-                    }
-                    //為一直線
-                    if ((NodeList[0].Y / NodeList[0].X) == (NodeList[1].Y / NodeList[1].X) && (NodeList[0].Y / NodeList[0].X) == (NodeList[2].Y / NodeList[2].X))
-                    {
+                    Mid2.X = (NodeList_Sort[2].X + NodeList_Sort[1].X) / 2;
+                    Mid2.Y = (NodeList_Sort[2].Y + NodeList_Sort[1].Y) / 2;
+                    DataStruct.Node topNode2 = new DataStruct.Node();
+                    topNode2.X = Mid2.X + K * normal_vector.X;
+                    topNode2.Y = Mid2.Y + K * normal_vector.Y;
+                    DataStruct.Node downNode2 = new DataStruct.Node();
+                    downNode2.X = Mid2.X - K * normal_vector.X;
+                    downNode2.Y = Mid2.Y - K * normal_vector.Y;
 
-                        NodeStruct normal_vector = new NodeStruct();//得ab法向量(y,-x)
-                        normal_vector.X = NodeList[0].Y - NodeList[1].Y;
-                        normal_vector.Y = -(NodeList[0].X - NodeList[1].X);
-                        
-                        List<NodeStruct> tempList = new List<NodeStruct>();
-                        for (int i = 0; i < 3; i++)
-                        {
-                            tempList.Add(NodeList[i]);
-                        }
-                        var NodeList_Sort = tempList.OrderBy(a => a.X).ToList();//共線時，3點等比，比較x的大小，由小到大依序排序，因此可得到正確的中點
-                        //例如 a(200 200)b(100 100)c(300 300) ->sort b a c 
-                        Mid1.X = (NodeList_Sort[0].X + NodeList_Sort[1].X) / 2;
-                        Mid1.Y = (NodeList_Sort[0].Y + NodeList_Sort[1].Y) / 2;
-                        NodeStruct topNode1 = new NodeStruct();
-                        topNode1.X = Mid1.X + K * normal_vector.X;
-                        topNode1.Y = Mid1.Y + K * normal_vector.Y;
-                        NodeStruct downNode1 = new NodeStruct();
-                        downNode1.X = Mid1.X - K * normal_vector.X;
-                        downNode1.Y = Mid1.Y - K * normal_vector.Y;
-
-                        g.DrawLine(myPen, topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
-                        EdgeStruct edge1 = new EdgeStruct(topNode1.X, topNode1.Y, downNode1.X, downNode1.Y);
-                        EdgeList.Add(edge1);
-
-                        Mid2.X = (NodeList_Sort[2].X + NodeList_Sort[1].X) / 2;
-                        Mid2.Y = (NodeList_Sort[2].Y + NodeList_Sort[1].Y) / 2;
-                        NodeStruct topNode2 = new NodeStruct();
-                        topNode2.X = Mid2.X + K * normal_vector.X;
-                        topNode2.Y = Mid2.Y + K * normal_vector.Y;
-                        NodeStruct downNode2 = new NodeStruct();
-                        downNode2.X = Mid2.X - K * normal_vector.X;
-                        downNode2.Y = Mid2.Y - K * normal_vector.Y;
-
-                        g.DrawLine(myPen, topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
-                        EdgeStruct edge2 = new EdgeStruct(topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
-                        EdgeList.Add(edge2);
-                    }
+                    g.DrawLine(myPen, topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
+                    DataStruct.Edge edge2 = new DataStruct.Edge(topNode2.X, topNode2.Y, downNode2.X, downNode2.Y);
+                    EdgeList.Add(edge2);
                 }
             }
         }
-        //--------------------------------------------------------------------------------------------------
-        private void ClockwiseSortPoints()
+
+        private void TwoNodeFun(List<DataStruct.Node> tempList)
         {
-            NodeStruct center;
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            DataStruct.Node A = tempList[0];
+            DataStruct.Node B = tempList[1];
+            DataStruct.Node Mid = new DataStruct.Node();
+            if (A.X == B.X && A.Y != B.Y) //垂直
+            {
+                Mid.Y = (A.Y + B.Y) / 2;
+                g.DrawLine(myPen, 0, Mid.Y, 600, Mid.Y);
+                DataStruct.Edge edge = new DataStruct.Edge(0, Mid.Y, 600, Mid.Y);
+                EdgeList.Add(edge);
+            }
+            if (A.Y == B.Y && A.X != B.X) //水平
+            {
+                Mid.X = (A.X + B.X) / 2;
+                g.DrawLine(myPen, Mid.X, 0, Mid.X, 600);
+                DataStruct.Edge edge = new DataStruct.Edge(Mid.X, 0, Mid.X, 600);
+                EdgeList.Add(edge);
+            }
+            if (A.X != B.X && A.Y != B.Y) //不同點
+            {
+                DataStruct.Node normal_vector = new DataStruct.Node(); //得ab法向量(y,-x)
+                normal_vector.X = A.Y - B.Y;
+                normal_vector.Y = -(A.X - B.X);
+                Mid.X = (A.X + B.X) / 2;
+                Mid.Y = (A.Y + B.Y) / 2;
+
+                DataStruct.Node topNode = new DataStruct.Node();
+                topNode.X = Mid.X + K * normal_vector.X;
+                topNode.Y = Mid.Y + K * normal_vector.Y;
+                DataStruct.Node downNode = new DataStruct.Node();
+                downNode.X = Mid.X - K * normal_vector.X;
+                downNode.Y = Mid.Y - K * normal_vector.Y;
+                g.DrawLine(myPen, topNode.X, topNode.Y, downNode.X, downNode.Y);
+                DataStruct.Edge edge = new DataStruct.Edge(topNode.X, topNode.Y, downNode.X, downNode.Y);
+                EdgeList.Add(edge);
+            }
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        private void ClockwiseSortPoints(List<DataStruct.Node> tempList)
+        {
+            DataStruct.Node center;
             double x = 0, y = 0;
             for (int i = 0; i < 3; i++)
             {
-                x += NodeList[i].X;
-                y += NodeList[i].Y;
+                x += tempList[i].X;
+                y += tempList[i].Y;
             }
             center.X = (int)x / 3;
             center.Y = (int)y / 3;
@@ -305,16 +412,16 @@ namespace WindowsFormsApp1
             {
                 for (int j = 0; j < 3 - i - 1; j++)
                 {
-                    if (PointCmp(NodeList[j], NodeList[j + 1], center))
+                    if (PointCmp(tempList[j], tempList[j + 1], center))
                     {
-                        NodeStruct tmp = NodeList[j];
-                        NodeList[j] = NodeList[j + 1];
-                        NodeList[j + 1] = tmp;
+                        DataStruct.Node tmp = tempList[j];
+                        tempList[j] = tempList[j + 1];
+                        tempList[j + 1] = tmp;
                     }
                 }
             }
         }
-        bool PointCmp(NodeStruct a, NodeStruct b, NodeStruct center)
+        bool PointCmp(DataStruct.Node a, DataStruct.Node b, DataStruct.Node center)
         {
             if (a.X >= 0 && b.X < 0)
                 return true;
@@ -333,10 +440,10 @@ namespace WindowsFormsApp1
         }
         //--------------------------------------------------------------------------------------------------
 
-        private NodeStruct GetTriangleExcenter(NodeStruct A, NodeStruct B, NodeStruct C)
+        private DataStruct.Node GetTriangleExcenter(DataStruct.Node A, DataStruct.Node B, DataStruct.Node C)
         {
-            NodeStruct Excenter = new NodeStruct();//新增點結構
-            NodeStruct noExcenter = new NodeStruct(0, 0);//用於不存在外心時回傳
+            DataStruct.Node Excenter = new DataStruct.Node();//新增點結構
+            DataStruct.Node noExcenter = new DataStruct.Node(0, 0);//用於不存在外心時回傳
             //same point
             if (A.X == B.X && A.Y == B.Y && A.X == C.X && A.Y == C.Y)
             {
@@ -350,7 +457,7 @@ namespace WindowsFormsApp1
             }
             if (A.Y != B.Y && A.X == B.X)//判斷直角三型
             {
-                NodeStruct temp = new NodeStruct();
+                DataStruct.Node temp = new DataStruct.Node();
                 temp = C;
                 C = B;
                 B = A;
@@ -361,13 +468,13 @@ namespace WindowsFormsApp1
             double C2 = Math.Pow(x2, 2) + Math.Pow(y2, 2) - Math.Pow(x3, 2) - Math.Pow(y3, 2);
             double centery = (C1 * (x2 - x3) - C2 * (x1 - x2)) / (2 * (y1 - y2) * (x2 - x3) - 2 * (y2 - y3) * (x1 - x2));
             double centerx = (C1 - 2 * centery * (y1 - y2)) / (2 * (x1 - x2));
-            Excenter = new NodeStruct(Convert.ToInt32(centerx), Convert.ToInt32(centery));
+            Excenter = new DataStruct.Node(Convert.ToInt32(centerx), Convert.ToInt32(centery));
             return Excenter;
         }
         //--------------------------------------------------------------------------------------------------
         private static Bitmap get_NodeBitmap()
         {
-            int NodeSize = 5;
+            int NodeSize = 3;
             Bitmap nodeBitmap = new Bitmap(NodeSize, NodeSize); //这里调整点的大小   
             for (int i = 0; i < NodeSize; i++)
             {
@@ -394,13 +501,8 @@ namespace WindowsFormsApp1
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-
         }
 
-        private void StepByStep_Click(object sender, EventArgs e)
-        {
-
-        }
         //--------------------------------------------------------------------------------------------------
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
@@ -439,7 +541,7 @@ namespace WindowsFormsApp1
                 }
                 else//為座標放入NodeList裡面
                 {
-                    NodeStruct node = new NodeStruct();//新增點結構
+                    DataStruct.Node node = new DataStruct.Node();//新增點結構
                     node.X = Convert.ToInt32(substrings[0]);
                     node.Y = Convert.ToInt32(substrings[1]);
                     NodeList.Add(node);//塞到list裡面                   
@@ -494,10 +596,10 @@ namespace WindowsFormsApp1
             }
             else
             {
-                List<NodeStruct> NodeListCopy = new List<NodeStruct>();
+                List<DataStruct.Node> NodeListCopy = new List<DataStruct.Node>();
                 for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
                 {
-                    NodeStruct temp = new NodeStruct();
+                    DataStruct.Node temp = new DataStruct.Node();
                     temp = NodeList[i];
                     NodeListCopy.Add(temp);
                 }
@@ -521,30 +623,7 @@ namespace WindowsFormsApp1
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
 
-        }
-
-        
+        }     
         //--------------------------------------------------------------------------------------------------
-    }
-
-    public struct NodeStruct
-    {
-        public int X, Y;
-        public NodeStruct(int p1, int p2)
-        {
-            X = p1;
-            Y = p2;
-        }
-    }
-    public struct EdgeStruct
-    {
-        public int X1, Y1, X2, Y2;
-        public EdgeStruct(int p1, int p2, int p3, int p4)
-        {
-            X1 = p1;
-            Y1 = p2;
-            X2 = p3;
-            Y2 = p4;
-        }
     }
 }
