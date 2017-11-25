@@ -12,6 +12,8 @@ using System.Windows;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using WindowsFormsApp1;
+
 
 namespace WindowsFormsApp1
 {
@@ -116,10 +118,10 @@ namespace WindowsFormsApp1
 
         //--------------------------------------------------------------------------------------------------
         DataStruct.Node[] CH = new DataStruct.Node[20000];
+        List<DataStruct.Edge> CH_EdgeList = new List<DataStruct.Edge>();
         private void Get_ConvexHull(List<DataStruct.Node> tempList)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
             MergeSort(0, tempList.Count - 1, tempList);
             int m = 0;
             for (int i = 0; i < tempList.Count; i++)
@@ -133,7 +135,39 @@ namespace WindowsFormsApp1
                 CH[m++] = tempList[i];
             }
             for (int i = 1; i < m; i++)
-                g.DrawLine(myPen1, CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
+            {
+                //g.DrawLine(myPen1, CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
+                DataStruct.Edge edge = new DataStruct.Edge(CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
+                CH_EdgeList.Add(edge);
+            }
+            //找出EdgeList與CH_EdgeList不同的邊，並移除原本EdgeList
+            var Tangents = CH_EdgeList.Except(EdgeList).ToList();
+            var Tangenttemp = EdgeList.Except(CH_EdgeList).ToList();
+            //暫時沒想到要如何改變邊的排序，暴力剃除，將Tangents裡的每條邊與Tangenttemp的每條邊比較斜率，有一樣的邊時，
+            //將edge從Tangent移除
+            if (Tangents.Count() > 2)
+            {
+                for (int i = 0; i < Tangents.Count(); i++)
+                {
+                    for (int j = 0; j < Tangenttemp.Count(); j++)
+                    {
+                        if ((Tangents.ElementAt(i).Y1 - Tangents.ElementAt(i).Y2) /
+                            (Tangents.ElementAt(i).X1 - Tangents.ElementAt(i).X2)
+                            ==
+                            (Tangenttemp.ElementAt(j).Y1 - Tangenttemp.ElementAt(j).Y2) /
+                            (Tangenttemp.ElementAt(j).X1 - Tangenttemp.ElementAt(j).X2)
+                        )
+                        {
+                            Tangents.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < Tangents.Count(); i++)
+            {
+                g.DrawLine(myPen1, Tangents.ElementAt(i).X1, Tangents.ElementAt(i).Y1, Tangents.ElementAt(i).X2, Tangents.ElementAt(i).Y2);
+            }
         }
         private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
         {
@@ -191,27 +225,38 @@ namespace WindowsFormsApp1
 
                 //先取得有幾個點，找中線讓點分成兩邊均勻(若點很多，要遞迴，先做4個點)，將點先排序，根據x值大小
 
-                Get_ConvexHull(tempList);
-
                 var tempListSort = tempList.OrderBy(a => a.X).ToList();
                 var tempList_L = tempListSort.GetRange(0, NodeCount / 2);
+                ClockwiseSortPoints(tempList_L);
                 var tempList_R = tempListSort.GetRange(NodeCount / 2, NodeCount - (NodeCount / 2));
+                ClockwiseSortPoints(tempList_R);
 
-
+                DataStruct.Edge edge = new DataStruct.Edge();
                 for (int i = 0; i < tempList_L.Count - 1; i++)
                 {
-                    g.DrawLine(myPen, tempList_L[i].X, tempList_L[i].Y,
-                        tempList_L[i + 1].X, tempList_L[i + 1].Y);
+                    g.DrawLine(myPen, tempList_L[i].X, tempList_L[i].Y,tempList_L[i + 1].X, tempList_L[i + 1].Y);
+                    edge = new DataStruct.Edge(tempList_L[i].X, tempList_L[i].Y, tempList_L[i + 1].X, tempList_L[i + 1].Y);
+                    EdgeList.Add(edge);
                 }
-                g.DrawLine(myPen, tempList_L[0].X, tempList_L[0].Y,
-                    tempList_L[tempList_L.Count - 1].X, tempList_L[tempList_L.Count - 1].Y);
+                if (tempList_L.Count - 1 != 1)
+                {
+                    g.DrawLine(myPen, tempList_L[tempList_L.Count - 1].X, tempList_L[tempList_L.Count - 1].Y, tempList_L[0].X, tempList_L[0].Y);
+                    edge = new DataStruct.Edge(tempList_L[tempList_L.Count - 1].X, tempList_L[tempList_L.Count - 1].Y, tempList_L[0].X, tempList_L[0].Y);
+                    EdgeList.Add(edge);
+                }
                 for (int i = 0; i < tempList_R.Count - 1; i++)
                 {
-                    g.DrawLine(myPen, tempList_R[i].X, tempList_R[i].Y,
-                        tempList_R[i + 1].X, tempList_R[i + 1].Y);
+                    g.DrawLine(myPen, tempList_R[i].X, tempList_R[i].Y,tempList_R[i + 1].X, tempList_R[i + 1].Y);
+                    edge = new DataStruct.Edge(tempList_R[i].X, tempList_R[i].Y, tempList_R[i + 1].X, tempList_R[i + 1].Y);
+                    EdgeList.Add(edge);
                 }
-                g.DrawLine(myPen, tempList_R[0].X, tempList_R[0].Y,
-                    tempList_R[tempList_R.Count - 1].X, tempList_R[tempList_R.Count - 1].Y);
+                if (tempList_R.Count - 1 != 1)
+                {
+                    g.DrawLine(myPen,tempList_R[tempList_R.Count - 1].X, tempList_R[tempList_R.Count - 1].Y, tempList_R[0].X, tempList_R[0].Y);
+                    edge = new DataStruct.Edge(tempList_R[tempList_R.Count - 1].X, tempList_R[tempList_R.Count - 1].Y, tempList_R[0].X, tempList_R[0].Y);
+                    EdgeList.Add(edge);
+                }
+                Get_ConvexHull(tempList);
             }
         }
 
@@ -400,17 +445,17 @@ namespace WindowsFormsApp1
         {
             DataStruct.Node center;
             double x = 0, y = 0;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < tempList.Count; i++)
             {
                 x += tempList[i].X;
                 y += tempList[i].Y;
             }
-            center.X = (int)x / 3;
-            center.Y = (int)y / 3;
+            center.X = (int)x / tempList.Count;
+            center.Y = (int)y / tempList.Count;
             //冒泡排序
-            for (int i = 0; i < 3 - 1; i++)
+            for (int i = 0; i < tempList.Count - 1; i++)
             {
-                for (int j = 0; j < 3 - i - 1; j++)
+                for (int j = 0; j < tempList.Count - i - 1; j++)
                 {
                     if (PointCmp(tempList[j], tempList[j + 1], center))
                     {
