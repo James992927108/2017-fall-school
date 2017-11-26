@@ -51,6 +51,14 @@ namespace WindowsFormsApp1
                     EdgeList.RemoveAt(0);
                 }
             }
+            if (CH_EdgeList.Count() != 0)
+            {
+                int temp = CH_EdgeList.Count();
+                for (int i = 0; i < temp; i++)
+                {
+                    CH_EdgeList.RemoveAt(0);
+                }
+            }
             if (IsReadFile == true)
             {
                 if (CurrentDataIndex != 0) //第一次不須移除
@@ -126,17 +134,22 @@ namespace WindowsFormsApp1
             int m = 0;
             for (int i = 0; i < tempList.Count; i++)
             {
-                while (m >= 2 && cross(CH[m - 2], CH[m - 1], tempList[i]) <= 0) m--;
+                while (m >= 2 && cross(CH[m - 2], CH[m - 1], tempList[i]) < 0)
+                {
+                    m--;
+                }
                 CH[m++] = tempList[i];
             }
             for (int i = tempList.Count - 2, t = m + 1; i >= 0; i--)
             {
-                while (m >= t && cross(CH[m - 2], CH[m - 1], tempList[i]) <= 0) m--;
+                while (m >= t && cross(CH[m - 2], CH[m - 1], tempList[i]) < 0)
+                {
+                    m--;
+                }
                 CH[m++] = tempList[i];
             }
             for (int i = 1; i < m; i++)
             {
-                //g.DrawLine(myPen1, CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
                 DataStruct.Edge edge = new DataStruct.Edge(CH[i - 1].X, CH[i - 1].Y, CH[i].X, CH[i].Y);
                 CH_EdgeList.Add(edge);
             }
@@ -151,12 +164,14 @@ namespace WindowsFormsApp1
                 {
                     for (int j = 0; j < Tangenttemp.Count(); j++)
                     {
-                        if ((Tangents.ElementAt(i).Y1 - Tangents.ElementAt(i).Y2) /
-                            (Tangents.ElementAt(i).X1 - Tangents.ElementAt(i).X2)
-                            ==
-                            (Tangenttemp.ElementAt(j).Y1 - Tangenttemp.ElementAt(j).Y2) /
-                            (Tangenttemp.ElementAt(j).X1 - Tangenttemp.ElementAt(j).X2)
-                        )
+                        //有一個問題，3點共線，解決方法，在判斷convex_hull線段時不移除共線得點
+                        float a = Tangents[i].Y1 - Tangents[i].Y2;
+                        float b = Tangents[i].X1 - Tangents[i].X2;
+                        float temp1 = a / b;
+                        float c = Tangenttemp[j].Y1 - Tangenttemp[j].Y2;
+                        float d = Tangenttemp[j].X1 - Tangenttemp[j].X2;
+                        float temp2 = c / d;
+                        if (temp1 == temp2)
                         {
                             Tangents.RemoveAt(i);
                             i--;
@@ -164,9 +179,11 @@ namespace WindowsFormsApp1
                     }
                 }
             }
+            //將Tangents存回CH_CH_EdgeList
+            CH_EdgeList = Tangents;
             for (int i = 0; i < Tangents.Count(); i++)
             {
-                g.DrawLine(myPen1, Tangents.ElementAt(i).X1, Tangents.ElementAt(i).Y1, Tangents.ElementAt(i).X2, Tangents.ElementAt(i).Y2);
+                g.DrawLine(myPen1, CH_EdgeList[i].X1, CH_EdgeList[i].Y1, CH_EdgeList[i].X2, CH_EdgeList[i].Y2);
             }
         }
         private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
