@@ -164,24 +164,22 @@ namespace WindowsFormsApp1
                 //DrawVerticalLine(R_part_List.Count, R_part_List);
 
                 Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
-
-                DataStruct.Edge Up_TangentLine = new DataStruct.Edge(TangentLine_List[0].X1, TangentLine_List[0].Y1,
-                    TangentLine_List[0].X2, TangentLine_List[0].Y2);
-                DataStruct.Edge Down_TangentLine = new DataStruct.Edge(TangentLine_List[1].X1, TangentLine_List[1].Y1,
-                    TangentLine_List[1].X2, TangentLine_List[1].Y2);
+                DataStruct.Edge Down_TangentLine = new DataStruct.Edge(TangentLine_List[1].X2, TangentLine_List[1].Y2,
+                    TangentLine_List[1].X1, TangentLine_List[1].Y1);
                 DataStruct.Node Node_X = new DataStruct.Node(TangentLine_List[0].X1, TangentLine_List[0].Y1);
                 DataStruct.Node Node_Y = new DataStruct.Node(TangentLine_List[0].X2, TangentLine_List[0].Y2);
-
+                //最重要一條線，while裡面會一直更新SG
                 DataStruct.Edge SG = new DataStruct.Edge(Node_X.X, Node_X.Y, Node_Y.X, Node_Y.Y);
+                //一開始SG為上切線，所以先在HP裡面存SG的垂直平分線的上點，然後進入while迴圈，直到SG等於下切線
                 List<PointF> HP = new List<PointF>();
                 PointF HP_FirstNode = new PointF(SG.Vertical().X, SG.Vertical().Y);
                 HP.Add(HP_FirstNode);
-                DataStruct.Edge SG_perpendicular_bisector = new DataStruct.Edge(SG.Vertical().X, SG.Vertical().Y, SG.down_Node().X, SG.down_Node().Y);
+
                 while (SG.X1 != Down_TangentLine.X1 && SG.X2 != Down_TangentLine.X2 && SG.Y1 != Down_TangentLine.Y1 && SG.Y2 != Down_TangentLine.Y2)
                 {
-                    //在Lpart中找與Node_x相鄰的點，另外兩個做為xz1與xz2
-                    //Lpart中去掉Node_x即為相鄰的點
+                    //想法:需要找到所有的點，
+                    //即在Lpart中去掉Node_x即為相鄰的點
+                    //    Rpart中去掉Node_y即為相鄰的點
                     List<DataStruct.Node> xz = new List<DataStruct.Node>();
                     for (int i = 0; i < L_part_List.Count; i++)
                     {
@@ -189,6 +187,12 @@ namespace WindowsFormsApp1
                         {
                             xz.Add(L_part_List[i]);
                         }
+                    }
+                    List<DataStruct.Edge> xz_lineList = new List<DataStruct.Edge>();
+                    for (int i = 0; i < xz.Count; i++)
+                    {
+                        DataStruct.Edge temp = new DataStruct.Edge(Node_X.X, Node_X.Y, xz[i].X, xz[i].Y);
+                        xz_lineList.Add(temp);
                     }
                     List<DataStruct.Node> yz = new List<DataStruct.Node>();
                     for (int i = 0; i < R_part_List.Count; i++)
@@ -198,81 +202,82 @@ namespace WindowsFormsApp1
                             yz.Add(R_part_List[i]);
                         }
                     }
-                    List<DataStruct.Edge> xz_line = new List<DataStruct.Edge>();
-                    for (int i = 0; i < xz.Count; i++)
-                    {
-                        DataStruct.Edge temp = new DataStruct.Edge(Node_X.X, Node_X.Y, xz[i].X, xz[i].Y);
-                        xz_line.Add(temp);
-                    }
-                    List<DataStruct.Edge> yz_line = new List<DataStruct.Edge>();
+                    List<DataStruct.Edge> yz_lineList = new List<DataStruct.Edge>();
                     for (int i = 0; i < yz.Count; i++)
                     {
                         DataStruct.Edge temp = new DataStruct.Edge(Node_Y.X, Node_Y.Y, yz[i].X, yz[i].Y);
-                        yz_line.Add(temp);
+                        yz_lineList.Add(temp);
                     }
-
-
-                    //交點
+                    //分別讓xz_lineList中的點的中垂線與SG的中垂線做交點，同理yz_lineList
+                    //並分別紀錄在xz_IntersectionNodeList與yz_IntersectionNodeList
+                    //同時紀錄是xz_lineList第幾條線得交點，例如 :xz_lineList的第一條線index = 0 ，交點為(200,300)，
+                    //則對應xz_IntersectionNodeList(200,300),0，完成所有交點時，
+                    //從xz_IntersectionNodeList中找到ｙ值最小的點，同理yz_IntersectionNodeList，然後比較兩值，取小的值。
                     Dictionary<PointF, int> xz_IntersectionNodeList = new Dictionary<PointF, int>();
                     Dictionary<PointF, int> yz_IntersectionNodeList = new Dictionary<PointF, int>();
-
-                    PointF SG_perpendicular_bisector_top = new PointF(SG_perpendicular_bisector.X1, SG_perpendicular_bisector.Y1);
-                    PointF SG_perpendicular_bisector_down = new PointF(SG_perpendicular_bisector.X2, SG_perpendicular_bisector.Y2);
-                    //從xz_line與yz_line作中垂線，同時與HP做交點
-                    for (int i = 0; i < xz_line.Count; i++)
+                    //SG的中垂線
+                    PointF SG_top = new PointF(SG.Vertical().X, SG.Vertical().Y);
+                    PointF SG_down = new PointF(SG.down_Node().X, SG.down_Node().Y);
+                    for (int i = 0; i < xz_lineList.Count; i++)
                     {
-                        PointF xz_line_top = new PointF(xz_line[i].Vertical().X, xz_line[i].Vertical().Y);
-                        PointF xz_line_down = new PointF(xz_line[i].down_Node().X, xz_line[i].down_Node().Y);
+                        //xz_lineList中的點的中垂線
+                        PointF xz_line_top = new PointF(xz_lineList[i].Vertical().X, xz_lineList[i].Vertical().Y);
+                        PointF xz_line_down = new PointF(xz_lineList[i].down_Node().X, xz_lineList[i].down_Node().Y);
+                        //分別做交點
                         PointF test = new PointF();
-                        test = GetIntersection(xz_line_top, xz_line_down, SG_perpendicular_bisector_top, SG_perpendicular_bisector_down);
+                        test = GetIntersection(xz_line_top, xz_line_down, SG_top, SG_down);
                         xz_IntersectionNodeList.Add(test, i);
-                        g.DrawLine(pen_in_vertical, xz_line[i].Vertical().X, xz_line[i].Vertical().Y, xz_line[i].down_Node().X, xz_line[i].down_Node().Y);
+                        g.DrawLine(pen_in_vertical, xz_lineList[i].Vertical().X, xz_lineList[i].Vertical().Y, xz_lineList[i].down_Node().X, xz_lineList[i].down_Node().Y);
                     }
-                    for (int i = 0; i < yz_line.Count; i++)
+                    for (int i = 0; i < yz_lineList.Count; i++)
                     {
-                        PointF yz_line_top = new PointF(yz_line[i].Vertical().X, yz_line[i].Vertical().Y);
-                        PointF yz_line_down = new PointF(yz_line[i].down_Node().X, yz_line[i].down_Node().Y);
+                        //yz_lineList中的點的中垂線
+                        PointF yz_line_top = new PointF(yz_lineList[i].Vertical().X, yz_lineList[i].Vertical().Y);
+                        PointF yz_line_down = new PointF(yz_lineList[i].down_Node().X, yz_lineList[i].down_Node().Y);
+                        //分別做交點
                         PointF test = new PointF();
-                        test = GetIntersection(yz_line_top, yz_line_down, SG_perpendicular_bisector_top, SG_perpendicular_bisector_down);
+                        test = GetIntersection(yz_line_top, yz_line_down, SG_top, SG_down);
                         yz_IntersectionNodeList.Add(test, i);
-                        g.DrawLine(pen_in_vertical, yz_line[i].Vertical().X, yz_line[i].Vertical().Y, yz_line[i].down_Node().X, yz_line[i].down_Node().Y);
+                        g.DrawLine(pen_in_vertical, yz_lineList[i].Vertical().X, yz_lineList[i].Vertical().Y, yz_lineList[i].down_Node().X, yz_lineList[i].down_Node().Y);
                     }
                     //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
-                    var xz_Y_small_edge = xz_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-                    var yz_Y_small_edge = yz_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-                    if (yz_Y_small_edge.Key.Y < xz_Y_small_edge.Key.Y)
+                    var xz_Y_small_Node = xz_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
+                    var yz_Y_small_Node = yz_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
+                    //比較２值大小，取小的，即為交點
+                    if (yz_Y_small_Node.Key.Y < xz_Y_small_Node.Key.Y)
                     {
-                        //yz_Y_small.Key是交點
-                        HP.Add(yz_Y_small_edge.Key);
+                        //yz_Y_small.Key是交點，加到HP中
+                        HP.Add(yz_Y_small_Node.Key);
+                        //更新SG
                         SG.X1 = Node_X.X;
                         SG.Y1 = Node_X.Y;
-                        if (xz_line[xz_Y_small_edge.Value].Y1 < xz_line[xz_Y_small_edge.Value].Y2)
+                        if (xz_lineList[xz_Y_small_Node.Value].Y1 < xz_lineList[xz_Y_small_Node.Value].Y2)
                         {//替換xz_line[xz_Y_small_edge.Value].Y2
-                            SG.X2 = xz_line[xz_Y_small_edge.Value].X2;
-                            SG.Y2 = xz_line[xz_Y_small_edge.Value].Y2;
+                            SG.X2 = xz_lineList[xz_Y_small_Node.Value].X2;
+                            SG.Y2 = xz_lineList[xz_Y_small_Node.Value].Y2;
                         }
                         else
                         {//替換xz_line[xz_Y_small_edge.Value].Y1
-                            SG.X2 = xz_line[xz_Y_small_edge.Value].X1;
-                            SG.Y2 = xz_line[xz_Y_small_edge.Value].Y1;
+                            SG.X2 = xz_lineList[xz_Y_small_Node.Value].X1;
+                            SG.Y2 = xz_lineList[xz_Y_small_Node.Value].Y1;
                         }
                     }
                     else
                     {
                         //xz_Y_small.Key是交點
-                        HP.Add(xz_Y_small_edge.Key);
+                        HP.Add(xz_Y_small_Node.Key);
 
                         SG.X1 = Node_Y.X;
                         SG.Y1 = Node_Y.Y;
-                        if (yz_line[yz_Y_small_edge.Value].Y1 < yz_line[yz_Y_small_edge.Value].Y2)
+                        if (yz_lineList[yz_Y_small_Node.Value].Y1 < yz_lineList[yz_Y_small_Node.Value].Y2)
                         {//替換xz_line[xz_Y_small_edge.Value].Y2
-                            SG.X2 = yz_line[yz_Y_small_edge.Value].X2;
-                            SG.Y2 = yz_line[yz_Y_small_edge.Value].Y2;
+                            SG.X2 = yz_lineList[yz_Y_small_Node.Value].X2;
+                            SG.Y2 = yz_lineList[yz_Y_small_Node.Value].Y2;
                         }
                         else
                         {//替換xz_line[xz_Y_small_edge.Value].Y1
-                            SG.X2 = yz_line[yz_Y_small_edge.Value].X1;
-                            SG.Y2 = yz_line[yz_Y_small_edge.Value].Y1;
+                            SG.X2 = yz_lineList[yz_Y_small_Node.Value].X1;
+                            SG.Y2 = yz_lineList[yz_Y_small_Node.Value].Y1;
                         }
                     }
                     for (int i = 0; i < HP.Count; i++)
@@ -280,7 +285,10 @@ namespace WindowsFormsApp1
                         g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
                         g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
                     }
-                    g.DrawLine(pen_in_hyper, HP[0].X,HP[0].Y, HP[1].X, HP[1].Y);
+                    for (int i = 0; i < HP.Count - 1; i++)
+                    {
+                        g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
+                    }
 
                 }
             }
