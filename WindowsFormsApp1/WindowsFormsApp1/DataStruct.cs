@@ -19,12 +19,15 @@ namespace WindowsFormsApp1
         public struct Edge
         {
             public int X1, Y1, X2, Y2;
+            public Node _a, _b;
             public Edge(int p1, int p2, int p3, int p4)
             {
                 X1 = p1;
                 Y1 = p2;
                 X2 = p3;
                 Y2 = p4;
+                _a = new Node(X1,Y1);
+                _b = new Node(X2,Y2);
             }
             //法向量為，
             // 若ab向量為(x,y)->法向量為(y,-x)方向向量
@@ -49,26 +52,27 @@ namespace WindowsFormsApp1
             }
 
             //中垂線
-            public Node Vertical_line()
+            public Node Vertical()
             {
                 int K = 10000;
-                int Vertical_line_x = mid_Node().X + K * normal_vector().X;
-                int Vertical_line_y = mid_Node().Y + K * normal_vector().Y;
-                Node Vertical_line = new Node();
-                Vertical_line.X = Vertical_line_x;
-                Vertical_line.Y = Vertical_line_y;
-                return Vertical_line;
+                int Vertical_x = mid_Node().X + K * normal_vector().X;
+                int Vertical_y = mid_Node().Y + K * normal_vector().Y;
+                Node Vertical = new Node();
+                Vertical.X = Vertical_x;
+                Vertical.Y = Vertical_y;
+                return Vertical;
             }
             public Node down_Node()
             {
                 int K = 10000;
-                int Vertical_line_x = mid_Node().X - K * normal_vector().X;
-                int Vertical_line_y = mid_Node().Y - K * normal_vector().Y;
-                Node Vertical_line = new Node();
-                Vertical_line.X = Vertical_line_x;
-                Vertical_line.Y = Vertical_line_y;
-                return Vertical_line;
+                int Vertical_x = mid_Node().X - K * normal_vector().X;
+                int Vertical_y = mid_Node().Y - K * normal_vector().Y;
+                Node Vertical = new Node();
+                Vertical.X = Vertical_x;
+                Vertical.Y = Vertical_y;
+                return Vertical;
             }
+
         }
     }
 }
