@@ -54,7 +54,7 @@ namespace WindowsFormsApp1
             //中垂線
             public Node Vertical()
             {
-                int K = 10000;
+                int K = 1000;
                 int Vertical_x = mid_Node().X + K * normal_vector().X;
                 int Vertical_y = mid_Node().Y + K * normal_vector().Y;
                 Node Vertical = new Node();
