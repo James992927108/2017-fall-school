@@ -19,7 +19,7 @@ namespace WindowsFormsApp1
         public struct Edge
         {
             public int X1, Y1, X2, Y2;
-            public Node _a, _b;
+            private Node _a, _b;
             public Edge(int p1, int p2, int p3, int p4)
             {
                 X1 = p1;
@@ -52,7 +52,7 @@ namespace WindowsFormsApp1
             }
 
             //中垂線
-            public Node Vertical()
+            public Node Vertical_top_Node()
             {
                 int K = 1000;
                 int Vertical_x = mid_Node().X + K * normal_vector().X;
@@ -62,7 +62,7 @@ namespace WindowsFormsApp1
                 Vertical.Y = Vertical_y;
                 return Vertical;
             }
-            public Node down_Node()
+            public Node Vertical_down_Node()
             {
                 int K = 10000;
                 int Vertical_x = mid_Node().X - K * normal_vector().X;
@@ -72,7 +72,32 @@ namespace WindowsFormsApp1
                 Vertical.Y = Vertical_y;
                 return Vertical;
             }
-
+            public Node startNode()//定義y軸較小的點為起點
+            {
+                Node startNode = new Node();
+                if (_a.Y < _b.Y)
+                {
+                    startNode = _a;
+                }
+                else
+                {
+                    startNode = _b;
+                }
+                return startNode;
+            }
+            public Node endNode()
+            {
+                Node endNode = new Node();
+                if (_a.Y > _b.Y)
+                {
+                    endNode = _a;
+                }
+                else
+                {
+                    endNode = _b;
+                }
+                return endNode;
+            }
         }
     }
 }
