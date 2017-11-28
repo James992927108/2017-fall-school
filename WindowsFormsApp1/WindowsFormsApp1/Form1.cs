@@ -180,7 +180,6 @@ namespace WindowsFormsApp1
                 {
                     oo--;
                     g.DrawLine(Pens.Black, SG.X1, SG.Y1, SG.X2, SG.Y2);
-                
                     //想法:需要找到所有的點，
                     //即在Lpart中去掉Node_x即為相鄰的點
                     //    Rpart中去掉Node_y即為相鄰的點
