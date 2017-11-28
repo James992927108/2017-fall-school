@@ -25,6 +25,7 @@ namespace WindowsFormsApp1
 
         DataStruct.Node[] TL = new DataStruct.Node[20000];
         List<DataStruct.Edge> TangentLine_List = new List<DataStruct.Edge>();
+        public int FirstTime_TangentLine_List_Num = 0;
         List<DataStruct.Node> L_part_List = new List<DataStruct.Node>();
         List<DataStruct.Node> R_part_List = new List<DataStruct.Node>();
 
@@ -260,18 +261,34 @@ namespace WindowsFormsApp1
                     if (L_lineList.Count == 0 && R_lineList.Count!=0)
                     {
                         HP.Add(R_Y_small_Node.Key);
-                        SG.X1 = Down_TangentLine.X1;
-                        SG.Y1 = Down_TangentLine.Y1;
-                        SG.X2 = Down_TangentLine.X2;
-                        SG.Y2 = Down_TangentLine.Y2;
+                        if (FirstTime_TangentLine_List_Num == 3)
+                        {
+                            SG.X2 = Down_TangentLine.X2;
+                            SG.Y2 = Down_TangentLine.Y2;
+                        }
+                        else
+                        {
+                            SG.X1 = Down_TangentLine.X1;
+                            SG.Y1 = Down_TangentLine.Y1;
+                            SG.X2 = Down_TangentLine.X2;
+                            SG.Y2 = Down_TangentLine.Y2;
+                        }
                     }
                     else if (R_lineList.Count == 0 && L_lineList.Count!=0)
                     {
                         HP.Add(L_Y_small_Node.Key);
-                        SG.X1 = Down_TangentLine.X1;
-                        SG.Y1 = Down_TangentLine.Y1;
-                        SG.X2 = Down_TangentLine.X2;
-                        SG.Y2 = Down_TangentLine.Y2;
+                        if (FirstTime_TangentLine_List_Num == 3)
+                        {
+                            SG.X1 = Down_TangentLine.X1;
+                            SG.Y1 = Down_TangentLine.Y1;
+                        }
+                        else
+                        {
+                            SG.X1 = Down_TangentLine.X1;
+                            SG.Y1 = Down_TangentLine.Y1;
+                            SG.X2 = Down_TangentLine.X2;
+                            SG.Y2 = Down_TangentLine.Y2;
+                        }
                     }
                     else if (R_lineList.Count == 0 && L_lineList.Count == 0)
                     {
@@ -363,32 +380,6 @@ namespace WindowsFormsApp1
         /// 計算兩條直線的交點
         public static PointF GetIntersection(PointF lineFirstStar, PointF lineFirstEnd, PointF lineSecondStar, PointF lineSecondEnd)
         {
-            /*
-             * L1，L2都存在斜率的情況：
-             * 直線方程L1: ( y - y1 ) / ( y2 - y1 ) = ( x - x1 ) / ( x2 - x1 ) 
-             * => y = [ ( y2 - y1 ) / ( x2 - x1 ) ]( x - x1 ) + y1
-             * 令 a = ( y2 - y1 ) / ( x2 - x1 )
-             * 有 y = a * x - a * x1 + y1   .........1
-             * 直線方程L2: ( y - y3 ) / ( y4 - y3 ) = ( x - x3 ) / ( x4 - x3 )
-             * 令 b = ( y4 - y3 ) / ( x4 - x3 )
-             * 有 y = b * x - b * x3 + y3 ..........2
-             * 
-             * 如果 a = b，則兩直線平等，否則， 聯解方程 1,2，得:
-             * x = ( a * x1 - b * x3 - y1 + y3 ) / ( a - b )
-             * y = a * x - a * x1 + y1
-             * 
-             * L1存在斜率, L2平行Y軸的情況：
-             * x = x3
-             * y = a * x3 - a * x1 + y1
-             * 
-             * L1 平行Y軸，L2存在斜率的情況：
-             * x = x1
-             * y = b * x - b * x3 + y3
-             * 
-             * L1與L2都平行Y軸的情況：
-             * 如果 x1 = x3，那麼L1與L2重合，否則平等
-             * 
-            */
             float a = 0, b = 0;
             int state = 0;
             if (lineFirstStar.X != lineFirstEnd.X)
@@ -471,6 +462,7 @@ namespace WindowsFormsApp1
             {
                 DataStruct.Edge edge = new DataStruct.Edge(TL[i].X, TL[i].Y, TL[i + 1].X, TL[i + 1].Y);
                 TangentLine_List.Add(edge);
+                FirstTime_TangentLine_List_Num = TangentLine_List.Count;//用在判斷是否有內角
             }
             //找出EdgeList與CH_EdgeList不同的邊，並移除原本EdgeList
             var Tangent = TangentLine_List.Except(EdgeList).ToList();
