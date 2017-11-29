@@ -180,14 +180,12 @@ namespace WindowsFormsApp1
                 {
                     oo--;
                     g.DrawLine(Pens.Black, SG.X1, SG.Y1, SG.X2, SG.Y2);
-                    //想法:需要找到所有的點，
-                    //即在Lpart中去掉Node_x即為相鄰的點
-                    //    Rpart中去掉Node_y即為相鄰的點
+
                     List<DataStruct.Node> xz = new List<DataStruct.Node>();
                     for (int i = 0; i < L_part_List.Count; i++)
                     {
-                        if (L_part_List[i].X != SG.X1 && L_part_List[i].Y != SG.Y1 &&
-                            L_part_List[i].X != last_SG_Node.X && L_part_List[i].Y != last_SG_Node.Y) 
+                        if (!(L_part_List[i].X == SG.X1 && L_part_List[i].Y == SG.Y1) &&
+                            !(L_part_List[i].X == last_SG_Node.X && L_part_List[i].Y == last_SG_Node.Y))
                         {
                             xz.Add(L_part_List[i]);
                         }
@@ -201,8 +199,8 @@ namespace WindowsFormsApp1
                     List<DataStruct.Node> yz = new List<DataStruct.Node>();
                     for (int i = 0; i < R_part_List.Count; i++)
                     {
-                        if (R_part_List[i].X != SG.X2 && R_part_List[i].Y != SG.Y2 &&
-                            R_part_List[i].X != last_SG_Node.X && R_part_List[i].Y != last_SG_Node.Y)
+                        if (!(R_part_List[i].X == SG.X2 && R_part_List[i].Y == SG.Y2) &&
+                            !(R_part_List[i].X == last_SG_Node.X && R_part_List[i].Y == last_SG_Node.Y))
                         {
                             yz.Add(R_part_List[i]);
                         }
@@ -213,11 +211,7 @@ namespace WindowsFormsApp1
                         DataStruct.Edge temp = new DataStruct.Edge(SG.X2, SG.Y2, yz[i].X, yz[i].Y);
                         R_lineList.Add(temp);
                     }
-                    //分別讓xz_lineList中的點的中垂線與SG的中垂線做交點，同理yz_lineList
-                    //並分別紀錄在xz_IntersectionNodeList與yz_IntersectionNodeList
-                    //同時紀錄是xz_lineList第幾條線得交點，例如 :xz_lineList的第一條線index = 0 ，交點為(200,300)，
-                    //則對應xz_IntersectionNodeList(200,300),0，完成所有交點時，
-                    //從xz_IntersectionNodeList中找到ｙ值最小的點，同理yz_IntersectionNodeList，然後比較兩值，取小的值。
+                  
                     Dictionary<PointF, int> L_IntersectionNodeList = new Dictionary<PointF, int>();
                     Dictionary<PointF, int> R_IntersectionNodeList = new Dictionary<PointF, int>();
                     //SG的中垂線
@@ -242,7 +236,7 @@ namespace WindowsFormsApp1
                             g.DrawLine(pen_in_vertical, L_lineList[i].Vertical_top_Node().X, L_lineList[i].Vertical_top_Node().Y, L_lineList[i].Vertical_down_Node().X, L_lineList[i].Vertical_down_Node().Y);
                         }
                     }
-                    
+
                     if (R_lineList.Count != 0)
                     {
                         for (int i = 0; i < R_lineList.Count; i++)
@@ -262,7 +256,8 @@ namespace WindowsFormsApp1
                     //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
                     var L_Y_small_Node = L_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
                     var R_Y_small_Node = R_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-                    if (L_lineList.Count == 0 && R_lineList.Count!=0)
+
+                    if (L_lineList.Count == 0 && R_lineList.Count != 0)
                     {
                         HP.Add(R_Y_small_Node.Key);
                         if (FirstTime_TangentLine_List_Num == 3)
@@ -280,7 +275,7 @@ namespace WindowsFormsApp1
                             SG.Y2 = Down_TangentLine.Y2;
                         }
                     }
-                    else if (R_lineList.Count == 0 && L_lineList.Count!=0)
+                    else if (R_lineList.Count == 0 && L_lineList.Count != 0)
                     {
                         HP.Add(L_Y_small_Node.Key);
                         if (FirstTime_TangentLine_List_Num == 3)
@@ -307,18 +302,55 @@ namespace WindowsFormsApp1
                     }
                     else
                     {
-                        //比較２值大小，取小的，即為交點
-                        if (R_Y_small_Node.Key.Y < L_Y_small_Node.Key.Y)
+                        if (L_Y_small_Node.Key.X == 0 && L_Y_small_Node.Key.Y == 0)
                         {
-                            //yz_Y_small.Key是交點，加到HP中
-                            //原本SG = ( PX , PY )，
-                            //交點對應的中垂線為PYPZ，所以SG = PX PZ，
                             HP.Add(R_Y_small_Node.Key);
-                            //更新SG，PX不變，PZ必須確認是哪一個點是xz_lineList[xz_Y_small_Node.Value]的哪一點
-                            //xz_lineList[xz_Y_small_Node.Value]其中一點為SG的切點，若是切點則為另一點為PZ
                             last_SG_Node.X = SG.X2;
                             last_SG_Node.Y = SG.Y2;
-              
+                            if (R_lineList.Count != 0)
+                            {
+                                if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
+                                    R_lineList[R_Y_small_Node.Value].Y1 == SG.Y2)
+                                {
+                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X2;
+                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y2;
+                                }
+                                else
+                                {
+                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X1;
+                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y1;
+                                }
+                            }
+                        }
+                        else if (R_Y_small_Node.Key.X == 0 && R_Y_small_Node.Key.Y == 0)
+                        {
+                            HP.Add(L_Y_small_Node.Key);
+                            last_SG_Node.X = SG.X1;
+                            last_SG_Node.Y = SG.Y1;
+
+                            if (L_lineList.Count != 0)
+                            {
+                                if (L_lineList[L_Y_small_Node.Value].X1 == last_SG_Node.X &&
+                                    L_lineList[L_Y_small_Node.Value].Y1 == last_SG_Node.Y)
+                                {
+                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X2;
+                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y2;
+                                }
+                                else
+                                {
+                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X1;
+                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y1;
+                                }
+                            }
+                        }
+                        else if (L_Y_small_Node.Key.Y > R_Y_small_Node.Key.Y)
+                        {
+
+                            HP.Add(R_Y_small_Node.Key);
+
+                            last_SG_Node.X = SG.X2;
+                            last_SG_Node.Y = SG.Y2;
+
                             if (R_lineList.Count != 0)
                             {
                                 if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
@@ -337,9 +369,7 @@ namespace WindowsFormsApp1
                         }
                         else
                         {
-                            //xz_Y_small.Key是交點
-                            //原本SG = ( PX , PY )，
-                            //交點對應的中垂線為PXPZ，所以SG = PYPZ，
+
                             HP.Add(L_Y_small_Node.Key);
                             last_SG_Node.X = SG.X1;
                             last_SG_Node.Y = SG.Y1;
@@ -375,7 +405,7 @@ namespace WindowsFormsApp1
                 }
 
                 PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
-                g.DrawLine(pen_in_hyper, HP[HP.Count-1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
+                g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
 
 
             }
@@ -383,13 +413,9 @@ namespace WindowsFormsApp1
         private bool cmpLine(DataStruct.Edge a, DataStruct.Edge b)
         {
             if (a.X1 == b.X1 && a.Y1 == b.Y1 && a.X2 == b.X2 && a.Y2 == b.Y2)
-            {
                 return true;
-            }
             else
-            {
                 return false;
-            }
         }
         /// <summary>
         /// 計算兩條直線的交點
@@ -490,7 +516,6 @@ namespace WindowsFormsApp1
                 {
                     for (int j = 0; j < Tangenttemp.Count(); j++)
                     {
-                        //有一個問題，3點共線，解決方法，在判斷convex_hull線段時不移除共線得點
                         float a = Tangent[i].Y1 - Tangent[i].Y2;
                         float b = Tangent[i].X1 - Tangent[i].X2;
                         float temp1 = a / b;
@@ -505,6 +530,23 @@ namespace WindowsFormsApp1
                     }
                 }
             }
+            var temp_1 = TangentLine_List.Except(Tangent).ToList();
+            if (Tangent.Count < 2)//代表移除了一條切線，須加回來
+            {
+                for (int i = 0; i < temp_1.Count; i++)
+                {
+                    for (int j = 0; j < EdgeList.Count; j++)
+                    {
+                        if (checkIfsameEdge(temp_1[i], EdgeList[j]))
+                        {
+                            temp_1.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+            DataStruct.Edge temp3 = new DataStruct.Edge(temp_1.ElementAt(0).X1, temp_1.ElementAt(0).Y1, temp_1.ElementAt(0).X2, temp_1.ElementAt(0).Y2);
+            Tangent.Add(temp3);
             //將Tangents存回CH_CH_EdgeList
             TangentLine_List = Tangent;
             for (int i = 0; i < Tangent.Count(); i++)
@@ -521,6 +563,21 @@ namespace WindowsFormsApp1
                 TangentLine_List[1] = temp;
             }
         }
+
+        private bool checkIfsameEdge(DataStruct.Edge a ,DataStruct.Edge b)
+        {
+            if (a.X1 == b.X1 && a.X2 == b.X2 && a.Y1 == b.Y1 && a.Y2 == b.Y2)
+                return true;
+            else if (a.X1 == b.X2 && a.X2 == b.X1 && a.Y1 == b.Y2 && a.Y2 == b.Y1)
+                return true;
+            else if (a.X2 == b.X1 && a.X1 == b.X2 && a.Y2 == b.Y1 && a.Y1 == b.Y2)
+                return true;
+            else if (a.X2 == b.X2 && a.X2 == b.X2 && a.Y2 == b.Y2 && a.Y2 == b.Y2)
+                return true;
+            else
+                return false;
+        }
+       
         private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
         {
             return (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
@@ -558,9 +615,6 @@ namespace WindowsFormsApp1
         private void Divide(int NodeCount, List<DataStruct.Node> tempList)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
-            //先取得有幾個點，找中線讓點分成兩邊均勻(若點很多，要遞迴，先做4個點)，將點先排序，根據x值大小
-
             var tempListSort = tempList.OrderBy(a => a.X).ToList();
             L_part_List = tempListSort.GetRange(0, NodeCount / 2).ToList();
             ClockwiseSortPoints(L_part_List);
