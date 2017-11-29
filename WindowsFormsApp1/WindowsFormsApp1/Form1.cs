@@ -223,6 +223,11 @@ namespace WindowsFormsApp1
                     //SG的中垂線
                     PointF SG_top = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
                     PointF SG_down = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
+                    if (cmpLine(SG, Down_TangentLine) && FirstTime_TangentLine_List_Num == 3)//解決內點三角形問題
+                    {
+                        L_lineList.Clear();
+                        R_lineList.Clear();
+                    }
                     if (L_lineList.Count != 0)
                     {
                         for (int i = 0; i < L_lineList.Count; i++)
@@ -262,6 +267,8 @@ namespace WindowsFormsApp1
                         HP.Add(R_Y_small_Node.Key);
                         if (FirstTime_TangentLine_List_Num == 3)
                         {
+                            last_SG_Node.X = SG.X2;
+                            last_SG_Node.Y = SG.Y2;
                             SG.X2 = Down_TangentLine.X2;
                             SG.Y2 = Down_TangentLine.Y2;
                         }
@@ -278,6 +285,8 @@ namespace WindowsFormsApp1
                         HP.Add(L_Y_small_Node.Key);
                         if (FirstTime_TangentLine_List_Num == 3)
                         {
+                            last_SG_Node.X = SG.X1;
+                            last_SG_Node.Y = SG.Y1;
                             SG.X1 = Down_TangentLine.X1;
                             SG.Y1 = Down_TangentLine.Y1;
                         }
@@ -309,9 +318,7 @@ namespace WindowsFormsApp1
                             //xz_lineList[xz_Y_small_Node.Value]其中一點為SG的切點，若是切點則為另一點為PZ
                             last_SG_Node.X = SG.X2;
                             last_SG_Node.Y = SG.Y2;
-//                            SG.X1 = P_X.X;
-//                            SG.Y1 = P_X.Y;
-//                            
+              
                             if (R_lineList.Count != 0)
                             {
                                 if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
@@ -336,8 +343,6 @@ namespace WindowsFormsApp1
                             HP.Add(L_Y_small_Node.Key);
                             last_SG_Node.X = SG.X1;
                             last_SG_Node.Y = SG.Y1;
-//                            SG.X1 = SG.X2;
-//                            SG.Y1 = SG.Y2;
 
                             if (L_lineList.Count != 0)
                             {
@@ -373,6 +378,17 @@ namespace WindowsFormsApp1
                 g.DrawLine(pen_in_hyper, HP[HP.Count-1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
 
 
+            }
+        }
+        private bool cmpLine(DataStruct.Edge a, DataStruct.Edge b)
+        {
+            if (a.X1 == b.X1 && a.Y1 == b.Y1 && a.X2 == b.X2 && a.Y2 == b.Y2)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         /// <summary>
