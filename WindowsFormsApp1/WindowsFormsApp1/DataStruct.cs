@@ -117,7 +117,7 @@ namespace WindowsFormsApp1
                 }
                 return L_Node;
             }
-            public Node R_Node()//定義y軸較小的點為起點
+            public Node R_Node()
             {
                 Node R_Node = new Node();
                 if (_a.X > _b.X)

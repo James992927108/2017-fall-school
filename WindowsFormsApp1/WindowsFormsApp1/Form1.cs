@@ -423,23 +423,28 @@ namespace WindowsFormsApp1
                     //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
                     for (int j = 0; j < 2 ; j++)
                     {
-                        DataStruct.Node tempNode1 = new DataStruct.Node(Convert.ToInt32(HP[j].X), Convert.ToInt32(HP[j].Y));
-                        DataStruct.Node tempNode2 = new DataStruct.Node(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y));
-                        DataStruct.Node tempNode3 = new DataStruct.Node(Convert.ToInt32(HP[j + 2].X), Convert.ToInt32(HP[j + 2].Y));
-                        var state_a = cross(tempNode1, tempNode2, tempNode3);
-                        state_a = getstate(state_a);
+                        DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[j].X), Convert.ToInt32(HP[j].Y));
+                        DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y));
+                        DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[j + 2].X), Convert.ToInt32(HP[j + 2].Y));
 
-                        var state_b = cross(tempNode1, tempNode2, VerticalList[i].R_Node());
-                        state_b = getstate(state_b);
-                        var state_c = cross(tempNode1, tempNode2, VerticalList[i].L_Node());
-                        state_c = getstate(state_c);
-                        if (state_a == state_b)
+                        PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
+                        PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
+                        PointF AR_Node_vecter = new PointF(VerticalList[i].R_Node().X - NodeA.X, VerticalList[i].R_Node().Y - NodeA.Y);
+                        PointF AL_Node_vecter = new PointF(VerticalList[i].L_Node().X - NodeA.X, VerticalList[i].L_Node().Y - NodeA.Y);
+                        //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
+                        var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X; 
+                        ABAC = getstate(ABAC);
+                        var ABAR = AB_vecter.X * AR_Node_vecter.Y - AB_vecter.Y * AR_Node_vecter.X;
+                        ABAR = getstate(ABAR);
+                        var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
+                        ABAL = getstate(ABAL);
+                        if (ABAC == ABAR)
                         {
                             DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
                                 VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
                             Fin_VerticalList.Add(temp);
                         }
-                        else if (state_a == state_c)
+                        else if (ABAC == ABAL)
                         {
                             DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
                                 VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
@@ -454,7 +459,7 @@ namespace WindowsFormsApp1
             }
         }
 
-        private int getstate(int state)
+        private int getstate(float state)
         {
             int fin_state = 0;
             if (state > 0)
