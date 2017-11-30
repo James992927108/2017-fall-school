@@ -72,6 +72,12 @@ namespace WindowsFormsApp1
                 Vertical.Y = Vertical_y;
                 return Vertical;
             }
+            public Edge VerticalLine()
+            {
+                Edge VerticalLine = new Edge(Vertical_top_Node().X, Vertical_top_Node().Y,
+                Vertical_down_Node().X, Vertical_down_Node().Y);
+                return VerticalLine;
+            }
             public Node startNode()//定義y軸較小的點為起點
             {
                 Node startNode = new Node();
@@ -98,6 +104,7 @@ namespace WindowsFormsApp1
                 }
                 return endNode;
             }
+            
         }
     }
 }

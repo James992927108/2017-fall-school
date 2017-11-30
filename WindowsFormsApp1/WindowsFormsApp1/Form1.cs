@@ -175,12 +175,12 @@ namespace WindowsFormsApp1
                 List<PointF> HP = new List<PointF>();
                 PointF HP_FirstNode = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
                 HP.Add(HP_FirstNode);
-                int oo = 4;
+                List<DataStruct.Edge> VerticalList = new List<DataStruct.Edge>();//
+                int oo = 3;
                 while (oo > 0)
                 {
                     oo--;
                     g.DrawLine(Pens.Black, SG.X1, SG.Y1, SG.X2, SG.Y2);
-
                     List<DataStruct.Node> xz = new List<DataStruct.Node>();
                     for (int i = 0; i < L_part_List.Count; i++)
                     {
@@ -247,9 +247,7 @@ namespace WindowsFormsApp1
                             //分別做交點
                             PointF test = new PointF();
                             test = GetIntersection(R_line_top, R_line_down, SG_top, SG_down);
-
                             R_IntersectionNodeList.Add(test, i);
-
                             g.DrawLine(pen_in_vertical, R_lineList[i].Vertical_top_Node().X, R_lineList[i].Vertical_top_Node().Y, R_lineList[i].Vertical_down_Node().X, R_lineList[i].Vertical_down_Node().Y);
                         }
                     }
@@ -260,6 +258,9 @@ namespace WindowsFormsApp1
                     if (L_lineList.Count == 0 && R_lineList.Count != 0)
                     {
                         HP.Add(R_Y_small_Node.Key);
+                        DataStruct.Edge  temp = new DataStruct.Edge();
+                        temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
+                        VerticalList.Add(temp);
                         if (FirstTime_TangentLine_List_Num == 3)
                         {
                             last_SG_Node.X = SG.X2;
@@ -278,6 +279,9 @@ namespace WindowsFormsApp1
                     else if (R_lineList.Count == 0 && L_lineList.Count != 0)
                     {
                         HP.Add(L_Y_small_Node.Key);
+                        DataStruct.Edge temp = new DataStruct.Edge();
+                        temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
+                        VerticalList.Add(temp);
                         if (FirstTime_TangentLine_List_Num == 3)
                         {
                             last_SG_Node.X = SG.X1;
@@ -305,6 +309,9 @@ namespace WindowsFormsApp1
                         if (L_Y_small_Node.Key.X == 0 && L_Y_small_Node.Key.Y == 0)
                         {
                             HP.Add(R_Y_small_Node.Key);
+                            DataStruct.Edge temp = new DataStruct.Edge();
+                            temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
+                            VerticalList.Add(temp);
                             last_SG_Node.X = SG.X2;
                             last_SG_Node.Y = SG.Y2;
                             if (R_lineList.Count != 0)
@@ -325,6 +332,9 @@ namespace WindowsFormsApp1
                         else if (R_Y_small_Node.Key.X == 0 && R_Y_small_Node.Key.Y == 0)
                         {
                             HP.Add(L_Y_small_Node.Key);
+                            DataStruct.Edge temp = new DataStruct.Edge();
+                            temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
+                            VerticalList.Add(temp);
                             last_SG_Node.X = SG.X1;
                             last_SG_Node.Y = SG.Y1;
 
@@ -347,7 +357,9 @@ namespace WindowsFormsApp1
                         {
 
                             HP.Add(R_Y_small_Node.Key);
-
+                            DataStruct.Edge temp = new DataStruct.Edge();
+                            temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
+                            VerticalList.Add(temp);
                             last_SG_Node.X = SG.X2;
                             last_SG_Node.Y = SG.Y2;
 
@@ -369,8 +381,10 @@ namespace WindowsFormsApp1
                         }
                         else
                         {
-
                             HP.Add(L_Y_small_Node.Key);
+                            DataStruct.Edge temp = new DataStruct.Edge();
+                            temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
+                            VerticalList.Add(temp);
                             last_SG_Node.X = SG.X1;
                             last_SG_Node.Y = SG.Y1;
 
@@ -406,7 +420,11 @@ namespace WindowsFormsApp1
 
                 PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
                 g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
-
+                var testtt = VerticalList;
+                for (int i = 0; i < VerticalList.Count; i++)
+                {
+                    g.DrawLine(Pens.DarkOrange, VerticalList[i].X1, VerticalList[i].Y1, VerticalList[i].X2, VerticalList[i].Y2);
+                }
 
             }
         }
