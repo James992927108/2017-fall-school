@@ -64,7 +64,7 @@ namespace WindowsFormsApp1
             }
             public Node Vertical_down_Node()
             {
-                int K = 10000;
+                int K = 1000;
                 int Vertical_x = mid_Node().X - K * normal_vector().X;
                 int Vertical_y = mid_Node().Y - K * normal_vector().Y;
                 Node Vertical = new Node();
@@ -78,7 +78,7 @@ namespace WindowsFormsApp1
                 Vertical_down_Node().X, Vertical_down_Node().Y);
                 return VerticalLine;
             }
-            public Node startNode()//定義y軸較小的點為起點
+            public Node Top_Node()//定義y軸較小的點為起點
             {
                 Node startNode = new Node();
                 if (_a.Y < _b.Y)
@@ -91,7 +91,7 @@ namespace WindowsFormsApp1
                 }
                 return startNode;
             }
-            public Node endNode()
+            public Node Down_Node()
             {
                 Node endNode = new Node();
                 if (_a.Y > _b.Y)
@@ -104,7 +104,33 @@ namespace WindowsFormsApp1
                 }
                 return endNode;
             }
-            
+            public Node L_Node()//定義y軸較小的點為起點
+            {
+                Node L_Node = new Node();
+                if (_a.X < _b.X)
+                {
+                    L_Node = _a;
+                }
+                else
+                {
+                    L_Node = _b;
+                }
+                return L_Node;
+            }
+            public Node R_Node()//定義y軸較小的點為起點
+            {
+                Node R_Node = new Node();
+                if (_a.X > _b.X)
+                {
+                    R_Node = _a;
+                }
+                else
+                {
+                    R_Node = _b;
+                }
+                return R_Node;
+            }
+
         }
     }
 }
