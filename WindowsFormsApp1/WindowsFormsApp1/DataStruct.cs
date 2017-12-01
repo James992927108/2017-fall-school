@@ -80,53 +80,109 @@ namespace WindowsFormsApp1
             }
             public Node Top_Node()//定義y軸較小的點為起點
             {
-                Node startNode = new Node();
-                if (_a.Y < _b.Y)
+                Node topNode = new Node();
+                if (_a.X < _b.X)
                 {
-                    startNode = _a;
+                    if (_a.Y < _b.Y)
+                    {
+                        topNode = _a;
+                    }
+                    else
+                    {
+                        topNode = _b;
+                    }
                 }
                 else
                 {
-                    startNode = _b;
+                    if (_a.Y < _b.Y)
+                    {
+                        topNode = _a;
+                    }
+                    else
+                    {
+                        topNode = _b;
+                    }
                 }
-                return startNode;
+                return topNode;
             }
             public Node Down_Node()
             {
-                Node endNode = new Node();
-                if (_a.Y > _b.Y)
+                Node downNode = new Node();
+                if (_a.X < _b.X)
                 {
-                    endNode = _a;
+                    if (_a.Y < _b.Y)
+                    {
+                        downNode = _b;
+                    }
+                    else
+                    {
+                        downNode = _a;
+                    }
                 }
                 else
                 {
-                    endNode = _b;
+                    if (_a.Y < _b.Y)
+                    {
+                        downNode = _b;
+                    }
+                    else
+                    {
+                        downNode = _a;
+                    }
                 }
-                return endNode;
+                return downNode;
             }
             public Node L_Node()
             {
                 Node L_Node = new Node();
-                if (_a.X < _b.X)
+                if (_a.Y < _b.Y)
                 {
-                    L_Node = _a;
+                    if (_a.X < _b.X)
+                    {
+                        L_Node = _a;
+                    }
+                    else
+                    {
+                        L_Node = _b;
+                    }
                 }
                 else
                 {
-                    L_Node = _b;
+                    if (_a.X < _b.X)
+                    {
+                        L_Node = _a;
+                    }
+                    else
+                    {
+                        L_Node = _b;
+                    }
                 }
                 return L_Node;
             }
             public Node R_Node()
             {
                 Node R_Node = new Node();
-                if (_a.X > _b.X)
+                if (_a.Y < _b.Y)
                 {
-                    R_Node = _a;
+                    if (_a.X < _b.X)
+                    {
+                        R_Node = _b;
+                    }
+                    else
+                    {
+                        R_Node = _a;
+                    }
                 }
                 else
                 {
-                    R_Node = _b;
+                    if (_a.X < _b.X)
+                    {
+                        R_Node = _b;
+                    }
+                    else
+                    {
+                        R_Node = _a;
+                    }
                 }
                 return R_Node;
             }

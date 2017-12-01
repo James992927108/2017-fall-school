@@ -233,9 +233,11 @@ namespace WindowsFormsApp1
                             PointF test = new PointF();
                             test = GetIntersection(L_line_top, L_line_down, SG_top, SG_down);
                             L_IntersectionNodeList.Add(test, i);
-                            g.DrawLine(pen_in_vertical, L_lineList[i].Vertical_top_Node().X,
-                                L_lineList[i].Vertical_top_Node().Y, L_lineList[i].Vertical_down_Node().X,
-                                L_lineList[i].Vertical_down_Node().Y);
+                            var aa = L_lineList[i].Vertical_top_Node().X;
+                            var bb = L_lineList[i].Vertical_top_Node().Y;
+                            var cc = L_lineList[i].Vertical_down_Node().X;
+                            var dd = L_lineList[i].Vertical_down_Node().Y;
+                            g.DrawLine(pen_in_vertical, aa, bb, cc, dd);
                         }
                     }
                     if (R_lineList.Count != 0)
@@ -251,16 +253,24 @@ namespace WindowsFormsApp1
                             PointF test = new PointF();
                             test = GetIntersection(R_line_top, R_line_down, SG_top, SG_down);
                             R_IntersectionNodeList.Add(test, i);
-                            g.DrawLine(pen_in_vertical, R_lineList[i].Vertical_top_Node().X,
-                                R_lineList[i].Vertical_top_Node().Y, R_lineList[i].Vertical_down_Node().X,
-                                R_lineList[i].Vertical_down_Node().Y);
+                            var aa = R_lineList[i].Vertical_top_Node().X;
+                            var bb = R_lineList[i].Vertical_top_Node().Y;
+                            var cc = R_lineList[i].Vertical_down_Node().X;
+                            var dd = R_lineList[i].Vertical_down_Node().Y;
+                            g.DrawLine(pen_in_vertical, aa, bb, cc, dd);
                         }
                     }
                     //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
                     var L_Y_small_Node = L_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
                     var R_Y_small_Node = R_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-
-                    if (L_lineList.Count == 0 && R_lineList.Count != 0)
+                    if (R_lineList.Count == 0 && L_lineList.Count == 0)
+                    {
+                        SG.X1 = Down_TangentLine.X1;
+                        SG.Y1 = Down_TangentLine.Y1;
+                        SG.X2 = Down_TangentLine.X2;
+                        SG.Y2 = Down_TangentLine.Y2;
+                    }
+                    else if (L_lineList.Count == 0 && R_lineList.Count != 0)
                     {
                         HP.Add(R_Y_small_Node.Key);
                         DataStruct.Edge temp = new DataStruct.Edge();
@@ -281,7 +291,7 @@ namespace WindowsFormsApp1
                             SG.Y2 = Down_TangentLine.Y2;
                         }
                     }
-                    else if (R_lineList.Count == 0 && L_lineList.Count != 0)
+                    else if (L_lineList.Count != 0 && R_lineList.Count == 0)
                     {
                         HP.Add(L_Y_small_Node.Key);
                         DataStruct.Edge temp = new DataStruct.Edge();
@@ -301,13 +311,6 @@ namespace WindowsFormsApp1
                             SG.X2 = Down_TangentLine.X2;
                             SG.Y2 = Down_TangentLine.Y2;
                         }
-                    }
-                    else if (R_lineList.Count == 0 && L_lineList.Count == 0)
-                    {
-                        SG.X1 = Down_TangentLine.X1;
-                        SG.Y1 = Down_TangentLine.Y1;
-                        SG.X2 = Down_TangentLine.X2;
-                        SG.Y2 = Down_TangentLine.Y2;
                     }
                     else
                     {
@@ -428,36 +431,36 @@ namespace WindowsFormsApp1
                 {
                     //先計算HP[i]HP[i+1]，HP[i]HP[i+2]的外積，記錄下狀態為A，之後與算HP[i]與第j條VerticalList的左點z，記錄下狀態為B，
                     //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
-                    for (int j = 0; j < 2 ; j++)
-                    {
-                        DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[j].X), Convert.ToInt32(HP[j].Y));
-                        DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y));
-                        DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[j + 2].X), Convert.ToInt32(HP[j + 2].Y));
+                    int j = i;
 
-                        PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
-                        PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
-                        PointF AR_Node_vecter = new PointF(VerticalList[i].R_Node().X - NodeA.X, VerticalList[i].R_Node().Y - NodeA.Y);
-                        PointF AL_Node_vecter = new PointF(VerticalList[i].L_Node().X - NodeA.X, VerticalList[i].L_Node().Y - NodeA.Y);
-                        //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
-                        var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X; 
-                        ABAC = getstate(ABAC);
-                        var ABAR = AB_vecter.X * AR_Node_vecter.Y - AB_vecter.Y * AR_Node_vecter.X;
-                        ABAR = getstate(ABAR);
-                        var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
-                        ABAL = getstate(ABAL);
-                        if (ABAC == ABAR)
-                        {
-                            DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
-                                VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
-                            Fin_VerticalList.Add(temp);
-                        }
-                        else if (ABAC == ABAL)
-                        {
-                            DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
-                                VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
-                            Fin_VerticalList.Add(temp);
-                        }
+                    DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[j].X), Convert.ToInt32(HP[j].Y));
+                    DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y));
+                    DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[j + 2].X), Convert.ToInt32(HP[j + 2].Y));
+
+                    PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
+                    PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
+                    PointF AR_Node_vecter = new PointF(VerticalList[i].Top_Node().X - NodeA.X, VerticalList[i].Top_Node().Y - NodeA.Y);
+                    PointF AL_Node_vecter = new PointF(VerticalList[i].Down_Node().X - NodeA.X, VerticalList[i].Down_Node().Y - NodeA.Y);
+                    //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
+                    var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X;
+                    ABAC = getstate(ABAC);
+                    var ABAR = AB_vecter.X * AR_Node_vecter.Y - AB_vecter.Y * AR_Node_vecter.X;
+                    ABAR = getstate(ABAR);
+                    var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
+                    ABAL = getstate(ABAL);
+                    if (ABAC == ABAR)
+                    {
+                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
+                            VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
+                        Fin_VerticalList.Add(temp);
                     }
+                    else if (ABAC == ABAL)
+                    {
+                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
+                            VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                        Fin_VerticalList.Add(temp);
+                    }
+
                 }
                 for (int i = 0; i < Fin_VerticalList.Count; i++)
                 {
@@ -472,7 +475,8 @@ namespace WindowsFormsApp1
             if (state > 0)
             {
                 fin_state = 1;
-            }else if (state < 0)
+            }
+            else if (state < 0)
             {
                 fin_state = -1;
             }
@@ -485,14 +489,10 @@ namespace WindowsFormsApp1
 
         private bool checkIfsameEdge(DataStruct.Edge a, DataStruct.Edge b)
         {
-            if ( (a.X1 == b.X1 && a.Y1 == b.Y1) && (a.X2 == b.X2 && a.Y2 == b.Y2))
+            if ((a.X1 == b.X1 && a.Y1 == b.Y1) && (a.X2 == b.X2 && a.Y2 == b.Y2))
                 return true;
-            else if ((a.X1 == b.X2 && a.Y1 == b.Y2) && (a.X2 == b.X1  && a.Y2 == b.Y1))
+            else if ((a.X1 == b.X2 && a.Y1 == b.Y2) && (a.X2 == b.X1 && a.Y2 == b.Y1))
                 return true;
-//            else if (a.X2 == b.X1 && a.X1 == b.X2 && a.Y2 == b.Y1 && a.Y1 == b.Y2)
-//                return true;
-//            else if (a.X2 == b.X2 && a.X2 == b.X2 && a.Y2 == b.Y2 && a.Y2 == b.Y2)
-//                return true;
             else
                 return false;
         }
