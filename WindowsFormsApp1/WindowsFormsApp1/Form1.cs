@@ -176,11 +176,9 @@ namespace WindowsFormsApp1
                 HP.Add(HP_FirstNode);
                 List<DataStruct.Edge> VerticalList = new List<DataStruct.Edge>();
                 List<DataStruct.Edge> Fin_VerticalList = new List<DataStruct.Edge>();
-                int oo = 2;
-                while (oo > 0)
+                do
                 {
-                    oo--;
-                    //g.DrawLine(Pens.Black, SG.X1, SG.Y1, SG.X2, SG.Y2);
+                    g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
                     List<DataStruct.Node> L_part = new List<DataStruct.Node>();
                     for (int i = 0; i < L_part_List.Count; i++)
                     {
@@ -211,13 +209,13 @@ namespace WindowsFormsApp1
                         DataStruct.Edge temp = new DataStruct.Edge(SG.X2, SG.Y2, R_part[i].X, R_part[i].Y);
                         R_lineList.Add(temp);
                     }
-                  
+
                     Dictionary<PointF, int> L_IntersectionNodeList = new Dictionary<PointF, int>();
                     Dictionary<PointF, int> R_IntersectionNodeList = new Dictionary<PointF, int>();
                     //SG的中垂線
                     PointF SG_top = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
                     PointF SG_down = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
-                    if (cmpLine(SG, Down_TangentLine) && FirstTime_TangentLine_List_Num == 3)//解決內點三角形問題
+                    if (cmpLine(SG, Down_TangentLine) && FirstTime_TangentLine_List_Num == 3) //解決內點三角形問題
                     {
                         L_lineList.Clear();
                         R_lineList.Clear();
@@ -227,13 +225,17 @@ namespace WindowsFormsApp1
                         for (int i = 0; i < L_lineList.Count; i++)
                         {
                             //xz_lineList中的點的中垂線
-                            PointF L_line_top = new PointF(L_lineList[i].Vertical_top_Node().X, L_lineList[i].Vertical_top_Node().Y);
-                            PointF L_line_down = new PointF(L_lineList[i].Vertical_down_Node().X, L_lineList[i].Vertical_down_Node().Y);
+                            PointF L_line_top = new PointF(L_lineList[i].Vertical_top_Node().X,
+                                L_lineList[i].Vertical_top_Node().Y);
+                            PointF L_line_down = new PointF(L_lineList[i].Vertical_down_Node().X,
+                                L_lineList[i].Vertical_down_Node().Y);
                             //分別做交點
                             PointF test = new PointF();
                             test = GetIntersection(L_line_top, L_line_down, SG_top, SG_down);
                             L_IntersectionNodeList.Add(test, i);
-                            //g.DrawLine(pen_in_vertical, L_lineList[i].Vertical_top_Node().X, L_lineList[i].Vertical_top_Node().Y, L_lineList[i].Vertical_down_Node().X, L_lineList[i].Vertical_down_Node().Y);
+                            g.DrawLine(pen_in_vertical, L_lineList[i].Vertical_top_Node().X,
+                                L_lineList[i].Vertical_top_Node().Y, L_lineList[i].Vertical_down_Node().X,
+                                L_lineList[i].Vertical_down_Node().Y);
                         }
                     }
                     if (R_lineList.Count != 0)
@@ -241,13 +243,17 @@ namespace WindowsFormsApp1
                         for (int i = 0; i < R_lineList.Count; i++)
                         {
                             //yz_lineList中的點的中垂線
-                            PointF R_line_top = new PointF(R_lineList[i].Vertical_top_Node().X, R_lineList[i].Vertical_top_Node().Y);
-                            PointF R_line_down = new PointF(R_lineList[i].Vertical_down_Node().X, R_lineList[i].Vertical_down_Node().Y);
+                            PointF R_line_top = new PointF(R_lineList[i].Vertical_top_Node().X,
+                                R_lineList[i].Vertical_top_Node().Y);
+                            PointF R_line_down = new PointF(R_lineList[i].Vertical_down_Node().X,
+                                R_lineList[i].Vertical_down_Node().Y);
                             //分別做交點
                             PointF test = new PointF();
                             test = GetIntersection(R_line_top, R_line_down, SG_top, SG_down);
                             R_IntersectionNodeList.Add(test, i);
-                            //g.DrawLine(pen_in_vertical, R_lineList[i].Vertical_top_Node().X, R_lineList[i].Vertical_top_Node().Y, R_lineList[i].Vertical_down_Node().X, R_lineList[i].Vertical_down_Node().Y);
+                            g.DrawLine(pen_in_vertical, R_lineList[i].Vertical_top_Node().X,
+                                R_lineList[i].Vertical_top_Node().Y, R_lineList[i].Vertical_down_Node().X,
+                                R_lineList[i].Vertical_down_Node().Y);
                         }
                     }
                     //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
@@ -257,7 +263,7 @@ namespace WindowsFormsApp1
                     if (L_lineList.Count == 0 && R_lineList.Count != 0)
                     {
                         HP.Add(R_Y_small_Node.Key);
-                        DataStruct.Edge  temp = new DataStruct.Edge();
+                        DataStruct.Edge temp = new DataStruct.Edge();
                         temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
                         VerticalList.Add(temp);
                         if (FirstTime_TangentLine_List_Num == 3)
@@ -402,7 +408,7 @@ namespace WindowsFormsApp1
                     }
                     for (int i = 0; i < HP.Count; i++)
                     {
-                        //g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
+                        g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
                         //g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
                     }
                     for (int i = 0; i < HP.Count - 1; i++)
@@ -412,7 +418,8 @@ namespace WindowsFormsApp1
 
                     L_IntersectionNodeList.Clear();
                     R_IntersectionNodeList.Clear();
-                }
+                } while (!checkIfsameEdge(SG, Down_TangentLine));
+                g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
                 PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
                 g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
                 HP.Add(HP_LastNode);
@@ -478,14 +485,14 @@ namespace WindowsFormsApp1
 
         private bool checkIfsameEdge(DataStruct.Edge a, DataStruct.Edge b)
         {
-            if (a.X1 == b.X1 && a.X2 == b.X2 && a.Y1 == b.Y1 && a.Y2 == b.Y2)
+            if ( (a.X1 == b.X1 && a.Y1 == b.Y1) && (a.X2 == b.X2 && a.Y2 == b.Y2))
                 return true;
-            else if (a.X1 == b.X2 && a.X2 == b.X1 && a.Y1 == b.Y2 && a.Y2 == b.Y1)
+            else if ((a.X1 == b.X2 && a.Y1 == b.Y2) && (a.X2 == b.X1  && a.Y2 == b.Y1))
                 return true;
-            else if (a.X2 == b.X1 && a.X1 == b.X2 && a.Y2 == b.Y1 && a.Y1 == b.Y2)
-                return true;
-            else if (a.X2 == b.X2 && a.X2 == b.X2 && a.Y2 == b.Y2 && a.Y2 == b.Y2)
-                return true;
+//            else if (a.X2 == b.X1 && a.X1 == b.X2 && a.Y2 == b.Y1 && a.Y1 == b.Y2)
+//                return true;
+//            else if (a.X2 == b.X2 && a.X2 == b.X2 && a.Y2 == b.Y2 && a.Y2 == b.Y2)
+//                return true;
             else
                 return false;
         }
@@ -558,7 +565,7 @@ namespace WindowsFormsApp1
         //--------------------------------------------------------------------------------------------------
         private void Get_TangentLine(List<DataStruct.Node> tempList)
         {
-            //Graphics g = Graphics.FromHwnd(this.panel1.Handle);
+            Graphics g = Graphics.FromHwnd(this.panel1.Handle);
             MergeSort(0, tempList.Count - 1, tempList);
             int m = 0;
             for (int i = 0; i < tempList.Count; i++)
@@ -583,56 +590,26 @@ namespace WindowsFormsApp1
                 TangentLine_List.Add(edge);
                 FirstTime_TangentLine_List_Num = TangentLine_List.Count;//用在判斷是否有內角
             }
-            //找出EdgeList與CH_EdgeList不同的邊，並移除原本EdgeList
-            var Tangent = TangentLine_List.Except(EdgeList).ToList();
-            var Tangenttemp = EdgeList.Except(TangentLine_List).ToList();
-            //暫時沒想到要如何改變邊的排序，暴力剃除，將Tangents裡的每條邊與Tangenttemp的每條邊比較斜率，有一樣的邊時，
-            //將edge從Tangent移除
-            if (Tangent.Count() > 2)
+            //找出EdgeList與TangentLine_List不同的邊，並移除原本EdgeList
+            var Tangenttemp = TangentLine_List;
+            for (int i = 0; i < TangentLine_List.Count; i++)
             {
-                for (int i = 0; i < Tangent.Count(); i++)
+                for (int j = 0; j < EdgeList.Count; j++)
                 {
-                    for (int j = 0; j < Tangenttemp.Count(); j++)
+                    if (checkIfsameEdge(Tangenttemp[i], EdgeList[j]))
                     {
-                        float a = Tangent[i].Y1 - Tangent[i].Y2;
-                        float b = Tangent[i].X1 - Tangent[i].X2;
-                        float temp1 = a / b;
-                        float c = Tangenttemp[j].Y1 - Tangenttemp[j].Y2;
-                        float d = Tangenttemp[j].X1 - Tangenttemp[j].X2;
-                        float temp2 = c / d;
-                        if (temp1 == temp2)
-                        {
-                            Tangent.RemoveAt(i);
-                            i--;
-                        }
+                        Tangenttemp.RemoveAt(i);
+                        i--;
                     }
                 }
             }
-            var temp_1 = TangentLine_List.Except(Tangent).ToList();
-            if (Tangent.Count < 2)//代表移除了一條切線，須加回來
+            Tangenttemp.OrderBy(o => o.Top_Node().Y);
+            TangentLine_List = Tangenttemp;
+            for (int i = 0; i < TangentLine_List.Count(); i++)
             {
-                for (int i = 0; i < temp_1.Count; i++)
-                {
-                    for (int j = 0; j < EdgeList.Count; j++)
-                    {
-                        if (checkIfsameEdge(temp_1[i], EdgeList[j]))
-                        {
-                            temp_1.RemoveAt(i);
-                            i--;
-                        }
-                    }
-                }
+                g.DrawLine(pen_in_tangent, TangentLine_List[i].X1, TangentLine_List[i].Y1, TangentLine_List[i].X2,
+                    TangentLine_List[i].Y2);
             }
-            DataStruct.Edge temp3 = new DataStruct.Edge(temp_1.ElementAt(0).X1, temp_1.ElementAt(0).Y1, temp_1.ElementAt(0).X2, temp_1.ElementAt(0).Y2);
-            Tangent.Add(temp3);
-            //將Tangents存回CH_CH_EdgeList
-            TangentLine_List = Tangent;
-//            for (int i = 0; i < Tangent.Count(); i++)
-//            {
-//                g.DrawLine(pen_in_tangent, TangentLine_List[i].X1, TangentLine_List[i].Y1, TangentLine_List[i].X2,
-//                    TangentLine_List[i].Y2);
-//            }
-
             if (TangentLine_List[0].Top_Node().Y > TangentLine_List[1].Top_Node().Y)
             {
                 DataStruct.Edge temp = new DataStruct.Edge();
@@ -640,6 +617,7 @@ namespace WindowsFormsApp1
                 TangentLine_List[0] = TangentLine_List[1];
                 TangentLine_List[1] = temp;
             }
+
         }
         //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
         private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
@@ -688,28 +666,28 @@ namespace WindowsFormsApp1
             DataStruct.Edge edge = new DataStruct.Edge();
             for (int i = 0; i < L_part_List.Count - 1; i++)
             {
-//                g.DrawLine(pen_in_divide, L_part_List[i].X, L_part_List[i].Y, L_part_List[i + 1].X, L_part_List[i + 1].Y);
+                g.DrawLine(pen_in_divide, L_part_List[i].X, L_part_List[i].Y, L_part_List[i + 1].X, L_part_List[i + 1].Y);
                 edge = new DataStruct.Edge(L_part_List[i].X, L_part_List[i].Y, L_part_List[i + 1].X, L_part_List[i + 1].Y);
                 EdgeList.Add(edge);
             }
             if (L_part_List.Count - 1 != 1)
             {
-//                g.DrawLine(pen_in_divide, L_part_List[L_part_List.Count - 1].X, L_part_List[L_part_List.Count - 1].Y, L_part_List[0].X,
-//                    L_part_List[0].Y);
+                g.DrawLine(pen_in_divide, L_part_List[L_part_List.Count - 1].X, L_part_List[L_part_List.Count - 1].Y, L_part_List[0].X,
+                    L_part_List[0].Y);
                 edge = new DataStruct.Edge(L_part_List[L_part_List.Count - 1].X, L_part_List[L_part_List.Count - 1].Y,
                     L_part_List[0].X, L_part_List[0].Y);
                 EdgeList.Add(edge);
             }
             for (int i = 0; i < R_part_List.Count - 1; i++)
             {
-//                g.DrawLine(pen_in_divide, R_part_List[i].X, R_part_List[i].Y, R_part_List[i + 1].X, R_part_List[i + 1].Y);
+                g.DrawLine(pen_in_divide, R_part_List[i].X, R_part_List[i].Y, R_part_List[i + 1].X, R_part_List[i + 1].Y);
                 edge = new DataStruct.Edge(R_part_List[i].X, R_part_List[i].Y, R_part_List[i + 1].X, R_part_List[i + 1].Y);
                 EdgeList.Add(edge);
             }
             if (R_part_List.Count - 1 != 1)
             {
-//                g.DrawLine(pen_in_divide, R_part_List[R_part_List.Count - 1].X, R_part_List[R_part_List.Count - 1].Y, R_part_List[0].X,
-//                    R_part_List[0].Y);
+                g.DrawLine(pen_in_divide, R_part_List[R_part_List.Count - 1].X, R_part_List[R_part_List.Count - 1].Y, R_part_List[0].X,
+                    R_part_List[0].Y);
                 edge = new DataStruct.Edge(R_part_List[R_part_List.Count - 1].X, R_part_List[R_part_List.Count - 1].Y,
                     R_part_List[0].X, R_part_List[0].Y);
                 EdgeList.Add(edge);
