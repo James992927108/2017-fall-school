@@ -1,0 +1,56 @@
+var Tangent = TangentLine_List.Except(EdgeList).ToList();
+            var Tangenttemp = EdgeList.Except(TangentLine_List).ToList();
+//暫時沒想到要如何改變邊的排序，暴力剃除，將Tangents裡的每條邊與Tangenttemp的每條邊比較斜率，有一樣的邊時，
+            //將edge從Tangent移除
+            if (Tangent.Count() > 2)
+            {
+                for (int i = 0; i < Tangent.Count(); i++)
+                {
+                    for (int j = 0; j < Tangenttemp.Count(); j++)
+                    {
+                        float a = Tangent[i].Y1 - Tangent[i].Y2;
+                        float b = Tangent[i].X1 - Tangent[i].X2;
+                        float temp1 = a / b;
+                        float c = Tangenttemp[j].Y1 - Tangenttemp[j].Y2;
+                        float d = Tangenttemp[j].X1 - Tangenttemp[j].X2;
+                        float temp2 = c / d;
+                        if (temp1 == temp2)
+                        {
+                            Tangent.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+            var temp_1 = TangentLine_List.Except(Tangent).ToList();
+            if (Tangent.Count < 2)//代表移除了一條切線，須加回來
+            {
+                for (int i = 0; i < temp_1.Count; i++)
+                {
+                    for (int j = 0; j < EdgeList.Count; j++)
+                    {
+                        if (checkIfsameEdge(temp_1[i], EdgeList[j]))
+                        {
+                            temp_1.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                }
+            }
+            DataStruct.Edge temp3 = new DataStruct.Edge(temp_1.ElementAt(0).X1, temp_1.ElementAt(0).Y1, temp_1.ElementAt(0).X2, temp_1.ElementAt(0).Y2);
+            Tangent.Add(temp3);
+            //將Tangents存回CH_CH_EdgeList
+            TangentLine_List = Tangent;
+            for (int i = 0; i < Tangent.Count(); i++)
+            {
+                g.DrawLine(pen_in_tangent, TangentLine_List[i].X1, TangentLine_List[i].Y1, TangentLine_List[i].X2,
+                    TangentLine_List[i].Y2);
+            }
+
+            if (TangentLine_List[0].Top_Node().Y > TangentLine_List[1].Top_Node().Y)
+            {
+                DataStruct.Edge temp = new DataStruct.Edge();
+                temp = TangentLine_List[0];
+                TangentLine_List[0] = TangentLine_List[1];
+                TangentLine_List[1] = temp;
+            }

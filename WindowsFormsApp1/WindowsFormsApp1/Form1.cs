@@ -427,20 +427,18 @@ namespace WindowsFormsApp1
                 g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
                 HP.Add(HP_LastNode);
 
-                for (int i = 0; i < VerticalList.Count - 1; i++)
+                for (int i = 0; i < VerticalList.Count ; i++)
                 {
                     //先計算HP[i]HP[i+1]，HP[i]HP[i+2]的外積，記錄下狀態為A，之後與算HP[i]與第j條VerticalList的左點z，記錄下狀態為B，
                     //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
-                    int j = i;
-
-                    DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[j].X), Convert.ToInt32(HP[j].Y));
-                    DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y));
-                    DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[j + 2].X), Convert.ToInt32(HP[j + 2].Y));
+                    DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
+                    DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y));
+                    DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[i + 2].X), Convert.ToInt32(HP[i + 2].Y));
 
                     PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
                     PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
-                    PointF AR_Node_vecter = new PointF(VerticalList[i].Top_Node().X - NodeA.X, VerticalList[i].Top_Node().Y - NodeA.Y);
-                    PointF AL_Node_vecter = new PointF(VerticalList[i].Down_Node().X - NodeA.X, VerticalList[i].Down_Node().Y - NodeA.Y);
+                    PointF AR_Node_vecter = new PointF(VerticalList[i].R_Node().X - NodeA.X, VerticalList[i].R_Node().Y - NodeA.Y);
+                    PointF AL_Node_vecter = new PointF(VerticalList[i].L_Node().X - NodeA.X, VerticalList[i].L_Node().Y - NodeA.Y);
                     //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
                     var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X;
                     ABAC = getstate(ABAC);
@@ -448,15 +446,16 @@ namespace WindowsFormsApp1
                     ABAR = getstate(ABAR);
                     var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
                     ABAL = getstate(ABAL);
+                    ABAL = getstate(ABAL);
                     if (ABAC == ABAR)
                     {
-                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
+                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y),
                             VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
                         Fin_VerticalList.Add(temp);
                     }
                     else if (ABAC == ABAL)
                     {
-                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[j + 1].X), Convert.ToInt32(HP[j + 1].Y),
+                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y),
                             VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
                         Fin_VerticalList.Add(temp);
                     }
