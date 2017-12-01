@@ -459,7 +459,6 @@ namespace WindowsFormsApp1
                             VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
                         Fin_VerticalList.Add(temp);
                     }
-
                 }
                 for (int i = 0; i < Fin_VerticalList.Count; i++)
                 {
@@ -958,7 +957,6 @@ namespace WindowsFormsApp1
         //--------------------------------------------------------------------------------------------------
         private void OnPanelMouseMove(object sender, MouseEventArgs e) => Text = $"Coordinate [{e.X},{e.Y}]";
         private void OnPanelMouseLeave(object sender, EventArgs e) => Text = "Voronoi Homework";
-
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
         }
@@ -966,7 +964,6 @@ namespace WindowsFormsApp1
         //--------------------------------------------------------------------------------------------------
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
-
         }
         private void OpenFile_Click(object sender, EventArgs e)
         {
@@ -1036,7 +1033,6 @@ namespace WindowsFormsApp1
                 file.Close();
             }
         }
-
         private void Output_txt_Click(object sender, EventArgs e)
         {
             FileStream fileStream = new FileStream(@"..\..\..\OutputFile.txt", FileMode.Create);
@@ -1079,10 +1075,8 @@ namespace WindowsFormsApp1
             sw.Close();
             MessageBox.Show("完成輸出txt");
         }
-
         private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
-
         }
         //--------------------------------------------------------------------------------------------------
     }
