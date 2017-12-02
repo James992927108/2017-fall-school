@@ -29,6 +29,15 @@ namespace WindowsFormsApp1
                 _a = new Node(X1,Y1);
                 _b = new Node(X2,Y2);
             }
+            public Edge(float p1, float p2, float p3, float p4)
+            {
+                X1 = Convert.ToInt32(p1);
+                Y1 = Convert.ToInt32(p2);
+                X2 = Convert.ToInt32(p3);
+                Y2 = Convert.ToInt32(p4);
+                _a = new Node(X1, Y1);
+                _b = new Node(X2, Y2);
+            }
             //法向量為，
             // 若ab向量為(x,y)->法向量為(y,-x)方向向量
             public Node normal_vector()

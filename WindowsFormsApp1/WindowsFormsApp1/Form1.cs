@@ -167,10 +167,9 @@ namespace WindowsFormsApp1
                 Graphics g = Graphics.FromHwnd(this.panel1.Handle);
                 DataStruct.Edge Down_TangentLine = new DataStruct.Edge(TangentLine_List[1].X2, TangentLine_List[1].Y2,
                     TangentLine_List[1].X1, TangentLine_List[1].Y1);
-                DataStruct.Node P_X = new DataStruct.Node(TangentLine_List[0].X1, TangentLine_List[0].Y1);
-                DataStruct.Node P_Y = new DataStruct.Node(TangentLine_List[0].X2, TangentLine_List[0].Y2);
-                DataStruct.Edge SG = new DataStruct.Edge(P_X.X, P_X.Y, P_Y.X, P_Y.Y);
-                //一開始SG為上切線，所以先在HP裡面存SG的垂直平分線的上點，然後進入while迴圈，直到SG等於下切線
+                DataStruct.Node P_L = new DataStruct.Node(TangentLine_List[0].L_Node().X, TangentLine_List[0].L_Node().Y);
+                DataStruct.Node P_R = new DataStruct.Node(TangentLine_List[0].R_Node().X, TangentLine_List[0].R_Node().Y);
+                DataStruct.Edge SG = new DataStruct.Edge(P_L.X, P_L.Y, P_R.X, P_R.Y);
                 List<PointF> HP = new List<PointF>();
                 PointF HP_FirstNode = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
                 HP.Add(HP_FirstNode);
@@ -224,45 +223,38 @@ namespace WindowsFormsApp1
                     {
                         for (int i = 0; i < L_lineList.Count; i++)
                         {
-                            //xz_lineList中的點的中垂線
-                            PointF L_line_top = new PointF(L_lineList[i].Vertical_top_Node().X,
-                                L_lineList[i].Vertical_top_Node().Y);
-                            PointF L_line_down = new PointF(L_lineList[i].Vertical_down_Node().X,
-                                L_lineList[i].Vertical_down_Node().Y);
-                            //分別做交點
-                            PointF test = new PointF();
-                            test = GetIntersection(L_line_top, L_line_down, SG_top, SG_down);
-                            L_IntersectionNodeList.Add(test, i);
-                            var aa = L_lineList[i].Vertical_top_Node().X;
-                            var bb = L_lineList[i].Vertical_top_Node().Y;
-                            var cc = L_lineList[i].Vertical_down_Node().X;
-                            var dd = L_lineList[i].Vertical_down_Node().Y;
-                            g.DrawLine(pen_in_vertical, aa, bb, cc, dd);
+                            var top_x = L_lineList[i].Vertical_top_Node().X;
+                            var top_y = L_lineList[i].Vertical_top_Node().Y;
+                            var down_x = L_lineList[i].Vertical_down_Node().X;
+                            var down_y = L_lineList[i].Vertical_down_Node().Y;
+                            PointF top = new PointF(top_x, top_y);
+                            PointF down = new PointF(down_x, down_y);
+                            PointF IntersectionNode = new PointF();
+                            IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
+                            L_IntersectionNodeList.Add(IntersectionNode, i);
+                            g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
                         }
                     }
                     if (R_lineList.Count != 0)
                     {
                         for (int i = 0; i < R_lineList.Count; i++)
                         {
-                            //yz_lineList中的點的中垂線
-                            PointF R_line_top = new PointF(R_lineList[i].Vertical_top_Node().X,
-                                R_lineList[i].Vertical_top_Node().Y);
-                            PointF R_line_down = new PointF(R_lineList[i].Vertical_down_Node().X,
-                                R_lineList[i].Vertical_down_Node().Y);
-                            //分別做交點
-                            PointF test = new PointF();
-                            test = GetIntersection(R_line_top, R_line_down, SG_top, SG_down);
-                            R_IntersectionNodeList.Add(test, i);
-                            var aa = R_lineList[i].Vertical_top_Node().X;
-                            var bb = R_lineList[i].Vertical_top_Node().Y;
-                            var cc = R_lineList[i].Vertical_down_Node().X;
-                            var dd = R_lineList[i].Vertical_down_Node().Y;
-                            g.DrawLine(pen_in_vertical, aa, bb, cc, dd);
+                            var top_x = R_lineList[i].Vertical_top_Node().X;
+                            var top_y = R_lineList[i].Vertical_top_Node().Y;
+                            var down_x = R_lineList[i].Vertical_down_Node().X;
+                            var down_y = R_lineList[i].Vertical_down_Node().Y;
+                            PointF top = new PointF(top_x, top_y);
+                            PointF down = new PointF(down_x, down_y);
+                            PointF IntersectionNode = new PointF();
+                            IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
+                            R_IntersectionNodeList.Add(IntersectionNode, i);
+                            g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
                         }
                     }
                     //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
                     var L_Y_small_Node = L_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
                     var R_Y_small_Node = R_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
+                    //--------------------------------------------------------------------------------------------
                     if (R_lineList.Count == 0 && L_lineList.Count == 0)
                     {
                         SG.X1 = Down_TangentLine.X1;
@@ -409,6 +401,7 @@ namespace WindowsFormsApp1
                             }
                         }
                     }
+                    //--------------------------------------------------------------------------------------------
                     for (int i = 0; i < HP.Count; i++)
                     {
                         g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
@@ -419,15 +412,13 @@ namespace WindowsFormsApp1
                         g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
                     }
 
-                    L_IntersectionNodeList.Clear();
-                    R_IntersectionNodeList.Clear();
                 } while (!checkIfsameEdge(SG, Down_TangentLine));
                 g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
                 PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
                 g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
                 HP.Add(HP_LastNode);
 
-                for (int i = 0; i < VerticalList.Count ; i++)
+                for (int i = 0; i < VerticalList.Count; i++)
                 {
                     //先計算HP[i]HP[i+1]，HP[i]HP[i+2]的外積，記錄下狀態為A，之後與算HP[i]與第j條VerticalList的左點z，記錄下狀態為B，
                     //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
@@ -449,24 +440,47 @@ namespace WindowsFormsApp1
                     ABAL = getstate(ABAL);
                     if (ABAC == ABAR)
                     {
-                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y),
-                            VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
+                        PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                        PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
+                        for (int j = 0; j < HP.Count; j++)
+                        {
+                            var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X),1);
+                            var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X),1);
+                            if (qq == ww & HP[j] != aa)
+                            {
+                                bb = HP[j];
+                            }
+                        }
+                        DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                        g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
                         Fin_VerticalList.Add(temp);
                     }
                     else if (ABAC == ABAL)
                     {
-                        DataStruct.Edge temp = new DataStruct.Edge(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y),
-                            VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                        PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                        PointF bb = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                        for (int j = 0; j < HP.Count; j++)
+                        {
+                            var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
+                            var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
+                            if (qq == ww & HP[j] != aa)
+                            {
+                                bb = HP[j];
+                            }
+                        }
+                        DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                        g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
                         Fin_VerticalList.Add(temp);
                     }
+                    
                 }
-                for (int i = 0; i < Fin_VerticalList.Count; i++)
-                {
-                    g.DrawLine(pen_in_hyper, Fin_VerticalList[i].X1, Fin_VerticalList[i].Y1, Fin_VerticalList[i].X2, Fin_VerticalList[i].Y2);
-                }
+//                for (int i = 0; i < Fin_VerticalList.Count; i++)
+//                {
+//                    g.DrawLine(pen_in_hyper, Fin_VerticalList[i].X1, Fin_VerticalList[i].Y1, Fin_VerticalList[i].X2, Fin_VerticalList[i].Y2);
+//                }
             }
         }
-
+        
         private int getstate(float state)
         {
             int fin_state = 0;
@@ -535,7 +549,7 @@ namespace WindowsFormsApp1
                     {
                         float x = lineSecondStar.X;
                         float y = (lineFirstStar.X - x) * (-a) + lineFirstStar.Y;
-                        return new PointF(x, y);
+                        return new PointF(Convert.ToInt32(x), Convert.ToInt32(y));
                     }
                 case 2: //L1 平行Y軸，L2存在斜率
                     {
@@ -543,7 +557,7 @@ namespace WindowsFormsApp1
                         //網上有相似代碼的，這一處是錯誤的。你可以對比case 1 的邏輯 進行分析
                         //源code:lineSecondStar * x + lineSecondStar * lineSecondStar.X + p3.Y;
                         float y = (lineSecondStar.X - x) * (-b) + lineSecondStar.Y;
-                        return new PointF(x, y);
+                        return new PointF(Convert.ToInt32(x), Convert.ToInt32(y));
                     }
                 case 3: //L1，L2都存在斜率
                     {
@@ -554,7 +568,7 @@ namespace WindowsFormsApp1
                         }
                         float x = (a * lineFirstStar.X - b * lineSecondStar.X - lineFirstStar.Y + lineSecondStar.Y) / (a - b);
                         float y = a * x - a * lineFirstStar.X + lineFirstStar.Y;
-                        return new PointF(x, y);
+                        return new PointF(Convert.ToInt32(x), Convert.ToInt32(y));
                     }
             }
             // throw new Exception("不可能發生的情況");
