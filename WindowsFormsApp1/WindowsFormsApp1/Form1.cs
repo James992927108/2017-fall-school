@@ -22,12 +22,14 @@ namespace WindowsFormsApp1
         List<int> NodeNumList = new List<int>();
         List<DataStruct.Node> NodeList = new List<DataStruct.Node>(); //紀錄所有的Node
         List<DataStruct.Edge> EdgeList = new List<DataStruct.Edge>(); //紀錄所有的Edge
-
         DataStruct.Node[] TL = new DataStruct.Node[20000];
         List<DataStruct.Edge> TangentLine_List = new List<DataStruct.Edge>();
         public int FirstTime_TangentLine_List_Num = 0;
         List<DataStruct.Node> L_part_List = new List<DataStruct.Node>();
         List<DataStruct.Node> R_part_List = new List<DataStruct.Node>();
+        List<PointF> HP = new List<PointF>();
+        List<DataStruct.Edge> VerticalList = new List<DataStruct.Edge>();
+        List<DataStruct.Edge> Fin_VerticalList = new List<DataStruct.Edge>();
 
         private int RemainDateCount = 0;//用於紀錄測資剩餘次數
         private int CurrentDataIndex = 0;//用於讀取NodeNumList中第幾個值
@@ -39,6 +41,8 @@ namespace WindowsFormsApp1
         Pen pen_in_vertical = new Pen(Color.Purple, 1);//新增畫筆用於畫線
         bool IsReadFile = false;
         int K = 1000;
+        enum step { Divide, TangentLine, Hyperplane, Eliminate };
+        public int whichstep = 0;
         public Form1()
         {
             InitializeComponent();
@@ -51,22 +55,12 @@ namespace WindowsFormsApp1
 
         public void Clean_function()//清除當前邊與點
         {
-            if (EdgeList.Count() != 0)
-            {
-                int temp = EdgeList.Count();
-                for (int i = 0; i < temp; i++)
-                {
-                    EdgeList.RemoveAt(0);
-                }
-            }
-            if (TangentLine_List.Count() != 0)
-            {
-                int temp = TangentLine_List.Count();
-                for (int i = 0; i < temp; i++)
-                {
-                    TangentLine_List.RemoveAt(0);
-                }
-            }
+            whichstep = 0;
+            HP.Clear();
+            VerticalList.Clear();
+            Fin_VerticalList.Clear();
+            EdgeList.Clear();
+            TangentLine_List.Clear();
             if (IsReadFile == true)
             {
                 if (CurrentDataIndex != 0) //第一次不須移除
@@ -80,7 +74,6 @@ namespace WindowsFormsApp1
             else
             {
                 int temp = NodeList.Count();
-
                 for (int i = 0; i < temp; i++)
                 {
                     NodeList.RemoveAt(0);
@@ -124,7 +117,10 @@ namespace WindowsFormsApp1
                 {
                     tempList.Add(NodeList[i]);
                 }
-                DrawVerticalLine(NodeList.Count, tempList);
+                for (int i = 0; i < 4; i++)
+                {
+                    DrawVerticalLine(NodeList.Count, tempList, i);
+                }
             }
             else
             {
@@ -133,18 +129,40 @@ namespace WindowsFormsApp1
                 {
                     tempList.Add(NodeList[i]);
                 }
-                DrawVerticalLine(NodeNumList[CurrentDataIndex], tempList);
+                for (int i = whichstep; i < 4; i++)
+                {
+                    DrawVerticalLine(NodeNumList[CurrentDataIndex], tempList, i);
+                }
             }
         }
         //--------------------------------------------------------------------------------------------------
         private void StepByStep_Click(object sender, EventArgs e)
         {
-
+            if (IsReadFile == false)
+            {
+                List<DataStruct.Node> tempList = new List<DataStruct.Node>();
+                for (int i = 0; i < NodeList.Count; i++)
+                {
+                    tempList.Add(NodeList[i]);
+                }
+                DrawVerticalLine(NodeList.Count, tempList, whichstep);
+                whichstep++;
+            }
+            else
+            {
+                List<DataStruct.Node> tempList = new List<DataStruct.Node>();
+                for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
+                {
+                    tempList.Add(NodeList[i]);
+                }
+                DrawVerticalLine(NodeNumList[CurrentDataIndex], tempList, whichstep);    
+                whichstep++;
+            }
         }
 
         //--------------------------------------------------------------------------------------------------
 
-        private void DrawVerticalLine(int NodeCount, List<DataStruct.Node> tempList)
+        private void DrawVerticalLine(int NodeCount, List<DataStruct.Node> tempList, int step)
         {
             if (NodeCount == 2)
             {
@@ -158,329 +176,339 @@ namespace WindowsFormsApp1
             //--------------------------------------------------------------------------------------------------
             if (NodeCount > 3)
             {
-                Divide(NodeCount, tempList);//取得L_part_List與R_part_List
-                Get_TangentLine(tempList);//取得TangentLine_List
-                //畫Hyperplane
-                //DrawVerticalLine(L_part_List.Count, L_part_List);
-                //DrawVerticalLine(R_part_List.Count, R_part_List);
-                DataStruct.Node last_SG_Node = new DataStruct.Node();
+                
                 Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-                DataStruct.Edge Down_TangentLine = new DataStruct.Edge(TangentLine_List[1].X2, TangentLine_List[1].Y2,
-                    TangentLine_List[1].X1, TangentLine_List[1].Y1);
-                DataStruct.Node P_L = new DataStruct.Node(TangentLine_List[0].L_Node().X, TangentLine_List[0].L_Node().Y);
-                DataStruct.Node P_R = new DataStruct.Node(TangentLine_List[0].R_Node().X, TangentLine_List[0].R_Node().Y);
-                DataStruct.Edge SG = new DataStruct.Edge(P_L.X, P_L.Y, P_R.X, P_R.Y);
-                List<PointF> HP = new List<PointF>();
-                PointF HP_FirstNode = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
-                HP.Add(HP_FirstNode);
-                List<DataStruct.Edge> VerticalList = new List<DataStruct.Edge>();
-                List<DataStruct.Edge> Fin_VerticalList = new List<DataStruct.Edge>();
-                do
+
+                if (step == (int)Form1.step.Divide)
                 {
-                    g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
-                    List<DataStruct.Node> L_part = new List<DataStruct.Node>();
-                    for (int i = 0; i < L_part_List.Count; i++)
+                    Divide(NodeCount, tempList);//取得L_part_List與R_part_List
+                }
+                if (step == (int)Form1.step.TangentLine)
+                {
+                    Get_TangentLine(tempList);//取得TangentLine_List
+                }
+                if (step == 2)
+                {
+                    //畫Hyperplane
+                    //DrawVerticalLine(L_part_List.Count, L_part_List);
+                    //DrawVerticalLine(R_part_List.Count, R_part_List);
+                    DataStruct.Node last_SG_Node = new DataStruct.Node();
+                    DataStruct.Edge Down_TangentLine = new DataStruct.Edge(TangentLine_List[1].X2, TangentLine_List[1].Y2,
+                        TangentLine_List[1].X1, TangentLine_List[1].Y1);
+                    DataStruct.Node P_L = new DataStruct.Node(TangentLine_List[0].L_Node().X, TangentLine_List[0].L_Node().Y);
+                    DataStruct.Node P_R = new DataStruct.Node(TangentLine_List[0].R_Node().X, TangentLine_List[0].R_Node().Y);
+                    DataStruct.Edge SG = new DataStruct.Edge(P_L.X, P_L.Y, P_R.X, P_R.Y);
+                    PointF HP_FirstNode = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
+                    HP.Add(HP_FirstNode);
+                    do
                     {
-                        if (!(L_part_List[i].X == SG.X1 && L_part_List[i].Y == SG.Y1) &&
-                            !(L_part_List[i].X == last_SG_Node.X && L_part_List[i].Y == last_SG_Node.Y))
+                        g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
+                        List<DataStruct.Node> L_part = new List<DataStruct.Node>();
+                        for (int i = 0; i < L_part_List.Count; i++)
                         {
-                            L_part.Add(L_part_List[i]);
+                            if (!(L_part_List[i].X == SG.X1 && L_part_List[i].Y == SG.Y1) &&
+                                !(L_part_List[i].X == last_SG_Node.X && L_part_List[i].Y == last_SG_Node.Y))
+                            {
+                                L_part.Add(L_part_List[i]);
+                            }
                         }
-                    }
-                    List<DataStruct.Edge> L_lineList = new List<DataStruct.Edge>();
-                    for (int i = 0; i < L_part.Count; i++)
-                    {
-                        DataStruct.Edge temp = new DataStruct.Edge(SG.X1, SG.Y1, L_part[i].X, L_part[i].Y);
-                        L_lineList.Add(temp);
-                    }
-                    List<DataStruct.Node> R_part = new List<DataStruct.Node>();
-                    for (int i = 0; i < R_part_List.Count; i++)
-                    {
-                        if (!(R_part_List[i].X == SG.X2 && R_part_List[i].Y == SG.Y2) &&
-                            !(R_part_List[i].X == last_SG_Node.X && R_part_List[i].Y == last_SG_Node.Y))
+                        List<DataStruct.Edge> L_lineList = new List<DataStruct.Edge>();
+                        for (int i = 0; i < L_part.Count; i++)
                         {
-                            R_part.Add(R_part_List[i]);
+                            DataStruct.Edge temp = new DataStruct.Edge(SG.X1, SG.Y1, L_part[i].X, L_part[i].Y);
+                            L_lineList.Add(temp);
                         }
-                    }
-                    List<DataStruct.Edge> R_lineList = new List<DataStruct.Edge>();
-                    for (int i = 0; i < R_part.Count; i++)
-                    {
-                        DataStruct.Edge temp = new DataStruct.Edge(SG.X2, SG.Y2, R_part[i].X, R_part[i].Y);
-                        R_lineList.Add(temp);
-                    }
+                        List<DataStruct.Node> R_part = new List<DataStruct.Node>();
+                        for (int i = 0; i < R_part_List.Count; i++)
+                        {
+                            if (!(R_part_List[i].X == SG.X2 && R_part_List[i].Y == SG.Y2) &&
+                                !(R_part_List[i].X == last_SG_Node.X && R_part_List[i].Y == last_SG_Node.Y))
+                            {
+                                R_part.Add(R_part_List[i]);
+                            }
+                        }
+                        List<DataStruct.Edge> R_lineList = new List<DataStruct.Edge>();
+                        for (int i = 0; i < R_part.Count; i++)
+                        {
+                            DataStruct.Edge temp = new DataStruct.Edge(SG.X2, SG.Y2, R_part[i].X, R_part[i].Y);
+                            R_lineList.Add(temp);
+                        }
 
-                    Dictionary<PointF, int> L_IntersectionNodeList = new Dictionary<PointF, int>();
-                    Dictionary<PointF, int> R_IntersectionNodeList = new Dictionary<PointF, int>();
-                    //SG的中垂線
-                    PointF SG_top = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
-                    PointF SG_down = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
-                    if (cmpLine(SG, Down_TangentLine) && FirstTime_TangentLine_List_Num == 3) //解決內點三角形問題
-                    {
-                        L_lineList.Clear();
-                        R_lineList.Clear();
-                    }
-                    if (L_lineList.Count != 0)
-                    {
-                        for (int i = 0; i < L_lineList.Count; i++)
+                        Dictionary<PointF, int> L_IntersectionNodeList = new Dictionary<PointF, int>();
+                        Dictionary<PointF, int> R_IntersectionNodeList = new Dictionary<PointF, int>();
+                        //SG的中垂線
+                        PointF SG_top = new PointF(SG.Vertical_top_Node().X, SG.Vertical_top_Node().Y);
+                        PointF SG_down = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
+                        if (cmpLine(SG, Down_TangentLine) && FirstTime_TangentLine_List_Num == 3) //解決內點三角形問題
                         {
-                            var top_x = L_lineList[i].Vertical_top_Node().X;
-                            var top_y = L_lineList[i].Vertical_top_Node().Y;
-                            var down_x = L_lineList[i].Vertical_down_Node().X;
-                            var down_y = L_lineList[i].Vertical_down_Node().Y;
-                            PointF top = new PointF(top_x, top_y);
-                            PointF down = new PointF(down_x, down_y);
-                            PointF IntersectionNode = new PointF();
-                            IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
-                            L_IntersectionNodeList.Add(IntersectionNode, i);
-                            g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
+                            L_lineList.Clear();
+                            R_lineList.Clear();
                         }
-                    }
-                    if (R_lineList.Count != 0)
-                    {
-                        for (int i = 0; i < R_lineList.Count; i++)
+                        if (L_lineList.Count != 0)
                         {
-                            var top_x = R_lineList[i].Vertical_top_Node().X;
-                            var top_y = R_lineList[i].Vertical_top_Node().Y;
-                            var down_x = R_lineList[i].Vertical_down_Node().X;
-                            var down_y = R_lineList[i].Vertical_down_Node().Y;
-                            PointF top = new PointF(top_x, top_y);
-                            PointF down = new PointF(down_x, down_y);
-                            PointF IntersectionNode = new PointF();
-                            IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
-                            R_IntersectionNodeList.Add(IntersectionNode, i);
-                            g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
+                            for (int i = 0; i < L_lineList.Count; i++)
+                            {
+                                var top_x = L_lineList[i].Vertical_top_Node().X;
+                                var top_y = L_lineList[i].Vertical_top_Node().Y;
+                                var down_x = L_lineList[i].Vertical_down_Node().X;
+                                var down_y = L_lineList[i].Vertical_down_Node().Y;
+                                PointF top = new PointF(top_x, top_y);
+                                PointF down = new PointF(down_x, down_y);
+                                PointF IntersectionNode = new PointF();
+                                IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
+                                L_IntersectionNodeList.Add(IntersectionNode, i);
+                                g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
+                            }
                         }
-                    }
-                    //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
-                    var L_Y_small_Node = L_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-                    var R_Y_small_Node = R_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
-                    //--------------------------------------------------------------------------------------------
-                    if (R_lineList.Count == 0 && L_lineList.Count == 0)
-                    {
-                        SG.X1 = Down_TangentLine.X1;
-                        SG.Y1 = Down_TangentLine.Y1;
-                        SG.X2 = Down_TangentLine.X2;
-                        SG.Y2 = Down_TangentLine.Y2;
-                    }
-                    else if (L_lineList.Count == 0 && R_lineList.Count != 0)
-                    {
-                        HP.Add(R_Y_small_Node.Key);
-                        DataStruct.Edge temp = new DataStruct.Edge();
-                        temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
-                        VerticalList.Add(temp);
-                        if (FirstTime_TangentLine_List_Num == 3)
+                        if (R_lineList.Count != 0)
                         {
-                            last_SG_Node.X = SG.X2;
-                            last_SG_Node.Y = SG.Y2;
-                            SG.X2 = Down_TangentLine.X2;
-                            SG.Y2 = Down_TangentLine.Y2;
+                            for (int i = 0; i < R_lineList.Count; i++)
+                            {
+                                var top_x = R_lineList[i].Vertical_top_Node().X;
+                                var top_y = R_lineList[i].Vertical_top_Node().Y;
+                                var down_x = R_lineList[i].Vertical_down_Node().X;
+                                var down_y = R_lineList[i].Vertical_down_Node().Y;
+                                PointF top = new PointF(top_x, top_y);
+                                PointF down = new PointF(down_x, down_y);
+                                PointF IntersectionNode = new PointF();
+                                IntersectionNode = GetIntersection(top, down, SG_top, SG_down);
+                                R_IntersectionNodeList.Add(IntersectionNode, i);
+                                g.DrawLine(pen_in_vertical, top_x, top_y, down_x, down_y);
+                            }
                         }
-                        else
+                        //從xz_IntersectionNodeList與yz_IntersectionNodeList找y值最小的點
+                        var L_Y_small_Node = L_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
+                        var R_Y_small_Node = R_IntersectionNodeList.OrderBy(o => o.Key.Y).FirstOrDefault();
+                        //--------------------------------------------------------------------------------------------
+                        if (R_lineList.Count == 0 && L_lineList.Count == 0)
                         {
                             SG.X1 = Down_TangentLine.X1;
                             SG.Y1 = Down_TangentLine.Y1;
                             SG.X2 = Down_TangentLine.X2;
                             SG.Y2 = Down_TangentLine.Y2;
                         }
-                    }
-                    else if (L_lineList.Count != 0 && R_lineList.Count == 0)
-                    {
-                        HP.Add(L_Y_small_Node.Key);
-                        DataStruct.Edge temp = new DataStruct.Edge();
-                        temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
-                        VerticalList.Add(temp);
-                        if (FirstTime_TangentLine_List_Num == 3)
-                        {
-                            last_SG_Node.X = SG.X1;
-                            last_SG_Node.Y = SG.Y1;
-                            SG.X1 = Down_TangentLine.X1;
-                            SG.Y1 = Down_TangentLine.Y1;
-                        }
-                        else
-                        {
-                            SG.X1 = Down_TangentLine.X1;
-                            SG.Y1 = Down_TangentLine.Y1;
-                            SG.X2 = Down_TangentLine.X2;
-                            SG.Y2 = Down_TangentLine.Y2;
-                        }
-                    }
-                    else
-                    {
-                        if (L_Y_small_Node.Key.X == 0 && L_Y_small_Node.Key.Y == 0)
+                        else if (L_lineList.Count == 0 && R_lineList.Count != 0)
                         {
                             HP.Add(R_Y_small_Node.Key);
                             DataStruct.Edge temp = new DataStruct.Edge();
                             temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
                             VerticalList.Add(temp);
-                            last_SG_Node.X = SG.X2;
-                            last_SG_Node.Y = SG.Y2;
-                            if (R_lineList.Count != 0)
+                            if (FirstTime_TangentLine_List_Num == 3)
                             {
-                                if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
-                                    R_lineList[R_Y_small_Node.Value].Y1 == SG.Y2)
-                                {
-                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X2;
-                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y2;
-                                }
-                                else
-                                {
-                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X1;
-                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y1;
-                                }
+                                last_SG_Node.X = SG.X2;
+                                last_SG_Node.Y = SG.Y2;
+                                SG.X2 = Down_TangentLine.X2;
+                                SG.Y2 = Down_TangentLine.Y2;
+                            }
+                            else
+                            {
+                                SG.X1 = Down_TangentLine.X1;
+                                SG.Y1 = Down_TangentLine.Y1;
+                                SG.X2 = Down_TangentLine.X2;
+                                SG.Y2 = Down_TangentLine.Y2;
                             }
                         }
-                        else if (R_Y_small_Node.Key.X == 0 && R_Y_small_Node.Key.Y == 0)
+                        else if (L_lineList.Count != 0 && R_lineList.Count == 0)
                         {
                             HP.Add(L_Y_small_Node.Key);
                             DataStruct.Edge temp = new DataStruct.Edge();
                             temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
                             VerticalList.Add(temp);
-                            last_SG_Node.X = SG.X1;
-                            last_SG_Node.Y = SG.Y1;
-
-                            if (L_lineList.Count != 0)
+                            if (FirstTime_TangentLine_List_Num == 3)
                             {
-                                if (L_lineList[L_Y_small_Node.Value].X1 == last_SG_Node.X &&
-                                    L_lineList[L_Y_small_Node.Value].Y1 == last_SG_Node.Y)
-                                {
-                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X2;
-                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y2;
-                                }
-                                else
-                                {
-                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X1;
-                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y1;
-                                }
+                                last_SG_Node.X = SG.X1;
+                                last_SG_Node.Y = SG.Y1;
+                                SG.X1 = Down_TangentLine.X1;
+                                SG.Y1 = Down_TangentLine.Y1;
                             }
-                        }
-                        else if (L_Y_small_Node.Key.Y > R_Y_small_Node.Key.Y)
-                        {
-
-                            HP.Add(R_Y_small_Node.Key);
-                            DataStruct.Edge temp = new DataStruct.Edge();
-                            temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
-                            VerticalList.Add(temp);
-                            last_SG_Node.X = SG.X2;
-                            last_SG_Node.Y = SG.Y2;
-                            if (R_lineList.Count != 0)
+                            else
                             {
-                                if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
-                                    R_lineList[R_Y_small_Node.Value].Y1 == SG.Y2)
-                                {
-                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X2;
-                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y2;
-                                }
-                                else
-                                {
-                                    SG.X2 = R_lineList[R_Y_small_Node.Value].X1;
-                                    SG.Y2 = R_lineList[R_Y_small_Node.Value].Y1;
-                                }
+                                SG.X1 = Down_TangentLine.X1;
+                                SG.Y1 = Down_TangentLine.Y1;
+                                SG.X2 = Down_TangentLine.X2;
+                                SG.Y2 = Down_TangentLine.Y2;
                             }
                         }
                         else
                         {
-                            HP.Add(L_Y_small_Node.Key);
-                            DataStruct.Edge temp = new DataStruct.Edge();
-                            temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
-                            VerticalList.Add(temp);
-                            last_SG_Node.X = SG.X1;
-                            last_SG_Node.Y = SG.Y1;
-                            if (L_lineList.Count != 0)
+                            if (L_Y_small_Node.Key.X == 0 && L_Y_small_Node.Key.Y == 0)
                             {
-                                if (L_lineList[L_Y_small_Node.Value].X1 == last_SG_Node.X &&
-                                    L_lineList[L_Y_small_Node.Value].Y1 == last_SG_Node.Y)
+                                HP.Add(R_Y_small_Node.Key);
+                                DataStruct.Edge temp = new DataStruct.Edge();
+                                temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
+                                VerticalList.Add(temp);
+                                last_SG_Node.X = SG.X2;
+                                last_SG_Node.Y = SG.Y2;
+                                if (R_lineList.Count != 0)
                                 {
-                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X2;
-                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y2;
+                                    if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
+                                        R_lineList[R_Y_small_Node.Value].Y1 == SG.Y2)
+                                    {
+                                        SG.X2 = R_lineList[R_Y_small_Node.Value].X2;
+                                        SG.Y2 = R_lineList[R_Y_small_Node.Value].Y2;
+                                    }
+                                    else
+                                    {
+                                        SG.X2 = R_lineList[R_Y_small_Node.Value].X1;
+                                        SG.Y2 = R_lineList[R_Y_small_Node.Value].Y1;
+                                    }
                                 }
-                                else
+                            }
+                            else if (R_Y_small_Node.Key.X == 0 && R_Y_small_Node.Key.Y == 0)
+                            {
+                                HP.Add(L_Y_small_Node.Key);
+                                DataStruct.Edge temp = new DataStruct.Edge();
+                                temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
+                                VerticalList.Add(temp);
+                                last_SG_Node.X = SG.X1;
+                                last_SG_Node.Y = SG.Y1;
+                                if (L_lineList.Count != 0)
                                 {
-                                    SG.X1 = L_lineList[L_Y_small_Node.Value].X1;
-                                    SG.Y1 = L_lineList[L_Y_small_Node.Value].Y1;
+                                    if (L_lineList[L_Y_small_Node.Value].X1 == last_SG_Node.X &&
+                                        L_lineList[L_Y_small_Node.Value].Y1 == last_SG_Node.Y)
+                                    {
+                                        SG.X1 = L_lineList[L_Y_small_Node.Value].X2;
+                                        SG.Y1 = L_lineList[L_Y_small_Node.Value].Y2;
+                                    }
+                                    else
+                                    {
+                                        SG.X1 = L_lineList[L_Y_small_Node.Value].X1;
+                                        SG.Y1 = L_lineList[L_Y_small_Node.Value].Y1;
+                                    }
+                                }
+                            }
+                            else if (L_Y_small_Node.Key.Y > R_Y_small_Node.Key.Y)
+                            {
+
+                                HP.Add(R_Y_small_Node.Key);
+                                DataStruct.Edge temp = new DataStruct.Edge();
+                                temp = R_lineList[R_Y_small_Node.Value].VerticalLine();
+                                VerticalList.Add(temp);
+                                last_SG_Node.X = SG.X2;
+                                last_SG_Node.Y = SG.Y2;
+                                if (R_lineList.Count != 0)
+                                {
+                                    if (R_lineList[R_Y_small_Node.Value].X1 == SG.X2 &&
+                                        R_lineList[R_Y_small_Node.Value].Y1 == SG.Y2)
+                                    {
+                                        SG.X2 = R_lineList[R_Y_small_Node.Value].X2;
+                                        SG.Y2 = R_lineList[R_Y_small_Node.Value].Y2;
+                                    }
+                                    else
+                                    {
+                                        SG.X2 = R_lineList[R_Y_small_Node.Value].X1;
+                                        SG.Y2 = R_lineList[R_Y_small_Node.Value].Y1;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                HP.Add(L_Y_small_Node.Key);
+                                DataStruct.Edge temp = new DataStruct.Edge();
+                                temp = L_lineList[L_Y_small_Node.Value].VerticalLine();
+                                VerticalList.Add(temp);
+                                last_SG_Node.X = SG.X1;
+                                last_SG_Node.Y = SG.Y1;
+                                if (L_lineList.Count != 0)
+                                {
+                                    if (L_lineList[L_Y_small_Node.Value].X1 == last_SG_Node.X &&
+                                        L_lineList[L_Y_small_Node.Value].Y1 == last_SG_Node.Y)
+                                    {
+                                        SG.X1 = L_lineList[L_Y_small_Node.Value].X2;
+                                        SG.Y1 = L_lineList[L_Y_small_Node.Value].Y2;
+                                    }
+                                    else
+                                    {
+                                        SG.X1 = L_lineList[L_Y_small_Node.Value].X1;
+                                        SG.Y1 = L_lineList[L_Y_small_Node.Value].Y1;
+                                    }
                                 }
                             }
                         }
-                    }
-                    //--------------------------------------------------------------------------------------------
-                    for (int i = 0; i < HP.Count; i++)
-                    {
-                        g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
-                        //g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
-                    }
+                        //--------------------------------------------------------------------------------------------
+                        for (int i = 0; i < HP.Count; i++)
+                        {
+                            g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
+                            //g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
+                        }
+                        
+
+                    } while (!checkIfsameEdge(SG, Down_TangentLine));
                     for (int i = 0; i < HP.Count - 1; i++)
                     {
                         g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
                     }
-
-                } while (!checkIfsameEdge(SG, Down_TangentLine));
-                g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
-                PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
-                g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
-                HP.Add(HP_LastNode);
-
-                for (int i = 0; i < VerticalList.Count; i++)
-                {
-                    //先計算HP[i]HP[i+1]，HP[i]HP[i+2]的外積，記錄下狀態為A，之後與算HP[i]與第j條VerticalList的左點z，記錄下狀態為B，
-                    //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
-                    DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
-                    DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y));
-                    DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[i + 2].X), Convert.ToInt32(HP[i + 2].Y));
-
-                    PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
-                    PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
-                    PointF AR_Node_vecter = new PointF(VerticalList[i].R_Node().X - NodeA.X, VerticalList[i].R_Node().Y - NodeA.Y);
-                    PointF AL_Node_vecter = new PointF(VerticalList[i].L_Node().X - NodeA.X, VerticalList[i].L_Node().Y - NodeA.Y);
-                    //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
-                    var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X;
-                    ABAC = getstate(ABAC);
-                    var ABAR = AB_vecter.X * AR_Node_vecter.Y - AB_vecter.Y * AR_Node_vecter.X;
-                    ABAR = getstate(ABAR);
-                    var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
-                    ABAL = getstate(ABAL);
-                    ABAL = getstate(ABAL);
-                    if (ABAC == ABAR)
-                    {
-                        PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
-                        PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
-                        for (int j = 0; j < HP.Count; j++)
-                        {
-                            var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X),1);
-                            var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X),1);
-                            if (qq == ww & HP[j] != aa)
-                            {
-                                bb = HP[j];
-                            }
-                        }
-                        DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
-                        g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
-                        Fin_VerticalList.Add(temp);
-                    }
-                    else if (ABAC == ABAL)
-                    {
-                        PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
-                        PointF bb = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
-                        for (int j = 0; j < HP.Count; j++)
-                        {
-                            var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
-                            var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
-                            if (qq == ww & HP[j] != aa)
-                            {
-                                bb = HP[j];
-                            }
-                        }
-                        DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
-                        g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
-                        Fin_VerticalList.Add(temp);
-                    }
-                    
+                    g.DrawLine(Pens.OrangeRed, SG.X1, SG.Y1, SG.X2, SG.Y2);
+                    PointF HP_LastNode = new PointF(SG.Vertical_down_Node().X, SG.Vertical_down_Node().Y);
+                    g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
+                    HP.Add(HP_LastNode);
                 }
-//                for (int i = 0; i < Fin_VerticalList.Count; i++)
-//                {
-//                    g.DrawLine(pen_in_hyper, Fin_VerticalList[i].X1, Fin_VerticalList[i].Y1, Fin_VerticalList[i].X2, Fin_VerticalList[i].Y2);
-//                }
+                if (step == 3)
+                {
+                    this.panel1.Refresh();
+                    for (int i = 0; i < HP.Count - 1; i++)
+                    {
+                        g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
+                    }
+                    for (int i = 0; i < VerticalList.Count; i++)
+                    {
+                        //先計算HP[i]HP[i+1]，HP[i]HP[i+2]的外積，記錄下狀態為A，之後與算HP[i]與第j條VerticalList的左點z，記錄下狀態為B，
+                        //與算HP[i]與第j條VerticalList的右點x，記錄下狀態為C，如果B與A相同則代表只留HP[i+1]x這條邊
+                        DataStruct.Node NodeA = new DataStruct.Node(Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
+                        DataStruct.Node NodeB = new DataStruct.Node(Convert.ToInt32(HP[i + 1].X), Convert.ToInt32(HP[i + 1].Y));
+                        DataStruct.Node NodeC = new DataStruct.Node(Convert.ToInt32(HP[i + 2].X), Convert.ToInt32(HP[i + 2].Y));
+                        PointF AB_vecter = new PointF(NodeB.X - NodeA.X, NodeB.Y - NodeA.Y);
+                        PointF AC_vectet = new PointF(NodeC.X - NodeA.X, NodeC.Y - NodeA.Y);
+                        PointF AR_Node_vecter = new PointF(VerticalList[i].R_Node().X - NodeA.X, VerticalList[i].R_Node().Y - NodeA.Y);
+                        PointF AL_Node_vecter = new PointF(VerticalList[i].L_Node().X - NodeA.X, VerticalList[i].L_Node().Y - NodeA.Y);
+                        //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
+                        var ABAC = AB_vecter.X * AC_vectet.Y - AB_vecter.Y * AC_vectet.X;
+                        ABAC = getstate(ABAC);
+                        var ABAR = AB_vecter.X * AR_Node_vecter.Y - AB_vecter.Y * AR_Node_vecter.X;
+                        ABAR = getstate(ABAR);
+                        var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
+                        ABAL = getstate(ABAL);
+                        ABAL = getstate(ABAL);
+                        if (ABAC == ABAR)
+                        {
+                            PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                            PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
+                            for (int j = 0; j < HP.Count; j++)
+                            {
+                                var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
+                                var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
+                                if (qq == ww & HP[j] != aa)
+                                {
+                                    bb = HP[j];
+                                }
+                            }
+                            DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                            g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                            Fin_VerticalList.Add(temp);
+                        }
+                        else if (ABAC == ABAL)
+                        {
+                            PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                            PointF bb = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                            for (int j = 0; j < HP.Count; j++)
+                            {
+                                var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
+                                var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
+                                if (qq == ww & HP[j] != aa)
+                                {
+                                    bb = HP[j];
+                                }
+                            }
+                            DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                            g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                            Fin_VerticalList.Add(temp);
+                        }
+
+                    }
+                }
             }
         }
-        
+
         private int getstate(float state)
         {
             int fin_state = 0;
