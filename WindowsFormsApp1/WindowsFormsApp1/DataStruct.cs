@@ -15,6 +15,11 @@ namespace WindowsFormsApp1
                 X = p1;
                 Y = p2;
             }
+            public Node(float p1, float p2)
+            {
+                X = Convert.ToInt32(p1);
+                Y = Convert.ToInt32(p2);
+            }
         }
         public struct Edge
         {

@@ -22,6 +22,8 @@ namespace WindowsFormsApp1
         List<int> NodeNumList = new List<int>();
         List<DataStruct.Node> NodeList = new List<DataStruct.Node>(); //紀錄所有的Node
         List<DataStruct.Edge> EdgeList = new List<DataStruct.Edge>(); //紀錄所有的Edge
+        List<DataStruct.Node> OutputNodeList = new List<DataStruct.Node>(); //紀錄所有的Node
+        List<DataStruct.Edge> OutputEdgeList = new List<DataStruct.Edge>();
         DataStruct.Node[] TL = new DataStruct.Node[20000];
         List<DataStruct.Edge> TangentLine_List = new List<DataStruct.Edge>();
         public int FirstTime_TangentLine_List_Num = 0;
@@ -175,10 +177,8 @@ namespace WindowsFormsApp1
             }
             //--------------------------------------------------------------------------------------------------
             if (NodeCount > 3)
-            {
-                
+            {        
                 Graphics g = Graphics.FromHwnd(this.panel1.Handle);
-
                 if (step == (int)Form1.step.Divide)
                 {
                     Divide(NodeCount, tempList);//取得L_part_List與R_part_List
@@ -446,9 +446,18 @@ namespace WindowsFormsApp1
                 if (step == 3)
                 {
                     this.panel1.Refresh();
+                    EdgeList.Clear();
+                    NodeList.Clear();
                     for (int i = 0; i < HP.Count - 1; i++)
                     {
                         g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
+                        DataStruct.Edge temp = new DataStruct.Edge(HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
+                        EdgeList.Add(temp);
+                    }
+                    for (int i = 0; i < HP.Count; i++)
+                    {
+                        DataStruct.Node temp = new DataStruct.Node(HP[i].X, HP[i].Y);
+                        NodeList.Add(temp);
                     }
                     for (int i = 0; i < VerticalList.Count; i++)
                     {
@@ -484,6 +493,9 @@ namespace WindowsFormsApp1
                             }
                             DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
                             g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                            DataStruct.Node tempbb = new DataStruct.Node(bb.X,bb.Y);
+                            NodeList.Add(tempbb);
+                            EdgeList.Add(temp);
                             Fin_VerticalList.Add(temp);
                         }
                         else if (ABAC == ABAL)
@@ -501,9 +513,11 @@ namespace WindowsFormsApp1
                             }
                             DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
                             g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                            DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
+                            NodeList.Add(tempbb);
+                            EdgeList.Add(temp);
                             Fin_VerticalList.Add(temp);
                         }
-
                     }
                 }
             }
@@ -526,7 +540,6 @@ namespace WindowsFormsApp1
             }
             return fin_state;
         }
-
         private bool checkIfsameEdge(DataStruct.Edge a, DataStruct.Edge b)
         {
             if ((a.X1 == b.X1 && a.Y1 == b.Y1) && (a.X2 == b.X2 && a.Y2 == b.Y2))
@@ -536,7 +549,6 @@ namespace WindowsFormsApp1
             else
                 return false;
         }
-
         private bool cmpLine(DataStruct.Edge a, DataStruct.Edge b)
         {
             if (a.X1 == b.X1 && a.Y1 == b.Y1 && a.X2 == b.X2 && a.Y2 == b.Y2)
@@ -649,6 +661,9 @@ namespace WindowsFormsApp1
             {
                 g.DrawLine(pen_in_tangent, TangentLine_List[i].X1, TangentLine_List[i].Y1, TangentLine_List[i].X2,
                     TangentLine_List[i].Y2);
+                DataStruct.Edge temp = new DataStruct.Edge(TangentLine_List[i].X1, TangentLine_List[i].Y1, TangentLine_List[i].X2,
+                    TangentLine_List[i].Y2);
+                EdgeList.Add(temp);
             }
             if (TangentLine_List[0].Top_Node().Y > TangentLine_List[1].Top_Node().Y)
             {
@@ -657,7 +672,6 @@ namespace WindowsFormsApp1
                 TangentLine_List[0] = TangentLine_List[1];
                 TangentLine_List[1] = temp;
             }
-
         }
         //oa * ob = oa.x * ob.y - oa.y * ob.x 外積公式
         private int cross(DataStruct.Node o, DataStruct.Node a, DataStruct.Node b)
@@ -734,7 +748,6 @@ namespace WindowsFormsApp1
             }
         }
         //--------------------------------------------------------------------------------------------------
-
         private void ThreeNodeFun(List<DataStruct.Node> tempList)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
@@ -748,9 +761,7 @@ namespace WindowsFormsApp1
 
                 //做逆時針排序，用於找每一條邊的法向量
                 //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
-
                 List<DataStruct.Edge> Edge_List = new List<DataStruct.Edge>();
-
                 for (int i = 0; i < 3; i++)
                 {
                     DataStruct.Edge normal_vector = new DataStruct.Edge();
@@ -760,7 +771,6 @@ namespace WindowsFormsApp1
                     normal_vector.Y2 = tempList[(i + 1) % 3].Y;
                     Edge_List.Add(normal_vector);
                 }
-
                 for (int i = 0; i < 3; i++)
                 {
                     g.DrawLine(pen, Edge_List[i].Vertical_top_Node().X, Edge_List[i].Vertical_top_Node().Y, Excenter.X, Excenter.Y);
@@ -1002,7 +1012,6 @@ namespace WindowsFormsApp1
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
         }
-
         //--------------------------------------------------------------------------------------------------
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
