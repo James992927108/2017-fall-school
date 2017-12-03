@@ -150,7 +150,7 @@
             this.button4.TabIndex = 10;
             this.button4.Text = "OpenOutputFile";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.OpenOutputFile_Clic);
+            this.button4.Click += new System.EventHandler(this.OpenOutputFile_Click);
             // 
             // Form1
             // 

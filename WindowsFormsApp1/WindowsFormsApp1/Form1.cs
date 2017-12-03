@@ -31,7 +31,6 @@ namespace WindowsFormsApp1
         List<DataStruct.Node> R_part_List = new List<DataStruct.Node>();
         List<PointF> HP = new List<PointF>();
         List<DataStruct.Edge> VerticalList = new List<DataStruct.Edge>();
-        List<DataStruct.Edge> Fin_VerticalList = new List<DataStruct.Edge>();
 
         private int RemainDateCount = 0;//用於紀錄測資剩餘次數
         private int CurrentDataIndex = 0;//用於讀取NodeNumList中第幾個值
@@ -60,7 +59,6 @@ namespace WindowsFormsApp1
             whichstep = 0;
             HP.Clear();
             VerticalList.Clear();
-            Fin_VerticalList.Clear();
             EdgeList.Clear();
             TangentLine_List.Clear();
             if (IsReadFile == true)
@@ -142,50 +140,50 @@ namespace WindowsFormsApp1
         {
             if (IsReadFile == false)
             {
-                List<DataStruct.Node> tempList = new List<DataStruct.Node>();
+                List<DataStruct.Node> tempNodeList = new List<DataStruct.Node>();
                 for (int i = 0; i < NodeList.Count; i++)
                 {
-                    tempList.Add(NodeList[i]);
+                    tempNodeList.Add(NodeList[i]);
                 }
-                DrawVerticalLine(NodeList.Count, tempList, whichstep);
+                DrawVerticalLine(NodeList.Count, tempNodeList, whichstep);
                 whichstep++;
             }
             else
             {
-                List<DataStruct.Node> tempList = new List<DataStruct.Node>();
+                List<DataStruct.Node> tempNodeList = new List<DataStruct.Node>();
                 for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
                 {
-                    tempList.Add(NodeList[i]);
+                    tempNodeList.Add(NodeList[i]);
                 }
-                DrawVerticalLine(NodeNumList[CurrentDataIndex], tempList, whichstep);    
+                DrawVerticalLine(NodeNumList[CurrentDataIndex], tempNodeList, whichstep);
                 whichstep++;
             }
         }
 
         //--------------------------------------------------------------------------------------------------
 
-        private void DrawVerticalLine(int NodeCount, List<DataStruct.Node> tempList, int step)
+        private void DrawVerticalLine(int NodeCount, List<DataStruct.Node> tempNodeList, int step)
         {
             if (NodeCount == 2)
             {
-                TwoNodeFun(tempList);
+                TwoNodeFun(tempNodeList);
             }
             //--------------------------------------------------------------------------------------------------
             if (NodeCount == 3) //三點時要找外心
             {
-                ThreeNodeFun(tempList);
+                ThreeNodeFun(tempNodeList);
             }
             //--------------------------------------------------------------------------------------------------
             if (NodeCount > 3)
-            {        
+            {
                 Graphics g = Graphics.FromHwnd(this.panel1.Handle);
                 if (step == (int)Form1.step.Divide)
                 {
-                    Divide(NodeCount, tempList);//取得L_part_List與R_part_List
+                    Divide(NodeCount, tempNodeList);//取得L_part_List與R_part_List
                 }
                 if (step == (int)Form1.step.TangentLine)
                 {
-                    Get_TangentLine(tempList);//取得TangentLine_List
+                    Get_TangentLine(tempNodeList);//取得TangentLine_List
                 }
                 if (step == 2)
                 {
@@ -431,7 +429,7 @@ namespace WindowsFormsApp1
                             g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
                             //g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
                         }
-                        
+
 
                     } while (!checkIfsameEdge(SG, Down_TangentLine));
                     for (int i = 0; i < HP.Count - 1; i++)
@@ -447,7 +445,7 @@ namespace WindowsFormsApp1
                 {
                     this.panel1.Refresh();
                     EdgeList.Clear();
-                    NodeList.Clear();
+                    OutputNodeList.Clear();
                     for (int i = 0; i < HP.Count - 1; i++)
                     {
                         g.DrawLine(pen_in_hyper, HP[i].X, HP[i].Y, HP[i + 1].X, HP[i + 1].Y);
@@ -457,7 +455,7 @@ namespace WindowsFormsApp1
                     for (int i = 0; i < HP.Count; i++)
                     {
                         DataStruct.Node temp = new DataStruct.Node(HP[i].X, HP[i].Y);
-                        NodeList.Add(temp);
+                        OutputNodeList.Add(temp);
                     }
                     for (int i = 0; i < VerticalList.Count; i++)
                     {
@@ -493,10 +491,9 @@ namespace WindowsFormsApp1
                             }
                             DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
                             g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
-                            DataStruct.Node tempbb = new DataStruct.Node(bb.X,bb.Y);
-                            NodeList.Add(tempbb);
+                            DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
+                            OutputNodeList.Add(tempbb);
                             EdgeList.Add(temp);
-                            Fin_VerticalList.Add(temp);
                         }
                         else if (ABAC == ABAL)
                         {
@@ -514,9 +511,8 @@ namespace WindowsFormsApp1
                             DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
                             g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
                             DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
-                            NodeList.Add(tempbb);
+                            OutputNodeList.Add(tempbb);
                             EdgeList.Add(temp);
-                            Fin_VerticalList.Add(temp);
                         }
                     }
                 }
@@ -1059,7 +1055,7 @@ namespace WindowsFormsApp1
             this.button_Next.Text = $"{NodeNumList.Count}";
             RemainDateCount = NodeNumList.Count;
         }
-        private void OpenOutputFile_Clic(object sender, EventArgs e)
+        private void OpenOutputFile_Click(object sender, EventArgs e)
         {
             string line;
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
@@ -1094,7 +1090,7 @@ namespace WindowsFormsApp1
             if (IsReadFile != true)
             {
                 //將NodeList中的元素跟具x值排序
-                var NodeList_Sort = NodeList.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
+                var NodeList_Sort = OutputNodeList.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
                 foreach (var node in NodeList_Sort)
                 {
                     sw.Write("P " + node.X + " " + node.Y);
@@ -1107,7 +1103,7 @@ namespace WindowsFormsApp1
                 for (int i = 0; i < NodeNumList[CurrentDataIndex]; i++)
                 {
                     DataStruct.Node temp = new DataStruct.Node();
-                    temp = NodeList[i];
+                    temp = OutputNodeList[i];
                     NodeListCopy.Add(temp);
                 }
                 var NodeList_Sort = NodeListCopy.OrderBy(a => a.X).ThenBy(b => b.Y).ToList();
