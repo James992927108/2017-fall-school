@@ -647,7 +647,8 @@ namespace WindowsFormsApp1
                     if (checkIfsameEdge(Tangenttemp[i], EdgeList[j]))
                     {
                         Tangenttemp.RemoveAt(i);
-                        i--;
+                        if(i!=0)
+                            i--;
                     }
                 }
             }
@@ -1086,7 +1087,6 @@ namespace WindowsFormsApp1
             fileStream.Close();
             StreamWriter sw = new StreamWriter(@"..\..\..\OutputFile.txt");
             //當前點個數
-
             if (IsReadFile != true)
             {
                 //將NodeList中的元素跟具x值排序
