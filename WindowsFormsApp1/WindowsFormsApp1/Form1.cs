@@ -185,7 +185,7 @@ namespace WindowsFormsApp1
                 {
                     Get_TangentLine(tempNodeList);//取得TangentLine_List
                 }
-                if (step == 2)
+                if (step == (int)Form1.step.Hyperplane)
                 {
                     //畫Hyperplane
                     //DrawVerticalLine(L_part_List.Count, L_part_List);
@@ -429,8 +429,6 @@ namespace WindowsFormsApp1
                             g.DrawImageUnscaled(get_NodeBitmap(), Convert.ToInt32(HP[i].X), Convert.ToInt32(HP[i].Y));
                             //g.DrawString($"{HP[i].X},{HP[i].X}", myFont, Brushes.Firebrick, HP[i].X, HP[i].X);
                         }
-
-
                     } while (!checkIfsameEdge(SG, Down_TangentLine));
                     for (int i = 0; i < HP.Count - 1; i++)
                     {
@@ -441,7 +439,7 @@ namespace WindowsFormsApp1
                     g.DrawLine(pen_in_hyper, HP[HP.Count - 1].X, HP[HP.Count - 1].Y, HP_LastNode.X, HP_LastNode.Y);
                     HP.Add(HP_LastNode);
                 }
-                if (step == 3)
+                if (step == (int)Form1.step.Eliminate)
                 {
                     this.panel1.Refresh();
                     EdgeList.Clear();
@@ -475,39 +473,50 @@ namespace WindowsFormsApp1
                         ABAR = getstate(ABAR);
                         var ABAL = AB_vecter.X * AL_Node_vecter.Y - AB_vecter.Y * AL_Node_vecter.X;
                         ABAL = getstate(ABAL);
-                        ABAL = getstate(ABAL);
-                        if (ABAC == ABAR)
+                        if (ABAC != 0)
                         {
-                            PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
-                            PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
-                            for (int j = 0; j < HP.Count; j++)
+                            if (ABAC == ABAR)
                             {
-                                var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
-                                var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
-                                if (qq == ww & HP[j] != aa)
+                                PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                                PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);
+                                for (int j = 0; j < HP.Count; j++)
                                 {
-                                    bb = HP[j];
+                                    var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
+                                    var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
+                                    if (qq == ww & HP[j] != aa)
+                                    {
+                                        bb = HP[j];
+                                    }
                                 }
+                                DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                                g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                                DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
+                                OutputNodeList.Add(tempbb);
+                                EdgeList.Add(temp);
                             }
-                            DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
-                            g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
-                            DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
-                            OutputNodeList.Add(tempbb);
-                            EdgeList.Add(temp);
+                            else if (ABAC == ABAL)
+                            {
+                                PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
+                                PointF bb = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                                for (int j = 0; j < HP.Count; j++)
+                                {
+                                    var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
+                                    var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
+                                    if (qq == ww & HP[j] != aa)
+                                    {
+                                        bb = HP[j];
+                                    }
+                                }
+                                DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
+                                g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
+                                DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
+                                OutputNodeList.Add(tempbb);
+                                EdgeList.Add(temp);
+                            }
                         }
-                        else if (ABAC == ABAL)
-                        {
-                            PointF aa = new PointF(HP[i + 1].X, HP[i + 1].Y);
-                            PointF bb = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
-                            for (int j = 0; j < HP.Count; j++)
-                            {
-                                var qq = Math.Round((bb.Y - aa.Y) / (bb.X - aa.X), 1);
-                                var ww = Math.Round((HP[j].Y - aa.Y) / (HP[j].X - aa.X), 1);
-                                if (qq == ww & HP[j] != aa)
-                                {
-                                    bb = HP[j];
-                                }
-                            }
+                        else{
+                            PointF aa = new PointF(VerticalList[i].R_Node().X, VerticalList[i].R_Node().Y);
+                            PointF bb = new PointF(VerticalList[i].L_Node().X, VerticalList[i].L_Node().Y);                         
                             DataStruct.Edge temp = new DataStruct.Edge(aa.X, aa.Y, bb.X, bb.Y);
                             g.DrawLine(pen_in_hyper, temp.X1, temp.Y1, temp.X2, temp.Y2);
                             DataStruct.Node tempbb = new DataStruct.Node(bb.X, bb.Y);
