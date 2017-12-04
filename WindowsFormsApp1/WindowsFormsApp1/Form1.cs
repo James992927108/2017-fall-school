@@ -677,7 +677,7 @@ namespace WindowsFormsApp1
                     TangentLine_List[i].Y2);
                 EdgeList.Add(temp);
             }
-            if (TangentLine_List[0].Top_Node().Y > TangentLine_List[1].Top_Node().Y)
+            if (TangentLine_List[0].mid_Node().Y > TangentLine_List[1].mid_Node().Y)
             {
                 DataStruct.Edge temp = new DataStruct.Edge();
                 temp = TangentLine_List[0];
