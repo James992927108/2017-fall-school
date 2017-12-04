@@ -1,4 +1,10 @@
-﻿using System;
+﻿// $LAN=C#$ 
+//題目 : voronoi
+//系級 : 資工碩一
+//姓名 : 鄧子奇
+//學號 : M063040065
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,7 +29,7 @@ namespace WindowsFormsApp1
         List<DataStruct.Node> NodeList = new List<DataStruct.Node>(); //紀錄所有的Node
         List<DataStruct.Edge> EdgeList = new List<DataStruct.Edge>(); //紀錄所有的Edge
         List<DataStruct.Node> OutputNodeList = new List<DataStruct.Node>(); //紀錄所有的Node
-        List<DataStruct.Edge> OutputEdgeList = new List<DataStruct.Edge>();
+
         DataStruct.Node[] TL = new DataStruct.Node[20000];
         List<DataStruct.Edge> TangentLine_List = new List<DataStruct.Edge>();
         public int FirstTime_TangentLine_List_Num = 0;
@@ -764,7 +770,6 @@ namespace WindowsFormsApp1
             if (Excenter.X != 0 && Excenter.Y != 0) //有找到外心時
             {
                 g.DrawImageUnscaled(get_NodeBitmap(), Excenter.X, Excenter.Y);
-
                 //做逆時針排序，用於找每一條邊的法向量
                 //以逆時針順序記錄三角形的三個頂點（三角形的三條邊變成有向邊）。這麼做的好處是，三角形依序取兩條邊計算叉積，就得到朝外的法向量
                 List<DataStruct.Edge> Edge_List = new List<DataStruct.Edge>();
@@ -871,7 +876,6 @@ namespace WindowsFormsApp1
                 }
             }
         }
-
         private void TwoNodeFun(List<DataStruct.Node> tempList)
         {
             Graphics g = Graphics.FromHwnd(this.panel1.Handle);
