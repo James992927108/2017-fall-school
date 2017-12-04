@@ -1629,7 +1629,10 @@
 	}
 
 	p {
-		margin: 0 0 2em 0;
+		margin: 0 0 0.2em 0;
+	}
+	indent{
+		 padding-left: 1.8em 
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -3710,7 +3713,7 @@
 			position: relative;
 			overflow: hidden;
 			background-color: #ffffff;
-			background-size: cover;
+			/*background-size: cover;*/
 			background-position: center;
 			background-repeat: no-repeat;
 		}
@@ -4471,7 +4474,7 @@
 
 					.post .image img {
 						position: relative;
-						width: 100%;
+						width: auto;
 						height: auto;
 						display: block;
 					}
