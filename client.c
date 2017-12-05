@@ -25,8 +25,8 @@ int main(void)
 	read(sock, recv_userId_from_server, sizeof(recv_userId_from_server));
 
 	printf("User< %s >\n", recv_userId_from_server);
-	int check_create_user = 0;
 	int client_state = 0;
+	char Member_id[50];
 	pid = fork();
 	while (1)
 	{ //listen
@@ -40,11 +40,11 @@ int main(void)
 			printf("pid = 0 -- client_state : %d\n", client_state);
 			if (client_state == 0)
 			{
-				printf("1 . Type user name\n");
+				printf("1 . Type user name(like : name-james)\n");
 			}
 			else if (client_state == 1)
 			{
-				printf("2 .which group\n");
+				printf("2 .which group(like : group-AOS-students)\n");
 			}
 			else
 			{
@@ -54,24 +54,38 @@ int main(void)
 				printf("6 .modify Permission\n");
 			}
 
-			char recv_from_server[256];
+			char recv_msg_from_server[256];
 
-			read(sock, recv_from_server, sizeof(recv_from_server));
+			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
 
 			//recvbox[readFromsock] = 0;
-			printf("from server :%s \n", recv_from_server);
-
-			if (strcmp(recv_from_server, "exist") == 0)
+			printf("from server :%s \n", recv_msg_from_server);
+			if (client_state == 0)
 			{
-				client_state = 2;
-				
-				printf("user have created before \n");
+				if (strcmp(recv_msg_from_server, "user_exist") == 0)
+				{
+					client_state = 2;
+
+					printf("user_exist \n");
+				}
+				else
+				{
+					client_state = 1;
+					printf("%s\n", recv_msg_from_server);
+				}
 			}
-			else
+			else if (client_state == 1)
 			{
-				client_state = 1;
-
-				printf("creating user \n");
+				if (strcmp(recv_msg_from_server, "group_exist") == 0)
+				{
+					client_state = 1;
+					printf("group_exist \n");
+				}
+				else
+				{
+					client_state = 2;
+					printf("%s\n", recv_msg_from_server);
+				}
 			}
 			if (flag != 0)
 			{
@@ -80,44 +94,19 @@ int main(void)
 		}
 		else
 		{
+
 			char buf[256];
 			printf("pid > 0 -- client_state :  %d\n", client_state);
 
-			if (client_state == 0)
+			if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
 			{
-				if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
-				{
-					char name_tage[256];
-					strcpy(name_tage, "name-");
-					strcat(name_tage, buf);
-					write(sock, name_tage, sizeof(name_tage)); //要傳一個tag_name，告訴server為name
-				}
-				else
-				{
-					flag = 1;
-					_exit(EXIT_SUCCESS);
-					break;
-				}
-			}
-			else if (client_state == 1)
-			{
-
-				if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
-				{
-					char name_tage[256];
-					strcpy(name_tage, "group-");
-					strcat(name_tage, buf);
-					write(sock, name_tage, sizeof(name_tage)); //要傳一個tag_name，告訴server為name
-				}
-				else
-				{
-					flag = 1;
-					_exit(EXIT_SUCCESS);
-					break;
-				}
+				write(sock, buf, sizeof(buf)); //
 			}
 			else
 			{
+				flag = 1;
+				_exit(EXIT_SUCCESS);
+				break;
 			}
 		}
 	}

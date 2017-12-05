@@ -5,8 +5,7 @@
 #include <string.h>
 #include <pthread.h>
 int a[100] = {0};
-int working = 0;
-int Member_id = 0;
+int client_num = 0;
 typedef struct Permission
 {
 	char own[3];
@@ -65,15 +64,14 @@ void initial()
 }
 void testData()
 {
-	strcpy(MemberArray[Member_id].member_group, "AOS-students");
-	strcpy(MemberArray[Member_id].name, "james");
-	Member_id++;
-	strcpy(MemberArray[Member_id].member_group, "AOS-students");
-	strcpy(MemberArray[Member_id].name, "sam");
-	Member_id++;
-	strcpy(MemberArray[Member_id].member_group, "CSE-students");
-	strcpy(MemberArray[Member_id].name, "antony");
-	Member_id++;
+	strcpy(MemberArray[0].member_group, "AOS-students");
+	strcpy(MemberArray[0].name, "james");
+
+	strcpy(MemberArray[1].member_group, "AOS-students");
+	strcpy(MemberArray[1].name, "sam");
+
+	strcpy(MemberArray[2].member_group, "CSE-students");
+	strcpy(MemberArray[2].name, "antony");
 
 	FileArray[0].access_right.own[0] = 'r';
 	FileArray[0].access_right.own[1] = 'w';
@@ -104,32 +102,37 @@ int check_user_isExist(char *user)
 	}
 	return 0;
 }
+int check_group_isExist(char *group)
+{
+	for (int i = 0; i < 50; i++)
+	{
+		if (strcmp(group, MemberArray[i].member_group) == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 void *connection_handler(void *sock)
 {
 	char *buffer;
 	int csock = *(int *)sock;
 	int readSize;
 	long addr = 0;
-	char buf[256], temp[256];
-	
-	int i, j;
 
-	int number = working; //the online id
+	int client_id = client_num; //the online id
 
-	a[number] = csock;
-
+	a[client_id] = csock;
+	char buf[256];
 	while (readSize = read(csock, buf, sizeof(buf)))
 	{
+		printf("from client buf : %s , user id : %d\n", buf, client_id);
 
-		buf[readSize] = 0;
-		printf("user : %s , user id : %d\n", buf, number);
-		
-	
 		if (strcmp(buf, "quit") == 0)
 		{
-			working--;
+			client_num--;
 
-			for (i = number; i < 100; i++)
+			for (int i = client_id; i < 100; i++)
 			{
 				a[i] = a[i + 1];
 				a[99] = 0;
@@ -137,47 +140,70 @@ void *connection_handler(void *sock)
 
 			break;
 		}
+
 		if (buf[0] == 'n' && buf[1] == 'a' && buf[2] == 'm' && buf[3] == 'e')
 		{
 			printf("%s\n", buf + 5);
 			int checkinformation = check_user_isExist(buf + 5);
 			if (checkinformation == 1)
 			{
-				//傳回給使用者，number使用者的id
+				//傳回給使用者，number即client的id
 				char mes_to_client[256];
-				strcpy(mes_to_client, "exist");
-				write(a[number], mes_to_client, sizeof(mes_to_client));
+				strcpy(mes_to_client, "user_exist");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
 			}
 			else
 			{
 				//建立使用者
-				// strcpy(MemberArray[Member_id].member_group, "AOS-students");
-				strcpy(MemberArray[Member_id].name, buf);
-				printf("%d\n", Member_id);
-				printf("%s\n", MemberArray[Member_id++].name);
+				//從蒂9個開始，9前個內建資料庫
+				int current_client_id = client_id + 9;
+				strcpy(MemberArray[current_client_id].name, buf + 5);
+				printf("%d\n", current_client_id);
+				printf("%s\n", MemberArray[current_client_id].name);
 
 				char mes_to_client[256];
-				strcpy(mes_to_client, "create successful");
-				write(a[number], mes_to_client, sizeof(mes_to_client));
-				printf("create successful\n");
+				strcpy(mes_to_client,"create user successful");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
 			}
 		}
 		if (buf[0] == 'g' && buf[1] == 'r' && buf[2] == 'o' && buf[3] == 'u' && buf[4] == 'p')
 		{
 			printf("%s\n", buf);
 			printf("%s\n", buf + 6);
-		}
+			int checkinformation = check_group_isExist(buf + 6);
+			if (checkinformation == 1)
+			{
+				char mes_to_client[256];
+				strcpy(mes_to_client, "group_exist");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+			}
+			else
+			{
+				//建立使用者
+				//從蒂9個開始，9前個內建資料庫
+				int current_client_id = client_id + 9;
+				strcpy(MemberArray[current_client_id].member_group, buf + 6);
+				printf("%d\n", current_client_id);
+				printf("%s\n", MemberArray[current_client_id].member_group);
 
+				char mes_to_client[256];
+				strcpy(mes_to_client,"create group successful");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+			}
+		}
 	}
 	if (readSize == 0)
 	{
 
-		printf("Client %d disconnected\n", number);
+		printf("Client %d disconnected\n", client_id);
 		fflush(stdout);
-		working--;
-		a[number] = 0;
-		for (i = number; i < 100; i++)
+		client_num--;
+		a[client_id] = 0;
+		for (int i = client_id; i < 100; i++)
 		{
 			a[i] = a[i + 1];
 			a[99] = 0;
@@ -193,7 +219,7 @@ int main(void)
 	struct sockaddr_in server, client;
 	int sock, csock, readSize, addressSize, c;
 	char buf[256], temp[256];
-	char cworking[256];
+	char send_client_num[256];
 	pthread_t sniffer_thread;
 
 	sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -222,11 +248,11 @@ int main(void)
 	{
 		csock = accept(sock, (struct sockaddr *)&server, (socklen_t *)&addressSize);
 		//new link
-		working++;
-		printf("online:%d\n", working);
+		client_num++;
+		printf("online:%d\n", client_num);
 
-		sprintf(cworking, "%d", working);
-		write(csock, cworking, sizeof(cworking));
+		sprintf(send_client_num, "%d", client_num);
+		write(csock, send_client_num, sizeof(send_client_num));
 
 		if (csock < 0)
 		{
