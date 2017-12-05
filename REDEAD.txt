@@ -1,0 +1,11 @@
+Student Id : D0240163
+Student Name : 鄧子奇
+
+作業系統 : ubuntu 15.04
+作業使用助教lab2提供的code作為參考
+使用fork()來同時處理多個client
+client 連接 server 時可以知道自己為第幾個使用者
+通果server回傳直
+
+server 也可以判斷每次接收到的信息來自哪個client
+ 
