@@ -102,16 +102,14 @@ int check_user_isExist(char *user)
 	}
 	return 0;
 }
-int check_group_isExist(char *group)
+void split(char **arr, char *str, const char *del)
 {
-	for (int i = 0; i < 50; i++)
+	char *s = strtok(str, del);
+	while (s != NULL)
 	{
-		if (strcmp(group, MemberArray[i].member_group) == 0)
-		{
-			return 1;
-		}
+		*arr++ = s;
+		s = strtok(NULL, del);
 	}
-	return 0;
 }
 void *connection_handler(void *sock)
 {
@@ -143,6 +141,7 @@ void *connection_handler(void *sock)
 
 		if (buf[0] == 'n' && buf[1] == 'a' && buf[2] == 'm' && buf[3] == 'e')
 		{
+			printf("%s\n", buf);
 			printf("%s\n", buf + 5);
 			int checkinformation = check_user_isExist(buf + 5);
 			if (checkinformation == 1)
@@ -163,37 +162,67 @@ void *connection_handler(void *sock)
 				printf("%s\n", MemberArray[current_client_id].name);
 
 				char mes_to_client[256];
-				strcpy(mes_to_client,"create user successful");
+				strcpy(mes_to_client, "create user successful");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
 			}
 		}
-		if (buf[0] == 'g' && buf[1] == 'r' && buf[2] == 'o' && buf[3] == 'u' && buf[4] == 'p')
+		else if (buf[0] == 'g' && buf[1] == 'r' && buf[2] == 'o' && buf[3] == 'u' && buf[4] == 'p')
 		{
 			printf("%s\n", buf);
 			printf("%s\n", buf + 6);
-			int checkinformation = check_group_isExist(buf + 6);
-			if (checkinformation == 1)
-			{
-				char mes_to_client[256];
-				strcpy(mes_to_client, "group_exist");
-				write(a[client_id], mes_to_client, sizeof(mes_to_client));
-				printf("%s\n", mes_to_client);
-			}
-			else
-			{
-				//建立使用者
-				//從蒂9個開始，9前個內建資料庫
-				int current_client_id = client_id + 9;
-				strcpy(MemberArray[current_client_id].member_group, buf + 6);
-				printf("%d\n", current_client_id);
-				printf("%s\n", MemberArray[current_client_id].member_group);
+			//建立使用者
+			//從蒂9個開始，9前個內建資料庫
+			int current_client_id = client_id + 9;
+			strcpy(MemberArray[current_client_id].member_group, buf + 6);
+			printf("%d\n", current_client_id);
+			printf("%s\n", MemberArray[current_client_id].member_group);
+			char mes_to_client[256];
+			strcpy(mes_to_client, "create group successful");
+			write(a[client_id], mes_to_client, sizeof(mes_to_client));
+			printf("%s\n", mes_to_client);
+		}
+		else if (buf[0] == '3') //3 .create file
+		{
+			printf("%s\n", buf);
+			printf("%s\n", buf + 2);
+			//檢查是否已經有該資料
+			const char *del = " ";
+			char *arr[50];
+			split(arr, buf, del);
+			int i = 0;
+			while (i < 50)
+				printf("123%s\n", *(arr + i++));
+			// int checkinformation = check_user_isExist(buf + 2);
+			// if (checkinformation == 1)
+			// {
 
-				char mes_to_client[256];
-				strcpy(mes_to_client,"create group successful");
-				write(a[client_id], mes_to_client, sizeof(mes_to_client));
-				printf("%s\n", mes_to_client);
-			}
+			// }
+			// else
+			// {
+
+			// }
+			File creatFile;
+			strcpy(creatFile.file_name, buf + 2);
+
+			FILE *file;
+			file = fopen(creatFile.file_name, "w");
+			//fprintf(file, "%s", "123");
+			fclose(file);
+
+			char mes_to_client[256];
+			strcpy(mes_to_client, "create file successful");
+			write(a[client_id], mes_to_client, sizeof(mes_to_client));
+			printf("%s\n", mes_to_client);
+		}
+		else if (buf[0] == '4') //4 .read file
+		{
+		}
+		else if (buf[0] == '5') //5 .write file
+		{
+		}
+		else if (buf[0] == '6') //6 .modify Permission
+		{
 		}
 	}
 	if (readSize == 0)

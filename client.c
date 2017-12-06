@@ -46,9 +46,9 @@ int main(void)
 			{
 				printf("2 .which group(like : group-AOS-students)\n");
 			}
-			else
+			else if (client_state == 2)
 			{
-				printf("3 .create file\n");
+				printf("3 .create file(like : 3-filename.txt)\n");
 				printf("4 .read file\n");
 				printf("5 .write file\n");
 				printf("6 .modify Permission\n");
@@ -58,7 +58,6 @@ int main(void)
 
 			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
 
-			//recvbox[readFromsock] = 0;
 			printf("from server :%s \n", recv_msg_from_server);
 			if (client_state == 0)
 			{
@@ -76,16 +75,12 @@ int main(void)
 			}
 			else if (client_state == 1)
 			{
-				if (strcmp(recv_msg_from_server, "group_exist") == 0)
-				{
-					client_state = 1;
-					printf("group_exist \n");
-				}
-				else
-				{
-					client_state = 2;
-					printf("%s\n", recv_msg_from_server);
-				}
+				client_state = 2;
+				printf("%s\n", recv_msg_from_server);
+			}
+			else//client_state = 2;
+			{
+				printf("%s\n", recv_msg_from_server);		
 			}
 			if (flag != 0)
 			{
@@ -94,7 +89,6 @@ int main(void)
 		}
 		else
 		{
-
 			char buf[256];
 			printf("pid > 0 -- client_state :  %d\n", client_state);
 
