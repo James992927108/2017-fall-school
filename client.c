@@ -40,21 +40,21 @@ int main(void)
 			printf("pid = 0 -- client_state : %d\n", client_state);
 			if (client_state == 0)
 			{
-				printf("1 . Type user name(like : name-james)\n");
+				printf("1 . Type user name(like : name james)\n");
 			}
 			else if (client_state == 1)
 			{
-				printf("2 .which group(like : group-AOS-students)\n");
+				printf("2 .which group(like : group AOS-students)\n");
 			}
 			else if (client_state == 2)
 			{
-				printf("3 .create file(like : 3-filename.txt)\n");
+				printf("3 .create file(like : 3 filename rwxrwx---)\n");
 				printf("4 .read file\n");
 				printf("5 .write file\n");
 				printf("6 .modify Permission\n");
 			}
 
-			char recv_msg_from_server[256];
+			char recv_msg_from_server[512];
 
 			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
 
@@ -65,22 +65,22 @@ int main(void)
 				{
 					client_state = 2;
 
-					printf("user_exist \n");
+					printf("0->2user_exist \n");
 				}
 				else
 				{
 					client_state = 1;
-					printf("%s\n", recv_msg_from_server);
+					printf("0->1%s\n", recv_msg_from_server);
 				}
 			}
 			else if (client_state == 1)
 			{
 				client_state = 2;
-				printf("%s\n", recv_msg_from_server);
+				printf("1->2%s\n", recv_msg_from_server);
 			}
 			else//client_state = 2;
 			{
-				printf("%s\n", recv_msg_from_server);		
+				printf("2%s\n", recv_msg_from_server);		
 			}
 			if (flag != 0)
 			{

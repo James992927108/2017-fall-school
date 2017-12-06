@@ -102,6 +102,17 @@ int check_user_isExist(char *user)
 	}
 	return 0;
 }
+int check_file_isExist(char *filename)
+{
+	for (int i = 0; i < 50; i++)
+	{
+		if (strcmp(filename, FileArray[i].file_name) == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 void split(char **arr, char *str, const char *del)
 {
 	char *s = strtok(str, del);
@@ -125,8 +136,13 @@ void *connection_handler(void *sock)
 	while (readSize = read(csock, buf, sizeof(buf)))
 	{
 		printf("from client buf : %s , user id : %d\n", buf, client_id);
-
-		if (strcmp(buf, "quit") == 0)
+		char *arr[3];
+		const char *del = " ";
+		split(arr, buf, del); //切割char放入arr
+		printf("---%s\n", *(arr));
+		printf("---%s\n", *(arr + 1));
+		// printf("---%s\n", *(arr + 2));
+		if (strcmp(*(arr), "quit") == 0)
 		{
 			client_num--;
 
@@ -139,14 +155,12 @@ void *connection_handler(void *sock)
 			break;
 		}
 
-		if (buf[0] == 'n' && buf[1] == 'a' && buf[2] == 'm' && buf[3] == 'e')
+		if (strcmp(*(arr), "name") == 0)
 		{
-			printf("%s\n", buf);
-			printf("%s\n", buf + 5);
 			int checkinformation = check_user_isExist(buf + 5);
 			if (checkinformation == 1)
 			{
-				//傳回給使用者，number即client的id
+				//傳回給使用者
 				char mes_to_client[256];
 				strcpy(mes_to_client, "user_exist");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
@@ -158,7 +172,6 @@ void *connection_handler(void *sock)
 				//從蒂9個開始，9前個內建資料庫
 				int current_client_id = client_id + 9;
 				strcpy(MemberArray[current_client_id].name, buf + 5);
-				printf("%d\n", current_client_id);
 				printf("%s\n", MemberArray[current_client_id].name);
 
 				char mes_to_client[256];
@@ -167,53 +180,82 @@ void *connection_handler(void *sock)
 				printf("%s\n", mes_to_client);
 			}
 		}
-		else if (buf[0] == 'g' && buf[1] == 'r' && buf[2] == 'o' && buf[3] == 'u' && buf[4] == 'p')
+		else if (strcmp(*(arr), "group") == 0)
 		{
-			printf("%s\n", buf);
-			printf("%s\n", buf + 6);
 			//建立使用者
 			//從蒂9個開始，9前個內建資料庫
 			int current_client_id = client_id + 9;
 			strcpy(MemberArray[current_client_id].member_group, buf + 6);
-			printf("%d\n", current_client_id);
 			printf("%s\n", MemberArray[current_client_id].member_group);
+
 			char mes_to_client[256];
 			strcpy(mes_to_client, "create group successful");
 			write(a[client_id], mes_to_client, sizeof(mes_to_client));
 			printf("%s\n", mes_to_client);
 		}
-		else if (buf[0] == '3') //3 .create file
+		else if (strcmp(*(arr), "3") == 0) //3 .create file
 		{
-			printf("%s\n", buf);
-			printf("%s\n", buf + 2);
+			//有可能沒輸入名子就進入3，需要做防呆
 			//檢查是否已經有該資料
-			const char *del = " ";
-			char *arr[50];
-			split(arr, buf, del);
-			int i = 0;
-			while (i < 50)
-				printf("123%s\n", *(arr + i++));
-			// int checkinformation = check_user_isExist(buf + 2);
-			// if (checkinformation == 1)
-			// {
+			int checkinformation = check_file_isExist(*(arr + 1));
+			if (checkinformation == 1) //存在
+			{
+				//傳回給使用者
+				char mes_to_client[256];
+				strcpy(mes_to_client, "file_exist");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+			}
+			else
+			{
 
-			// }
-			// else
-			// {
+				//目前一個使用者先暫定只能建立一個file，尚未做防呆
+				char filename[50];
+				strcpy(filename, *(arr + 1));
+				char access_right[9];
+				strcpy(access_right, *(arr + 2));
 
-			// }
-			File creatFile;
-			strcpy(creatFile.file_name, buf + 2);
+				time_t timep;
+				time(&timep);
 
-			FILE *file;
-			file = fopen(creatFile.file_name, "w");
-			//fprintf(file, "%s", "123");
-			fclose(file);
+				FILE *file;
+				file = fopen(filename, "w"); //建立檔案
+				fclose(file);
 
-			char mes_to_client[256];
-			strcpy(mes_to_client, "create file successful");
-			write(a[client_id], mes_to_client, sizeof(mes_to_client));
-			printf("%s\n", mes_to_client);
+				FileArray[client_id].access_right.own[0] = access_right[0];
+				FileArray[client_id].access_right.own[1] = access_right[1];
+				FileArray[client_id].access_right.own[2] = access_right[2];
+
+				FileArray[client_id].access_right.group[0] = access_right[3];
+				FileArray[client_id].access_right.group[1] = access_right[4];
+				FileArray[client_id].access_right.group[2] = access_right[5];
+
+				FileArray[client_id].access_right.other[0] = access_right[6];
+				FileArray[client_id].access_right.other[1] = access_right[7];
+				FileArray[client_id].access_right.other[2] = access_right[8];
+
+				strcpy(FileArray[client_id].own_name, MemberArray[client_id].name);
+				strcpy(FileArray[client_id].file_group, MemberArray[client_id].member_group);
+
+				strcpy(FileArray[client_id].create_time, asctime(gmtime(&timep)));
+				strcpy(FileArray[client_id].file_name, filename);
+				FileArray[client_id].file_size = 0;
+				//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
+
+				char mes_to_client[512];
+				char file_size_temp[128];
+				strcat(mes_to_client,access_right);
+				strcat(mes_to_client,FileArray[client_id].own_name);
+				strcat(mes_to_client,FileArray[client_id].file_group);
+
+				sprintf(file_size_temp,"%d",FileArray[client_id].file_size);
+				strcat(mes_to_client,file_size_temp);
+
+				strcat(mes_to_client, FileArray[client_id].file_name);
+
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("****%s\n", mes_to_client);
+			}
 		}
 		else if (buf[0] == '4') //4 .read file
 		{
