@@ -122,6 +122,20 @@ void split(char **arr, char *str, const char *del)
 		s = strtok(NULL, del);
 	}
 }
+//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
+typedef struct File
+{
+	Permission access_right;
+	char own_name[50];
+	char file_group[50];
+	int file_size;
+	char create_time[50];
+	char file_name[50];
+} File;
+void sendFormat(File file)
+{
+	printf("sendFormat\n";)
+}
 void *connection_handler(void *sock)
 {
 	char *buffer;
@@ -157,11 +171,11 @@ void *connection_handler(void *sock)
 
 		if (strcmp(*(arr), "name") == 0)
 		{
-			int checkinformation = check_user_isExist(buf + 5);
+			int checkinformation = check_user_isExist(*(arr + 1));
 			if (checkinformation == 1)
 			{
 				//傳回給使用者
-				char mes_to_client[256];
+				char mes_to_client[256] = { 0 };
 				strcpy(mes_to_client, "user_exist");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
@@ -174,7 +188,7 @@ void *connection_handler(void *sock)
 				strcpy(MemberArray[current_client_id].name, buf + 5);
 				printf("%s\n", MemberArray[current_client_id].name);
 
-				char mes_to_client[256];
+				char mes_to_client[256] = { 0 };
 				strcpy(mes_to_client, "create user successful");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
@@ -188,7 +202,7 @@ void *connection_handler(void *sock)
 			strcpy(MemberArray[current_client_id].member_group, buf + 6);
 			printf("%s\n", MemberArray[current_client_id].member_group);
 
-			char mes_to_client[256];
+			char mes_to_client[256] = { 0 };
 			strcpy(mes_to_client, "create group successful");
 			write(a[client_id], mes_to_client, sizeof(mes_to_client));
 			printf("%s\n", mes_to_client);
@@ -242,8 +256,8 @@ void *connection_handler(void *sock)
 				FileArray[client_id].file_size = 0;
 				//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 
-				char mes_to_client[512];
-				char file_size_temp[128];
+				char mes_to_client[512] = { 0 };
+				char file_size_temp[128] = { 0 };
 				strcat(mes_to_client,access_right);
 				strcat(mes_to_client,FileArray[client_id].own_name);
 				strcat(mes_to_client,FileArray[client_id].file_group);
@@ -252,6 +266,8 @@ void *connection_handler(void *sock)
 				strcat(mes_to_client,file_size_temp);
 
 				strcat(mes_to_client, FileArray[client_id].file_name);
+
+				sendFormat( FileArray[client_id] );
 
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("****%s\n", mes_to_client);
