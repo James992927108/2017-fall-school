@@ -6,12 +6,12 @@
 #include <pthread.h>
 int a[100] = {0};
 int client_num = 0;
-typedef struct Permission
-{
-	char own[3];
-	char group[3];
-	char other[3];
-} Permission;
+// typedef struct Permission
+// {
+// 	char own[3];
+// 	char group[3];
+// 	char other[3];
+// } Permission;
 typedef struct Member
 {
 	char member_group[50];
@@ -20,7 +20,7 @@ typedef struct Member
 //-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 typedef struct File
 {
-	Permission access_right;
+	char access_right[9];
 	char own_name[50];
 	char file_group[50];
 	int file_size;
@@ -49,17 +49,17 @@ void initial()
 			FileArray[i].file_name[j] = '\0';
 		}
 		FileArray[i].file_size = 0;
-		FileArray[i].access_right.own[0] = 'r';
-		FileArray[i].access_right.own[1] = 'w';
-		FileArray[i].access_right.own[2] = 'x';
+		FileArray[i].access_right[0] = 'r';
+		FileArray[i].access_right[1] = 'w';
+		FileArray[i].access_right[2] = 'x';
 
-		FileArray[i].access_right.group[0] = 'r';
-		FileArray[i].access_right.group[1] = 'w';
-		FileArray[i].access_right.group[2] = 'x';
+		FileArray[i].access_right[3] = 'r';
+		FileArray[i].access_right[4] = 'w';
+		FileArray[i].access_right[5] = 'x';
 
-		FileArray[i].access_right.other[0] = 'r';
-		FileArray[i].access_right.other[1] = 'w';
-		FileArray[i].access_right.other[2] = 'x';
+		FileArray[i].access_right[6] = 'r';
+		FileArray[i].access_right[7] = 'w';
+		FileArray[i].access_right[8] = 'x';
 	}
 }
 void testData()
@@ -73,15 +73,15 @@ void testData()
 	strcpy(MemberArray[2].member_group, "CSE-students");
 	strcpy(MemberArray[2].name, "antony");
 
-	FileArray[0].access_right.own[0] = 'r';
-	FileArray[0].access_right.own[1] = 'w';
-	FileArray[0].access_right.own[2] = 'x';
-	FileArray[0].access_right.group[0] = 'r';
-	FileArray[0].access_right.group[1] = 'w';
-	FileArray[0].access_right.group[2] = 'x';
-	FileArray[0].access_right.other[0] = 'r';
-	FileArray[0].access_right.other[1] = 'w';
-	FileArray[0].access_right.other[2] = 'x';
+	FileArray[0].access_right[0] = 'r';
+	FileArray[0].access_right[1] = 'w';
+	FileArray[0].access_right[2] = 'x';
+	FileArray[0].access_right[3] = 'r';
+	FileArray[0].access_right[4] = 'w';
+	FileArray[0].access_right[5] = 'x';
+	FileArray[0].access_right[6] = 'r';
+	FileArray[0].access_right[7] = 'w';
+	FileArray[0].access_right[8] = 'x';
 
 	strcpy(FileArray[0].own_name, MemberArray[0].name);
 	strcpy(FileArray[0].file_group, MemberArray[0].member_group);
@@ -123,18 +123,27 @@ void split(char **arr, char *str, const char *del)
 	}
 }
 //-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
-typedef struct File
+void sendFormat(File file, char *mes_to_client)
 {
-	Permission access_right;
-	char own_name[50];
-	char file_group[50];
-	int file_size;
-	char create_time[50];
-	char file_name[50];
-} File;
-void sendFormat(File file)
-{
-	printf("sendFormat\n";)
+	char file_size_temp[128] = {0};
+	char block[1] = {" "};
+	//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
+	//rwx---rwxjack jack nctu 0 0Thu Dec  7 13:21:39 2017 0filename.txt
+	printf("%s\n",file.access_right);
+
+	strcat(mes_to_client, file.access_right);
+	strcat(mes_to_client, block);
+	strcat(mes_to_client, file.own_name);
+	strcat(mes_to_client, block);
+	strcat(mes_to_client, file.file_group);
+	strcat(mes_to_client, block);
+	sprintf(file_size_temp, "%d", file.file_size);
+	strcat(mes_to_client, file_size_temp);
+	strcat(mes_to_client, block);
+	strcat(mes_to_client, file.create_time);
+	strcat(mes_to_client, block);
+	strcat(mes_to_client, file.file_name);
+	printf("sendFormat finish\n");
 }
 void *connection_handler(void *sock)
 {
@@ -175,7 +184,7 @@ void *connection_handler(void *sock)
 			if (checkinformation == 1)
 			{
 				//傳回給使用者
-				char mes_to_client[256] = { 0 };
+				char mes_to_client[256] = {0};
 				strcpy(mes_to_client, "user_exist");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
@@ -188,7 +197,7 @@ void *connection_handler(void *sock)
 				strcpy(MemberArray[current_client_id].name, buf + 5);
 				printf("%s\n", MemberArray[current_client_id].name);
 
-				char mes_to_client[256] = { 0 };
+				char mes_to_client[256] = {0};
 				strcpy(mes_to_client, "create user successful");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
@@ -202,7 +211,7 @@ void *connection_handler(void *sock)
 			strcpy(MemberArray[current_client_id].member_group, buf + 6);
 			printf("%s\n", MemberArray[current_client_id].member_group);
 
-			char mes_to_client[256] = { 0 };
+			char mes_to_client[256] = {0};
 			strcpy(mes_to_client, "create group successful");
 			write(a[client_id], mes_to_client, sizeof(mes_to_client));
 			printf("%s\n", mes_to_client);
@@ -235,40 +244,29 @@ void *connection_handler(void *sock)
 				FILE *file;
 				file = fopen(filename, "w"); //建立檔案
 				fclose(file);
+				int current_client_id = client_id + 9;
 
-				FileArray[client_id].access_right.own[0] = access_right[0];
-				FileArray[client_id].access_right.own[1] = access_right[1];
-				FileArray[client_id].access_right.own[2] = access_right[2];
+				FileArray[current_client_id].access_right[0] = access_right[0];
+				FileArray[current_client_id].access_right[1] = access_right[1];
+				FileArray[current_client_id].access_right[2] = access_right[2];
 
-				FileArray[client_id].access_right.group[0] = access_right[3];
-				FileArray[client_id].access_right.group[1] = access_right[4];
-				FileArray[client_id].access_right.group[2] = access_right[5];
+				FileArray[current_client_id].access_right[3] = access_right[3];
+				FileArray[current_client_id].access_right[4] = access_right[4];
+				FileArray[current_client_id].access_right[5] = access_right[5];
 
-				FileArray[client_id].access_right.other[0] = access_right[6];
-				FileArray[client_id].access_right.other[1] = access_right[7];
-				FileArray[client_id].access_right.other[2] = access_right[8];
+				FileArray[current_client_id].access_right[6] = access_right[6];
+				FileArray[current_client_id].access_right[7] = access_right[7];
+				FileArray[current_client_id].access_right[8] = access_right[8];
 
-				strcpy(FileArray[client_id].own_name, MemberArray[client_id].name);
-				strcpy(FileArray[client_id].file_group, MemberArray[client_id].member_group);
+				strcpy(FileArray[current_client_id].own_name, MemberArray[current_client_id].name);
+				strcpy(FileArray[current_client_id].file_group, MemberArray[current_client_id].member_group);
 
-				strcpy(FileArray[client_id].create_time, asctime(gmtime(&timep)));
-				strcpy(FileArray[client_id].file_name, filename);
-				FileArray[client_id].file_size = 0;
-				//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
+				strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
+				strcpy(FileArray[current_client_id].file_name, filename);
+				FileArray[current_client_id].file_size = 0;
 
-				char mes_to_client[512] = { 0 };
-				char file_size_temp[128] = { 0 };
-				strcat(mes_to_client,access_right);
-				strcat(mes_to_client,FileArray[client_id].own_name);
-				strcat(mes_to_client,FileArray[client_id].file_group);
-
-				sprintf(file_size_temp,"%d",FileArray[client_id].file_size);
-				strcat(mes_to_client,file_size_temp);
-
-				strcat(mes_to_client, FileArray[client_id].file_name);
-
-				sendFormat( FileArray[client_id] );
-
+				char mes_to_client[512] = {0};
+				sendFormat(FileArray[current_client_id], &mes_to_client);
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("****%s\n", mes_to_client);
 			}
