@@ -122,14 +122,13 @@ void split(char **arr, char *str, const char *del)
 		s = strtok(NULL, del);
 	}
 }
-//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 void sendFormat(File file, char *mes_to_client)
 {
 	char file_size_temp[128] = {0};
 	char block[1] = {" "};
 	//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 	//rwx---rwxjack jack nctu 0 0Thu Dec  7 13:21:39 2017 0filename.txt
-	printf("%s\n",file.access_right);
+	printf("4 - %s\n", file.access_right);
 
 	strcat(mes_to_client, file.access_right);
 	strcat(mes_to_client, block);
@@ -233,9 +232,9 @@ void *connection_handler(void *sock)
 			{
 
 				//目前一個使用者先暫定只能建立一個file，尚未做防呆
-				char filename[50];
+				char filename[50] = {0};
 				strcpy(filename, *(arr + 1));
-				char access_right[9];
+				char access_right[9] = {0};
 				strcpy(access_right, *(arr + 2));
 
 				time_t timep;
@@ -245,27 +244,24 @@ void *connection_handler(void *sock)
 				file = fopen(filename, "w"); //建立檔案
 				fclose(file);
 				int current_client_id = client_id + 9;
-
-				FileArray[current_client_id].access_right[0] = access_right[0];
-				FileArray[current_client_id].access_right[1] = access_right[1];
-				FileArray[current_client_id].access_right[2] = access_right[2];
-
-				FileArray[current_client_id].access_right[3] = access_right[3];
-				FileArray[current_client_id].access_right[4] = access_right[4];
-				FileArray[current_client_id].access_right[5] = access_right[5];
-
-				FileArray[current_client_id].access_right[6] = access_right[6];
-				FileArray[current_client_id].access_right[7] = access_right[7];
-				FileArray[current_client_id].access_right[8] = access_right[8];
+				printf("1 - %s\n", access_right);
+				strcpy(FileArray[current_client_id].access_right, access_right);
+				int i = 0;
+				while(access_right[i]!='\0')
+				{
+					FileArray[current_client_id].access_right[i] = access_right[i];
+				}
+				printf("2 - %s\n", FileArray[current_client_id].access_right);
 
 				strcpy(FileArray[current_client_id].own_name, MemberArray[current_client_id].name);
 				strcpy(FileArray[current_client_id].file_group, MemberArray[current_client_id].member_group);
-
 				strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
 				strcpy(FileArray[current_client_id].file_name, filename);
 				FileArray[current_client_id].file_size = 0;
 
 				char mes_to_client[512] = {0};
+				printf("3 - %s\n", FileArray[current_client_id].access_right);
+				
 				sendFormat(FileArray[current_client_id], &mes_to_client);
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("****%s\n", mes_to_client);
