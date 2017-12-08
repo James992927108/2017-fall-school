@@ -6,21 +6,15 @@
 #include <pthread.h>
 int a[100] = {0};
 int client_num = 0;
-// typedef struct Permission
-// {
-// 	char own[3];
-// 	char group[3];
-// 	char other[3];
-// } Permission;
 typedef struct Member
 {
-	char member_group[50];
-	char name[50];
+	char member_group[49];
+	char name[49];
 } Member;
 //-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 typedef struct File
 {
-	char access_right[9];
+	char access_right[10];
 	char own_name[50];
 	char file_group[50];
 	int file_size;
@@ -108,11 +102,36 @@ int check_file_isExist(char *filename)
 	{
 		if (strcmp(filename, FileArray[i].file_name) == 0)
 		{
-			return 1;
+			return 1; //存在
 		}
 	}
 	return 0;
 }
+int get_file_index(char *filename)
+{
+	for (int i = 0; i < 50; i++)
+	{
+		if (strcmp(filename, FileArray[i].file_name) == 0)
+		{
+			return i; //存在
+		}
+	}
+	return 0;
+}
+int check_access_right_islegal(char *access_right)
+{
+	for (int i = 0; i < 9; i++)
+	{
+		printf("###%c\n", access_right[i]);
+		if (access_right[i] != 'r' && access_right[i] != 'w' && access_right[i] != 'x' && access_right[i] != '-')
+		{
+			printf("!!!%c\n", access_right[i]);
+			return 0;
+		}
+	}
+	return 1; //合法
+}
+
 void split(char **arr, char *str, const char *del)
 {
 	char *s = strtok(str, del);
@@ -122,13 +141,13 @@ void split(char **arr, char *str, const char *del)
 		s = strtok(NULL, del);
 	}
 }
+
 void sendFormat(File file, char *mes_to_client)
 {
 	char file_size_temp[128] = {0};
 	char block[1] = {" "};
 	//-rw-r----- Ken ASO 87564 Nov 9 2017 homework2.c
 	//rwx---rwxjack jack nctu 0 0Thu Dec  7 13:21:39 2017 0filename.txt
-	printf("4 - %s\n", file.access_right);
 
 	strcat(mes_to_client, file.access_right);
 	strcat(mes_to_client, block);
@@ -163,17 +182,15 @@ void *connection_handler(void *sock)
 		split(arr, buf, del); //切割char放入arr
 		printf("---%s\n", *(arr));
 		printf("---%s\n", *(arr + 1));
-		// printf("---%s\n", *(arr + 2));
+		printf("---%s\n", *(arr + 2));
 		if (strcmp(*(arr), "quit") == 0)
 		{
 			client_num--;
-
 			for (int i = client_id; i < 100; i++)
 			{
 				a[i] = a[i + 1];
 				a[99] = 0;
 			}
-
 			break;
 		}
 
@@ -230,45 +247,102 @@ void *connection_handler(void *sock)
 			}
 			else
 			{
-
 				//目前一個使用者先暫定只能建立一個file，尚未做防呆
 				char filename[50] = {0};
 				strcpy(filename, *(arr + 1));
-				char access_right[9] = {0};
+				char access_right[10] = {0};
 				strcpy(access_right, *(arr + 2));
-
-				time_t timep;
-				time(&timep);
-
-				FILE *file;
-				file = fopen(filename, "w"); //建立檔案
-				fclose(file);
-				int current_client_id = client_id + 9;
-				printf("1 - %s\n", access_right);
-				strcpy(FileArray[current_client_id].access_right, access_right);
-				int i = 0;
-				while(access_right[i]!='\0')
+				int checkislegal = check_access_right_islegal(*(arr + 2));
+				if (checkislegal == 0) //不合法
 				{
-					FileArray[current_client_id].access_right[i] = access_right[i];
+					char mes_to_client[512] = "not_legal";
+					write(a[client_id], mes_to_client, sizeof(mes_to_client));
+					printf("****%s\n", mes_to_client);
 				}
-				printf("2 - %s\n", FileArray[current_client_id].access_right);
+				else
+				{
+					time_t timep;
+					time(&timep);
+					FILE *file;
+					file = fopen(filename, "w"); //建立檔案
+					fclose(file);
 
-				strcpy(FileArray[current_client_id].own_name, MemberArray[current_client_id].name);
-				strcpy(FileArray[current_client_id].file_group, MemberArray[current_client_id].member_group);
-				strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
-				strcpy(FileArray[current_client_id].file_name, filename);
-				FileArray[current_client_id].file_size = 0;
+					int current_client_id = client_id + 9;
+					strcpy(FileArray[current_client_id].access_right, access_right);
+					strcpy(FileArray[current_client_id].own_name, MemberArray[current_client_id].name);
+					strcpy(FileArray[current_client_id].file_group, MemberArray[current_client_id].member_group);
+					strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
+					strcpy(FileArray[current_client_id].file_name, filename);
+					FileArray[current_client_id].file_size = 0;
 
-				char mes_to_client[512] = {0};
-				printf("3 - %s\n", FileArray[current_client_id].access_right);
-				
-				sendFormat(FileArray[current_client_id], &mes_to_client);
-				write(a[client_id], mes_to_client, sizeof(mes_to_client));
-				printf("****%s\n", mes_to_client);
+					char mes_to_client[512] = {0};
+					sendFormat(FileArray[current_client_id], &mes_to_client);
+					write(a[client_id], mes_to_client, sizeof(mes_to_client));
+					printf("****%s\n", mes_to_client);
+				}
 			}
 		}
 		else if (buf[0] == '4') //4 .read file
 		{
+			//先檢查有無此檔案
+			int checkinformation = check_file_isExist(*(arr + 1));
+			if (checkinformation == 1) //存在
+			{
+				printf("存在\n");
+
+				//取得file的位置
+				int file_index = get_file_index(*(arr + 1));
+				int current_client_id = client_id + 9;
+				//先檢查檔案的使用者，比對目前開啟的使用者，若相同即可以讀取
+				printf("F--%s\n", FileArray[file_index].own_name);
+				printf("C--%s\n", MemberArray[current_client_id].name);
+				if (strcmp(FileArray[file_index].own_name, MemberArray[current_client_id].name) == 0)
+				{
+					char group_access_right[4] = {0};
+					char other_access_right[4] = {0};
+					strncpy(group_access_right, FileArray[file_index].access_right + 3, 3);
+					strncpy(other_access_right, FileArray[file_index].access_right + 6, 3);
+					printf("g--%s\n", group_access_right);
+					printf("o--%s\n", other_access_right);
+					//反之需要判斷目前的使用者權限，如果屬於該file的group則先以group判斷，
+					//否則判斷依據為other
+					if (strcmp(FileArray[file_index].file_group, MemberArray[current_client_id].member_group) == 0)
+					{
+						if (group_access_right[0] == 'r' || group_access_right[0] == 'R')
+						{
+							//可以讀
+						}
+						else
+						{
+						}
+					}
+					else
+					{
+						if (other_access_right[0] == 'r' || other_access_right[0] == 'R')
+						{
+							//可以讀
+						}
+						else
+						{
+						}
+					}
+				}
+				else
+				{
+					printf("不同使用者\n");
+				}
+
+				char mes_to_client[256] = {0};
+				strcpy(mes_to_client, "create user successful");
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+
+				char filename[50] = {0};
+				strcpy(filename, *(arr + 1));
+			}
+			else
+			{
+			}
 		}
 		else if (buf[0] == '5') //5 .write file
 		{
@@ -279,7 +353,6 @@ void *connection_handler(void *sock)
 	}
 	if (readSize == 0)
 	{
-
 		printf("Client %d disconnected\n", client_id);
 		fflush(stdout);
 		client_num--;
@@ -320,11 +393,8 @@ int main(void)
 		printf("ERROR on binding");
 		return 1;
 	}
-
 	listen(sock, 5);
-
 	addressSize = sizeof(client);
-
 	while (1)
 	{
 		csock = accept(sock, (struct sockaddr *)&server, (socklen_t *)&addressSize);

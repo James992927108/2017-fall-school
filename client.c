@@ -57,30 +57,26 @@ int main(void)
 			char recv_msg_from_server[512];
 
 			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
-
 			printf("from server :%s \n", recv_msg_from_server);
+
 			if (client_state == 0)
 			{
 				if (strcmp(recv_msg_from_server, "user_exist") == 0)
 				{
 					client_state = 2;
-
-					printf("0->2user_exist \n");
+					printf("user_exist \n");
 				}
 				else
 				{
 					client_state = 1;
-					printf("0->1%s\n", recv_msg_from_server);
 				}
 			}
 			else if (client_state == 1)
 			{
 				client_state = 2;
-				printf("1->2%s\n", recv_msg_from_server);
 			}
-			else//client_state = 2;
+			else //client_state = 2;
 			{
-				printf("2%s\n", recv_msg_from_server);		
 			}
 			if (flag != 0)
 			{
