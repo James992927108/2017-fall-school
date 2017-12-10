@@ -7,6 +7,15 @@
 #include <string.h>
 #include <arpa/inet.h>
 
+void split(char **arr, char *str, const char *del)
+{
+	char *s = strtok(str, del);
+	while (s != NULL)
+	{
+		*arr++ = s;
+		s = strtok(NULL, del);
+	}
+}
 int main(void)
 {
 	struct sockaddr_in server;
@@ -37,7 +46,7 @@ int main(void)
 		}
 		else if (pid == 0)
 		{
-			printf("pid = 0 -- client_state : %d\n", client_state);
+			//printf("pid = 0 -- client_state : %d\n", client_state);
 			if (client_state == 0)
 			{
 				printf("1 . Type user name(like : name james)\n");
@@ -55,7 +64,6 @@ int main(void)
 			}
 
 			char recv_msg_from_server[512];
-
 			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
 			printf("from server :%s \n", recv_msg_from_server);
 
@@ -77,6 +85,24 @@ int main(void)
 			}
 			else //client_state = 2;
 			{
+				char *arr[3];
+				const char *del = " ";
+				split(arr, recv_msg_from_server, del); //切割char放入arr
+				printf("---%s\n", *(arr));
+				printf("---%s\n", *(arr + 1));
+				printf("---%s\n", *(arr + 2));
+				if (strcmp(*(arr + 1), "can_read") == 0)
+				{
+					FILE *fpInput;
+					char ch;
+					fpInput = fopen(*(arr), "r");
+					while ((ch = fgetc(fpInput)) != EOF)
+					{
+						putchar(ch);
+					}
+					fclose(fpInput);
+					printf("\n");
+				}
 			}
 			if (flag != 0)
 			{
@@ -86,7 +112,6 @@ int main(void)
 		else
 		{
 			char buf[256];
-			printf("pid > 0 -- client_state :  %d\n", client_state);
 
 			if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
 			{

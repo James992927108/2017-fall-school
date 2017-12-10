@@ -282,66 +282,68 @@ void *connection_handler(void *sock)
 				}
 			}
 		}
-		else if (buf[0] == '4') //4 .read file
+		else if (strcmp(*(arr), "4") == 0) //4 .read file
 		{
 			//先檢查有無此檔案
 			int checkinformation = check_file_isExist(*(arr + 1));
 			if (checkinformation == 1) //存在
 			{
-				printf("存在\n");
-
+				printf("file存在\n");
 				//取得file的位置
 				int file_index = get_file_index(*(arr + 1));
 				int current_client_id = client_id + 9;
+
+				char other_access_right[4] = {0};
+				char group_access_right[4] = {0};
+				strncpy(group_access_right, FileArray[file_index].access_right + 3, 3);
+				strncpy(other_access_right, FileArray[file_index].access_right + 6, 3);
+				printf("g--%s\n", group_access_right);
+				printf("o--%s\n", other_access_right);
 				//先檢查檔案的使用者，比對目前開啟的使用者，若相同即可以讀取
 				printf("F--%s\n", FileArray[file_index].own_name);
 				printf("C--%s\n", MemberArray[current_client_id].name);
+				char mes_to_client[256] = {0};
+				strcpy(mes_to_client, *(arr + 1));
+
 				if (strcmp(FileArray[file_index].own_name, MemberArray[current_client_id].name) == 0)
 				{
-					char group_access_right[4] = {0};
-					char other_access_right[4] = {0};
-					strncpy(group_access_right, FileArray[file_index].access_right + 3, 3);
-					strncpy(other_access_right, FileArray[file_index].access_right + 6, 3);
-					printf("g--%s\n", group_access_right);
-					printf("o--%s\n", other_access_right);
-					//反之需要判斷目前的使用者權限，如果屬於該file的group則先以group判斷，
-					//否則判斷依據為other
-					if (strcmp(FileArray[file_index].file_group, MemberArray[current_client_id].member_group) == 0)
+					printf("相同user / 相同group\n");			
+					
+					strcat(mes_to_client, " can_read");
+				} //反之需要判斷目前的使用者權限，如果屬於該file的group則先以group判斷，
+				else if (strcmp(FileArray[file_index].file_group, MemberArray[current_client_id].member_group) == 0)
+				{
+					printf("不同user / 相同group\n");			
+					
+					if (group_access_right[0] == 'r' || group_access_right[0] == 'R')
 					{
-						if (group_access_right[0] == 'r' || group_access_right[0] == 'R')
-						{
-							//可以讀
-						}
-						else
-						{
-						}
+						strcat(mes_to_client, " can_read");
 					}
 					else
 					{
-						if (other_access_right[0] == 'r' || other_access_right[0] == 'R')
-						{
-							//可以讀
-						}
-						else
-						{
-						}
+						strcpy(mes_to_client, " can_not_read");
 					}
 				}
-				else
+				else //否則判斷依據為other
 				{
-					printf("不同使用者\n");
+					printf("不同user / 不同group\n");
+					
+					if (other_access_right[0] == 'r' || other_access_right[0] == 'R')
+					{
+						strcat(mes_to_client, " can_read");
+						//可以讀
+					}
+					else
+					{
+						strcpy(mes_to_client, " can_not_read");
+					}
 				}
-
-				char mes_to_client[256] = {0};
-				strcpy(mes_to_client, "create user successful");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
-
-				char filename[50] = {0};
-				strcpy(filename, *(arr + 1));
 			}
-			else
+			else //檔案不存在
 			{
+				printf("file不存在\n");
 			}
 		}
 		else if (buf[0] == '5') //5 .write file
