@@ -35,7 +35,8 @@ int main(void)
 
 	printf("User< %s >\n", recv_userId_from_server);
 	int client_state = 0;
-	char Member_id[50];
+	char Member_id[50] = {0};
+
 	pid = fork();
 	while (1)
 	{ //listen
@@ -63,7 +64,7 @@ int main(void)
 				printf("6 .modify Permission\n");
 			}
 
-			char recv_msg_from_server[512];
+			char recv_msg_from_server[5120];
 			read(sock, recv_msg_from_server, sizeof(recv_msg_from_server));
 			printf("from server :%s \n", recv_msg_from_server);
 
@@ -88,9 +89,9 @@ int main(void)
 				char *arr[3];
 				const char *del = " ";
 				split(arr, recv_msg_from_server, del); //切割char放入arr
-				printf("---%s\n", *(arr));
-				printf("---%s\n", *(arr + 1));
-				printf("---%s\n", *(arr + 2));
+				printf("---%s\n", *(arr));			   //filename
+				printf("---%s\n", *(arr + 1));		   //can_read / can_write
+				printf("---%s\n", *(arr + 2));		   //o / a
 				if (strcmp(*(arr + 1), "can_read") == 0)
 				{
 					FILE *fpInput;
@@ -103,6 +104,42 @@ int main(void)
 					fclose(fpInput);
 					printf("\n");
 				}
+				if (strcmp(*(arr + 1), "can_write") == 0)
+				{
+					printf("test write\n");
+					FILE *fpOutput;
+					char ch;
+					if (strcmp(*(arr + 2), "o") == 0)
+					{
+						printf("can write o\n");
+
+						fpOutput = fopen(*(arr), "w");
+						char buf[5120];
+
+						if (scanf("%27[^\n]%*c", buf) != EOF)
+						{
+							printf("%s\n",buf);
+							fputs(buf, fpOutput);
+						}
+						printf("finish\n");
+					}
+					else if (strcmp(*(arr + 2), "a") == 0)
+					{
+						printf("can write a\n");
+
+						// fpOutput = fopen(*(arr), "w");
+						// int i = 0;
+						// while (fileInput[i++] != '\0')
+						// {
+						// 	fputc(ch, fpOutput);
+						// }
+					}
+					else
+					{
+					}
+					fclose(fpOutput);
+					printf("close\n");
+				}
 			}
 			if (flag != 0)
 			{
@@ -111,11 +148,12 @@ int main(void)
 		}
 		else
 		{
-			char buf[256];
+			char buf[5120];
 
 			if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
 			{
-				write(sock, buf, sizeof(buf)); //
+
+				write(sock, buf, sizeof(buf));
 			}
 			else
 			{

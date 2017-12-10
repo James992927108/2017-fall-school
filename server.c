@@ -20,6 +20,7 @@ typedef struct File
 	int file_size;
 	char create_time[50];
 	char file_name[50];
+	int is_write; //用於判斷該檔案有無被開啟修改
 } File;
 
 Member MemberArray[50];
@@ -173,7 +174,7 @@ void *connection_handler(void *sock)
 	int client_id = client_num; //the online id
 
 	a[client_id] = csock;
-	char buf[256];
+	char buf[5120];
 	while (readSize = read(csock, buf, sizeof(buf)))
 	{
 		printf("from client buf : %s , user id : %d\n", buf, client_id);
@@ -183,6 +184,7 @@ void *connection_handler(void *sock)
 		printf("---%s\n", *(arr));
 		printf("---%s\n", *(arr + 1));
 		printf("---%s\n", *(arr + 2));
+		printf("---%s\n", *(arr + 3));
 		if (strcmp(*(arr), "quit") == 0)
 		{
 			client_num--;
@@ -240,7 +242,7 @@ void *connection_handler(void *sock)
 			if (checkinformation == 1) //存在
 			{
 				//傳回給使用者
-				char mes_to_client[256];
+				char mes_to_client[5120];
 				strcpy(mes_to_client, "file_exist");
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
@@ -255,7 +257,7 @@ void *connection_handler(void *sock)
 				int checkislegal = check_access_right_islegal(*(arr + 2));
 				if (checkislegal == 0) //不合法
 				{
-					char mes_to_client[512] = "not_legal";
+					char mes_to_client[5120] = "not_legal";
 					write(a[client_id], mes_to_client, sizeof(mes_to_client));
 					printf("****%s\n", mes_to_client);
 				}
@@ -274,11 +276,12 @@ void *connection_handler(void *sock)
 					strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
 					strcpy(FileArray[current_client_id].file_name, filename);
 					FileArray[current_client_id].file_size = 0;
+					FileArray[current_client_id].is_write = 0;
 
-					char mes_to_client[512] = {0};
+					char mes_to_client[5120] = {0};
 					sendFormat(FileArray[current_client_id], &mes_to_client);
 					write(a[client_id], mes_to_client, sizeof(mes_to_client));
-					printf("****%s\n", mes_to_client);
+					printf("%s\n", mes_to_client);
 				}
 			}
 		}
@@ -302,20 +305,20 @@ void *connection_handler(void *sock)
 				//先檢查檔案的使用者，比對目前開啟的使用者，若相同即可以讀取
 				printf("F--%s\n", FileArray[file_index].own_name);
 				printf("C--%s\n", MemberArray[current_client_id].name);
-				char mes_to_client[256] = {0};
+				char mes_to_client[5120] = {0};
 				strcpy(mes_to_client, *(arr + 1));
 
 				if (strcmp(FileArray[file_index].own_name, MemberArray[current_client_id].name) == 0)
 				{
-					printf("相同user / 相同group\n");			
-					
+					printf("相同user / 相同group\n");
+
 					strcat(mes_to_client, " can_read");
 				} //反之需要判斷目前的使用者權限，如果屬於該file的group則先以group判斷，
 				else if (strcmp(FileArray[file_index].file_group, MemberArray[current_client_id].member_group) == 0)
 				{
-					printf("不同user / 相同group\n");			
-					
-					if (group_access_right[0] == 'r' || group_access_right[0] == 'R')
+					printf("不同user / 相同group\n");
+
+					if (group_access_right[0] == 'r')
 					{
 						strcat(mes_to_client, " can_read");
 					}
@@ -327,8 +330,8 @@ void *connection_handler(void *sock)
 				else //否則判斷依據為other
 				{
 					printf("不同user / 不同group\n");
-					
-					if (other_access_right[0] == 'r' || other_access_right[0] == 'R')
+
+					if (other_access_right[0] == 'r')
 					{
 						strcat(mes_to_client, " can_read");
 						//可以讀
@@ -346,10 +349,78 @@ void *connection_handler(void *sock)
 				printf("file不存在\n");
 			}
 		}
-		else if (buf[0] == '5') //5 .write file
+		else if (strcmp(*(arr), "5") == 0) //5 .write file
 		{
+			//先檢查有無此檔案
+			int checkinformation = check_file_isExist(*(arr + 1));
+			if (checkinformation == 1) //存在
+			{
+				printf("file存在\n");
+				//取得file的位置
+				int file_index = get_file_index(*(arr + 1));
+				int current_client_id = client_id + 9;
+
+				char other_access_right[4] = {0};
+				char group_access_right[4] = {0};
+				strncpy(group_access_right, FileArray[file_index].access_right + 3, 3);
+				strncpy(other_access_right, FileArray[file_index].access_right + 6, 3);
+				printf("g--%s\n", group_access_right);
+				printf("o--%s\n", other_access_right);
+				char mes_to_client[5120] = {0};
+				strcpy(mes_to_client, *(arr + 1));
+				//還需另外多判斷是否以經開起該檔案
+				if (FileArray[file_index].is_write == 0) //無人開啟
+				{
+					if (strcmp(FileArray[file_index].own_name, MemberArray[current_client_id].name) == 0)
+					{
+						printf("相同user / 相同group\n");
+						strcat(mes_to_client, " can_write ");
+						FileArray[file_index].is_write = 1;
+					} //反之需要判斷目前的使用者權限，如果屬於該file的group則先以group判斷，
+					else if (strcmp(FileArray[file_index].file_group, MemberArray[current_client_id].member_group) == 0)
+					{
+						printf("不同user / 相同group\n");
+
+						if (group_access_right[1] == 'w')
+						{
+							strcat(mes_to_client, " can_write ");
+							FileArray[file_index].is_write = 1;
+						}
+						else
+						{
+							strcpy(mes_to_client, " can_not_write ");
+						}
+					}
+					else //否則判斷依據為other
+					{
+						printf("不同user / 不同group\n");
+
+						if (other_access_right[1] == 'w')
+						{
+							strcat(mes_to_client, " can_write ");
+							FileArray[file_index].is_write = 1;
+						}
+						else
+						{
+							strcpy(mes_to_client, " can_not_write ");
+						}
+					}
+				}
+				else //有其他人開啟
+				{
+					strcpy(mes_to_client, " can_not_write_file_have_opened_by_other");
+				}
+				strcat(mes_to_client, *(arr + 2));
+				
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+			}
+			else //檔案不存在
+			{
+				printf("file不存在\n");
+			}
 		}
-		else if (buf[0] == '6') //6 .modify Permission
+		else if (strcmp(*(arr), "6") == 0) //6 .modify Permission
 		{
 		}
 	}
