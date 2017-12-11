@@ -72,7 +72,7 @@ int main(void)
 			{
 				if (strcmp(recv_msg_from_server, "user_exist") == 0)
 				{
-					client_state = 2;
+					client_state = 0;
 					printf("user_exist \n");
 				}
 				else
@@ -118,7 +118,6 @@ int main(void)
 
 						if (scanf("%27[^\n]%*c", buf) != EOF)
 						{
-							printf("%s\n", buf);
 							fputs(buf, fpOutput);
 						}
 					}
@@ -131,7 +130,6 @@ int main(void)
 
 						if (scanf("%27[^\n]%*c", buf) != EOF)
 						{
-							printf("%s\n", buf);
 							fputs(buf, fpOutput);
 						}
 					}
@@ -143,7 +141,6 @@ int main(void)
 
 					printf("%s\n", mes_to_server);
 					fclose(fpOutput);
-					printf("close\n");
 				}
 				else
 				{

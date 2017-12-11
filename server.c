@@ -21,6 +21,7 @@ typedef struct File
 	char create_time[50];
 	char file_name[50];
 	int is_write; //用於判斷該檔案有無被開啟修改
+	char history_access_right[10][10];
 } File;
 
 Member MemberArray[50];
@@ -172,7 +173,7 @@ void *connection_handler(void *sock)
 	long addr = 0;
 
 	int client_id = client_num; //the online id
-
+	int history_access_right_index = 0;
 	a[client_id] = csock;
 	char buf[5120];
 	while (readSize = read(csock, buf, sizeof(buf)))
@@ -271,6 +272,8 @@ void *connection_handler(void *sock)
 
 					int current_client_id = client_id + 9;
 					strcpy(FileArray[current_client_id].access_right, access_right);
+					strcpy(FileArray[current_client_id].history_access_right[history_access_right_index++], FileArray[current_client_id].access_right);//將權限加入歷史紀錄
+
 					strcpy(FileArray[current_client_id].own_name, MemberArray[current_client_id].name);
 					strcpy(FileArray[current_client_id].file_group, MemberArray[current_client_id].member_group);
 					strcpy(FileArray[current_client_id].create_time, asctime(gmtime(&timep)));
@@ -428,6 +431,58 @@ void *connection_handler(void *sock)
 		}
 		else if (strcmp(*(arr), "6") == 0) //6 .modify Permission
 		{
+			//先檢查有無此檔案
+			int checkinformation = check_file_isExist(*(arr + 1));
+			if (checkinformation == 1) //存在
+			{
+				printf("file存在\n");
+				//取得file的位置
+				int file_index = get_file_index(*(arr + 1));
+				int current_client_id = client_id + 9;
+
+				char other_access_right[4] = {0};
+				char group_access_right[4] = {0};
+				strncpy(group_access_right, FileArray[file_index].access_right + 3, 3);
+				strncpy(other_access_right, FileArray[file_index].access_right + 6, 3);
+				printf("g--%s\n", group_access_right);
+				printf("o--%s\n", other_access_right);
+				char mes_to_client[5120] = {0};
+				strcpy(mes_to_client, *(arr + 1));
+				//還需另外多判斷是否以經開起該檔案
+				if (FileArray[file_index].is_write == 0) //無人開啟
+				{
+					if (strcmp(FileArray[file_index].own_name, MemberArray[current_client_id].name) == 0)
+					{
+						printf("創建者有權限更改\n");
+						strcat(mes_to_client, " can_modify ");
+						char temp_access_right[10] = {0};
+
+						strcpy(FileArray[file_index].access_right, *(arr + 2)); //將權限寫入
+						strcpy(FileArray[file_index].history_access_right[history_access_right_index++], FileArray[file_index].access_right); //將就的權限寫入history
+						
+					}															
+					else													
+					{
+						printf("非創建者無權限\n");
+						strcat(mes_to_client, " can_not_modify ");
+					}
+				}
+				else //有其他人開啟
+				{
+					strcpy(mes_to_client, " can_not_modify_access_right_file_have_opened_by_other");
+				}
+				for (int i = 0; i < 10; i++)
+				{
+					printf("%s\n", FileArray[file_index].history_access_right[i]);
+				}
+				strcat(mes_to_client, *(arr + 2)); //將從client從入的權限指令回傳
+				write(a[client_id], mes_to_client, sizeof(mes_to_client));
+				printf("%s\n", mes_to_client);
+			}
+			else //檔案不存在
+			{
+				printf("file不存在\n");
+			}
 		}
 	}
 	if (readSize == 0)
