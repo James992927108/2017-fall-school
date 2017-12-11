@@ -89,9 +89,10 @@ int main(void)
 				char *arr[3];
 				const char *del = " ";
 				split(arr, recv_msg_from_server, del); //切割char放入arr
-				printf("---%s\n", *(arr));			   //filename
-				printf("---%s\n", *(arr + 1));		   //can_read / can_write
-				printf("---%s\n", *(arr + 2));		   //o / a
+				// printf("---%s\n", *(arr));			   //filename
+				// printf("---%s\n", *(arr + 1));		   //can_read / can_write
+				// printf("---%s\n", *(arr + 2));		   //o / a
+				printf("1\n");
 				if (strcmp(*(arr + 1), "can_read") == 0)
 				{
 					FILE *fpInput;
@@ -104,9 +105,8 @@ int main(void)
 					fclose(fpInput);
 					printf("\n");
 				}
-				if (strcmp(*(arr + 1), "can_write") == 0)
+				else if (strcmp(*(arr + 1), "can_write") == 0)
 				{
-					printf("test write\n");
 					FILE *fpOutput;
 					char ch;
 					if (strcmp(*(arr + 2), "o") == 0)
@@ -118,27 +118,36 @@ int main(void)
 
 						if (scanf("%27[^\n]%*c", buf) != EOF)
 						{
-							printf("%s\n",buf);
+							printf("%s\n", buf);
 							fputs(buf, fpOutput);
 						}
-						printf("finish\n");
 					}
 					else if (strcmp(*(arr + 2), "a") == 0)
 					{
 						printf("can write a\n");
 
-						// fpOutput = fopen(*(arr), "w");
-						// int i = 0;
-						// while (fileInput[i++] != '\0')
-						// {
-						// 	fputc(ch, fpOutput);
-						// }
+						fpOutput = fopen(*(arr), "a");
+						char buf[5120];
+
+						if (scanf("%27[^\n]%*c", buf) != EOF)
+						{
+							printf("%s\n", buf);
+							fputs(buf, fpOutput);
+						}
 					}
-					else
-					{
-					}
+				
+					char mes_to_server[5120] = {0};
+					strcpy(mes_to_server, "finish_write ");
+					strcat(mes_to_server, *(arr));
+					write(sock, mes_to_server, sizeof(mes_to_server));
+
+					printf("%s\n", mes_to_server);
 					fclose(fpOutput);
 					printf("close\n");
+				}
+				else
+				{
+					printf("other message\n");
 				}
 			}
 			if (flag != 0)
@@ -152,7 +161,6 @@ int main(void)
 
 			if (scanf("%27[^\n]%*c", buf) != EOF && strcmp(buf, "quit") != 0)
 			{
-
 				write(sock, buf, sizeof(buf));
 			}
 			else

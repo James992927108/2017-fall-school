@@ -184,7 +184,7 @@ void *connection_handler(void *sock)
 		printf("---%s\n", *(arr));
 		printf("---%s\n", *(arr + 1));
 		printf("---%s\n", *(arr + 2));
-		printf("---%s\n", *(arr + 3));
+
 		if (strcmp(*(arr), "quit") == 0)
 		{
 			client_num--;
@@ -411,7 +411,7 @@ void *connection_handler(void *sock)
 					strcpy(mes_to_client, " can_not_write_file_have_opened_by_other");
 				}
 				strcat(mes_to_client, *(arr + 2));
-				
+
 				write(a[client_id], mes_to_client, sizeof(mes_to_client));
 				printf("%s\n", mes_to_client);
 			}
@@ -419,6 +419,12 @@ void *connection_handler(void *sock)
 			{
 				printf("file不存在\n");
 			}
+		}
+		else if (strcmp(*(arr), "finish_write") == 0)
+		{
+			int file_index = get_file_index(*(arr + 1));
+			FileArray[file_index].is_write = 0; //完成後其他人可以先改該檔案
+			printf("is_write = 0\n");
 		}
 		else if (strcmp(*(arr), "6") == 0) //6 .modify Permission
 		{
