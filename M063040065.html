@@ -1,124 +1,201 @@
 <html>
-    <head>
-        <meta charset="utf-8"/>
-    </head>
-    
-    <body>
-        <h1 style="color: red;">題目</h1>
-        <p>Voronoi diagram (divide-and-conquer)</p>
-        
-        <h2 style="color: red;">系級</h2>
-        <p>資汛工程學系碩士班一年級</p>
-        
-        <h2 style="color: red;">姓名</h2>
-        <p>鄧子奇</p>
-        
-        <h2 style="color: red;">學號</h2>
-        <p>M063040065</p>
-        
-        <hr/>
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <h1 style="color: red;">題目</h1>
+    <p>Voronoi diagram (divide-and-conquer)</p>
+
+    <h2 style="color: red;">系級</h2>
+    <p>資汛工程學系碩士班一年級</p>
+
+    <h2 style="color: red;">姓名</h2>
+    <p>鄧子奇</p>
+
+    <h2 style="color: red;">學號</h2>
+    <p>M063040065</p>
+
+    <hr/>
+    <div>
+        <h1 style="color: red;">軟體規格</h1>
         <div>
-            <h1 style="color: red;">軟體規格</h1>
-            <div>
-                <h2 style="color: red;">輸入</h2>
-                    <p>以左鍵點擊畫布或依需求格式輸入</p>
-            </div>
-            <div>
-                <h2 style="color: red;">輸出</h2>
-                    <p>直接顯示於畫布上或依格式輸出至文字檔</p>
-            </div>
-            <div>
-                <h2 style="color: red;">介面與功能說明</h2>
-                <img src="img/main_window_info.png" />
-                <ul>
-                    <li>A、畫布：顯示結果、滑鼠點擊輸入的地方。<br/>
-                    <span style="color: red;">未讀入任何檔案且未按下Start、Step By Step 時</span>，可以以<span style="color: red;">滑鼠左鍵</span>點擊畫布輸入資料；<span style="color: red;">按下 Start、Step By Step 後，畫布禁止再輸入並顯示結果</span>。<span style="color: red;">讀檔時無法輸入</span>。
-                    <ul>
-                        <li><span style="color: green">綠色線條</span>：表示左右的Convex Hull。</li>
-                        <li><span style="color: pink">粉紅色</span>：表示左邊的圖形。</li>
-                        <li><span style="color: lightskyblue">天藍色</span>：表示右邊的圖形。</li>
-                        <li><span style="color: darkblue">暗藍色線條</span>：表示HyperPlane的圖形。</li>
-                        <li><span style="color: yellow">黃色線條</span>：表示 Convex Hull 的上下公切線。</li>
-                        <li><span style="color: black">黑色</span>：處理完畢後以黑色顯示結果。</li>
-                    </ul></li><br/>
-                    
-                    <li>B、Start 按鈕：開始執行至所有點皆處理完畢。<br/>
-                    當<span style="color: red;">讀取測試資料檔</span>或<span style="color: red;">畫布上至少有一筆資料</span>時，可以點擊 Start 執行並顯示結果。<br/>
-                    若資料是<span style="color: red;">以讀取測試資料檔的方式輸入</span>時，則顯示結果後按下 Start 可以讀取下一筆測資。若無下一筆測資，則清空畫布。</li><br/>
-                    
-                    <li>C、Clear 按鈕：當資料以<span style="color: red;">滑鼠點擊輸入</span>時，點擊 Clear 清空畫布。<br/>
-                    <span style="color: red;">註：以讀取測試資料檔的方式輸入資料時、請點擊 Start 或 Step By Step 清空畫布或執行下一步</span>。</li><br/>
-                    
-                    <li>D、Step By Step 按鈕：顯示每次Merge前、Merge後的狀況及合併後的 Convex Hull。<br/>
-                    當<span style="color: red;">讀取測試資料檔</span>或<span style="color: red;">畫布上至少有一筆資料</span>時，點擊 Step By Step 可以看到每次 Merge 前後的狀況。<br/>
-                    第一次按下暫停在 Merge 前，第二次暫停在 Merge 後，第三次顯示 Merge 後的 Convex Hull，再按一次則進入下一回合 Merge 前。結束後以黑色線條顯示結果。<br/>
-                    若資料是<span style="color: red;">以讀檔方式輸入</span>，則顯示結果後按下 Step By Step 可以讀取下一筆測資。若無下一筆測資，則清空畫布。</li><br/>
-                    
-                    <li>E、Read File 按鈕：讀取<span style="color: red;">測試資料檔</span>。<br/>
-                    <span style="color: red;">註：以此方式輸入資料時、請點擊 Start 或 Step By Step 清空畫布或執行下一步</span>。</li><br/>
-                    
-                    <li>F、Save As... 按鈕：儲存結果至檔案<br/>
-                    當畫布上的資料以黑色呈現時，代表此測資完成，此時可點擊 Save As... 按鈕儲存結果。</li><br/>
-                    
-                    <li>G、Read result 按鈕：讀取<span style="color: red;">結果檔</span>。<br/>
-                    <span style="color: red;">註：以此方式輸入資料時、請點擊 Clear 清空畫布</span>。</li><br/>
-                    
-                    <li>H、Exit 按鈕：離開程式</li><br/>
-                </ul>
-            </div>
+            <h2 style="color: red;">輸入</h2>
+            <p>以左鍵點擊畫布或依需求格式輸入</p>
         </div>
-        
-        <hr/>
-        
-        <h1 style="color: red;">軟體說明</h1>
-        <p>解壓縮 voronoi-release.zip 後以滑鼠左鍵雙擊 Voronoi.exe 即可使用。</p>
-        
-        <hr/>
-        
-        <h1 style="color: red;">程式設計</h1>
-        <p>大致上都與課本描述的演算法相同，由於需要將輸入的點排序(輸出檔案時)，且點需要關聯到邊(方便演算法的實現)，故需另外寫出存放點的結構。此外，由於演算法大多在線的運算，故需實現可以存放線的資料結構，主要存放方程式與兩個端點，與生成這條線的兩個資料點(方便演算法實現)。主要還是以陣列儲存點和線，並以指標達到點與線相互關聯的效果。<br/>
+        <div>
+            <h2 style="color: red;">輸出</h2>
+            <p>直接顯示於畫布上或依格式輸出至文字檔</p>
+        </div>
+        <div>
+            <h2 style="color: red;">介面與功能說明</h2>
+            <img src="img/main_window_info_1.png" />
+            <p align="center">圖(1)</p>
+            <img src="img/main_window_info_2.png" />
+            <p align="center">圖(2)</p>
+            <img src="img/main_window_info_3.png" />
+            <p align="center">圖(3)</p>
             <ul>
-                <li>分割：找出所有點的X座標，若任兩點X座標相同則只取一個，之後找中位數，若為找到的X座標數量為偶數則取中位數為切割線，奇數則取中位數與中位數的下一個數的平均值(為了正確的將點分開)為切割線，若所有點x軸相同則視為例外(避免四點以上垂直共線的情形)。</li><br/>
-                <li>合併：由於此演算法的Conquer不做任何事，所以直接講合併。
+                <li>A、畫布：顯示結果、滑鼠點擊輸入的地方。
+                    <br/>
+                    <span style="color: red;">未讀入任何檔案且未按下Start、Step By Step 時</span>
+                    ，可以以
+                    <span style="color: red;">滑鼠左鍵</span>
+                    點擊畫布輸入資料；
+                    <span style="color: red;">按下 Start或者Step By Step 後，畫布禁止再點擊</span>
+                    。
+                    <span style="color: red;">若選擇讀檔，則時畫布禁止輸入</span>。
                     <ul>
-                        <li>若只有兩個點則直接合併(只有一條中垂線)</li><br/>
-                        <li>找出上下公切線：以上公切線為例，取左邊Convex Hull的最右邊的點與右邊Convex Hull最左邊的點，接下來從左邊的Convex Hull以逆時鐘方向旋轉判斷是否有在現在所選的兩個點上方的點，若有則替換左邊Convex Hull選擇的點，若無則換右邊的Convex Hull以順時鐘的方向尋找是否有點在上方，找完後在回到左邊找，直到沒有變化為止。可以使用不等式或透過數學向量外積判斷點是否在上方。</li><br/>
-                        <li>HyperPlane：先產生一條現在所選左右兩點所產生的線，之後從左右兩邊到的點所關聯的線找出第一條切到的線，並取產生這條線的令一個點當作下一個選中的點，之後循環直到所選兩點為下公切線左右兩點為止</li><br/>
-                        <li>丟棄不必要的邊：產生HyperPlane時，若線有被中重線切割，則會放入待處理的陣列，並將該HyperPlane紀錄下來，之後以該HyperPlane的斜率判斷線的哪邊需要切掉。</li><br/>
-                        <li>Convex Hull:最後以找到的上下公切線將左右兩邊的Convex Hull合併。</li>
+                        圖(1)
+                        <li>
+                            <span style="color: green">綠色線條</span>：表示左右的Convex Hull。</li>
+                        <li>
+                            <span style="color: blue">藍色線條</span>：表示 Convex Hull 的上下公切線。</li>
+                        圖(2)
+                        <li>
+                            <span style="color: orange">橘色</span>選擇的切線</li>
+                        <li>
+                            <span style="color: purple">紫色</span>左右兩邊圖形的中垂線</li>
+                        <li>
+                            <span style="color: yellow">黃色</span>：表示HyperPlane的圖形。</li>
+                        圖(3)
+                        <li>
+                            <span style="color: yellow">黃色</span>：處理完畢後以黃色顯示結果。</li>
                     </ul>
-                </li><br/>
+                </li>
+                <br/>
+                <li>B、Run 按鈕：開始執行至所有點皆處理完畢。
+                    <br/> 當
+                    <span style="color: red;">讀取測試資料檔</span>或
+                    <span style="color: red;">畫布上至少有一筆資料</span>時，可以點擊 Run 執行並顯示結果。
+                    <br/> 若資料是
+                    <span style="color: red;">以讀取測試資料檔的方式輸入</span>時，則
+                    <span style="color: red;">必須先按Next鍵</span>，讀取每筆測資。
+                    <br/> 若先以Step by Step 執行，可在任一階段執行 Run 功能。
+                </li>
+                <br/>
+                <li>C、Step By Step 按鈕：顯示每次Merge前、Merge後的狀況及合併後的 Convex Hull。
+                    <br/> 當
+                    <span style="color: red;">讀取測試資料檔</span>
+                    或
+                    <span style="color: red;">畫布上至少有一筆資料</span>
+                    時，點擊 Step By Step 可以看到每次 Merge 前後的狀況。
+                    <br/> 第一次按下暫停在找出左右邊的圖形，第二次按下則暫停找出上下切線， 第三次則是找出左有兩圖形Merge的HyperPlane圖形，第四次則是以黃色現在畫布顯示最後圖形。
+                    <br/> 若資料是
+                    <span style="color: red;">以讀檔方式輸入，必須先按下Next按鍵</span>
+                    ，把點先畫於畫布上，才可以按下 Step By Step。
+                </li>
+                <br/>
+                <li>D、Next 按鈕：當資料以
+                    <span style="color: red;">讀檔方式輸入( Open File 按鍵)</span>時，Next 按鈕會以阿拉伯數字 顯示讀入的測資個數。當按鈕顯示為0時，會跳出訊息視窗提醒
+                    <span style="color: red;">已無資料</span>。
+                    <br/>按下確定後，Next 按鈕會消失。
+                </li>
+                <br/>
+                <li>E、Clean 按鈕：可在任一時間點清除畫布上的內容。</li>
+                <br/>
+                <li>F、Open Output File 按鈕：可以 <span style="color: red;">開啟 Output File的檔案格式</span>，並顯示於畫布。
+                <br/><span style="color: red;">(註) : 目前無做防呆判斷，若開啟格式不支援，軟體會崩潰</span>。
+                </li>
+                <br/>
+                <li>G、Open File 按鈕：讀取
+                    <span style="color: red;">測試資料檔</span>。
+                    <br/>
+                    註：以此方式輸入資料時，必須先
+                    <span style="color: red;">按 Next 按鍵</span>
+                    將點顯示於畫布，才可以請點擊 Start 或 Step By Step。
+                    <br/>每筆測資結束後，可再按 Next 顯示下一筆資料。執行過程中，可隨時切換測資。
+                </li>
+                <br/>
+                <li>H、Output File 按鈕：讀取
+                    <br/> 當畫布上的資料只以黃色線呈現時，代表此測資完成，此時可點擊 Output File，將會跳出提醒視窗，顯示
+                    <span style="color: red;">完成輸出txt</span>
+                    ，檔名預設為
+                     <span style="color: red;">OutputFile</span>。
+                     <br/>
+                     <span style="color: red;">(註) : 檔案會複寫，若要存存每筆測資的結果，需另外存檔。</span>
+                     </li>
+                <br/>
             </ul>
-        </p>
+        </div>
+    </div>
+    <hr/>
+    <h1 style="color: red;">軟體說明</h1>
+    <p>解壓縮 voronoi-release.zip 後以滑鼠左鍵雙擊 Voronoi.exe 即可使用。</p>
 
-        <hr/>
-        
-        <h1 style="color: red;">軟體測試與實驗結果</h1>
+    <hr/>
 
-        <h2 style="color: red;">測試環境</h2>
+    <h1 style="color: red;">程式設計</h1>
+    <p>大致上都與課本描述的演算法相同，由於需要將輸入的點排序(輸出檔案時)，且點需要關聯到邊(方便演算法的實現)，故需另外寫出存放點的結構。此外，由於演算法大多在線的運算，故需實現可以存放線的資料結構，主要存放方程式與兩個端點，與生成這條線的兩個資料點(方便演算法實現)。主要還是以陣列儲存點和線，並以指標達到點與線相互關聯的效果。
+        <br/>
         <ul>
-            <li>硬體配備：<ul><li>筆電型號：Lenovo G50-80</li><li>CPU：Intel Core I7-5500U</li><li>記憶體：8G</li></ul></li><br/>
-            <li>作業系統：Ubuntu 14.04</li><br/>
-            <li>編譯器：gcc 4.8.4</li><br/>
+            <li>分割：找出所有點的X座標，若任兩點X座標相同則只取一個，之後找中位數，若為找到的X座標數量為偶數則取中位數為切割線，奇數則取中位數與中位數的下一個數的平均值(為了正確的將點分開)為切割線，若所有點x軸相同則視為例外(避免四點以上垂直共線的情形)。</li>
+            <br/>
+            <li>合併：由於此演算法的Conquer不做任何事，所以直接講合併。
+                <ul>
+                    <li>若只有兩個點則直接合併(只有一條中垂線)</li>
+                    <br/>
+                    <li>找出上下公切線：以上公切線為例，取左邊Convex Hull的最右邊的點與右邊Convex Hull最左邊的點，接下來從左邊的Convex Hull以逆時鐘方向旋轉判斷是否有在現在所選的兩個點上方的點，若有則替換左邊Convex
+                        Hull選擇的點，若無則換右邊的Convex Hull以順時鐘的方向尋找是否有點在上方，找完後在回到左邊找，直到沒有變化為止。可以使用不等式或透過數學向量外積判斷點是否在上方。</li>
+                    <br/>
+                    <li>HyperPlane：先產生一條現在所選左右兩點所產生的線，之後從左右兩邊到的點所關聯的線找出第一條切到的線，並取產生這條線的令一個點當作下一個選中的點，之後循環直到所選兩點為下公切線左右兩點為止</li>
+                    <br/>
+                    <li>丟棄不必要的邊：產生HyperPlane時，若線有被中重線切割，則會放入待處理的陣列，並將該HyperPlane紀錄下來，之後以該HyperPlane的斜率判斷線的哪邊需要切掉。</li>
+                    <br/>
+                    <li>Convex Hull:最後以找到的上下公切線將左右兩邊的Convex Hull合併。</li>
+                </ul>
+            </li>
+            <br/>
         </ul>
-        <h2 style="color: red;">實驗結果</h2>
-        <img src="img/test.png" />
-        <ul>
-            <li>測資數量：542個點</li><br/>
-            <li>一般情況下超過500個點仍可以正常執行，但有機率陷入無窮迴圈，由於出錯時點的數量太多，所以目前還沒找到主要原因。</li>
-        </ul>
+    </p>
 
-        <hr/>
+    <hr/>
 
-        <h1 style="color: red;">結論與心得</h1>
-        <p>這份作業是我寫的第一隻視窗程式，以前從未接觸。本以為Qt跨平台很好用，寫完才發現跨平台很複雜，像這隻程式在windows 8 環境編譯會成功，但要執行時卻沒有任何回應。第一階段三個點的時候，還因為不知道要怎麽決定切掉線的哪邊而差點交不出來；而第二階段主要的難題在把線丟棄，還有如何決定下一個點。主要的缺憾是無法詳細解釋Hyperplane的時間複雜度，但邏輯上可以在O(n)的時間完成。</p>
+    <h1 style="color: red;">軟體測試與實驗結果</h1>
 
-        <hr/>
+    <h2 style="color: red;">測試環境</h2>
+    <ul>
+        <li>硬體配備：
+            <ul>
+                <li>筆電型號：Lenovo G50-80</li>
+                <li>CPU：Intel Core I7-5500U</li>
+                <li>記憶體：8G</li>
+            </ul>
+        </li>
+        <br/>
+        <li>作業系統：Ubuntu 14.04</li>
+        <br/>
+        <li>編譯器：gcc 4.8.4</li>
+        <br/>
+    </ul>
+    <h2 style="color: red;">實驗結果</h2>
+    <img src="img/test.png" />
+    <ul>
+        <li>測資數量：542個點</li>
+        <br/>
+        <li>一般情況下超過500個點仍可以正常執行，但有機率陷入無窮迴圈，由於出錯時點的數量太多，所以目前還沒找到主要原因。</li>
+    </ul>
 
-        <h1 style="color: red;">附錄</h1>
-        <h3><a href="M043040023_合併檔.txt">程式原始碼合併檔</a> <span style="color: red;">註：編碼為utf8</span></h3>
-        <p></p>
-        <h3><a href="test/test.in">測試輸入檔</a></h3>
-        <h3><a href="test/test.save">測試輸出檔</a></h3>
-    </body>
+    <hr/>
+
+    <h1 style="color: red;">結論與心得</h1>
+    <p>這份作業是我寫的第一隻視窗程式，以前從未接觸。本以為Qt跨平台很好用，寫完才發現跨平台很複雜，像這隻程式在windows 8 環境編譯會成功，但要執行時卻沒有任何回應。第一階段三個點的時候，還因為不知道要怎麽決定切掉線的哪邊而差點交不出來；而第二階段主要的難題在把線丟棄，還有如何決定下一個點。主要的缺憾是無法詳細解釋Hyperplane的時間複雜度，但邏輯上可以在O(n)的時間完成。</p>
+
+    <hr/>
+
+    <h1 style="color: red;">附錄</h1>
+    <h3>
+        <a href="M043040023_合併檔.txt">程式原始碼合併檔</a>
+        <span style="color: red;">註：編碼為utf8</span>
+    </h3>
+    <p></p>
+    <h3>
+        <a href="test/test.in">測試輸入檔</a>
+    </h3>
+    <h3>
+        <a href="test/test.save">測試輸出檔</a>
+    </h3>
+</body>
+
 </html>
