@@ -2,6 +2,38 @@
 
 <head>
     <meta charset="utf-8" />
+    <style type="text/css">
+        #years,
+        #months,
+        #posts {
+            cursor: pointer;
+        }
+
+        .archive_year {
+            margin-left: 1em;
+            font-size: large;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .archive_month {
+            margin-left: 1em;
+            margin-top: 0;
+            margin-bottom: 1em;
+            list-style-type: circle;
+            font-size: medium;
+            cursor: pointer;
+        }
+
+        .archive_posts {
+            margin-left: 1em;
+            margin-top: 0;
+            margin-bottom: 1em;
+            list-style: square url('http://www.webbossuk.com/admin/images/reply-arrow.png');
+            font-weight: normal;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -95,14 +127,16 @@
                 <br/>
                 <li>E、Clean 按鈕：可在任一時間點清除畫布上的內容。</li>
                 <br/>
-                <li>F、Open Output File 按鈕：可以 <span style="color: red;">開啟 Output File的檔案格式</span>，並顯示於畫布。
-                <br/><span style="color: red;">(註) : 目前無做防呆判斷，若開啟格式不支援，軟體會崩潰</span>。
+                <li>F、Open Output File 按鈕：可以
+                    <span style="color: red;">開啟 Output File的檔案格式</span>，並顯示於畫布。
+                    <br/>
+                    <span style="color: red;">(註) : 目前無做防呆判斷，若開啟格式不支援，軟體會崩潰</span>。
                 </li>
                 <br/>
                 <li>G、Open File 按鈕：讀取
                     <span style="color: red;">測試資料檔</span>。
-                    <br/>
-                    註：以此方式輸入資料時，必須先
+
+                    <br/> 註：以此方式輸入資料時，必須先
                     <span style="color: red;">按 Next 按鍵</span>
                     將點顯示於畫布，才可以請點擊 Start 或 Step By Step。
                     <br/>每筆測資結束後，可再按 Next 顯示下一筆資料。執行過程中，可隨時切換測資。
@@ -112,10 +146,12 @@
                     <br/> 當畫布上的資料只以黃色線呈現時，代表此測資完成，此時可點擊 Output File，將會跳出提醒視窗，顯示
                     <span style="color: red;">完成輸出txt</span>
                     ，檔名預設為
-                     <span style="color: red;">OutputFile</span>。
-                     <br/>
-                     <span style="color: red;">(註) : 檔案會複寫，若要存存每筆測資的結果，需另外存檔。</span>
-                     </li>
+                    <span style="color: red;">OutputFile</span>。
+                    <br/>
+                    <span style="color: red;">(註) : 檔案會複寫，若要存存每筆測資的結果，需另外存檔。</span>
+                </li>
+                <br/>
+                <li>I、座標顯示欄 :　鼠標在畫布內移動，會將座標值顯示於此。</li>
                 <br/>
             </ul>
         </div>
@@ -123,9 +159,7 @@
     <hr/>
     <h1 style="color: red;">軟體說明</h1>
     <p>解壓縮 voronoi-release.zip 後以滑鼠左鍵雙擊 Voronoi.exe 即可使用。</p>
-
     <hr/>
-
     <h1 style="color: red;">程式設計</h1>
     <p>大致上都與課本描述的演算法相同，由於需要將輸入的點排序(輸出檔案時)，且點需要關聯到邊(方便演算法的實現)，故需另外寫出存放點的結構。此外，由於演算法大多在線的運算，故需實現可以存放線的資料結構，主要存放方程式與兩個端點，與生成這條線的兩個資料點(方便演算法實現)。主要還是以陣列儲存點和線，並以指標達到點與線相互關聯的效果。
         <br/>
@@ -149,37 +183,92 @@
             <br/>
         </ul>
     </p>
-
     <hr/>
-
     <h1 style="color: red;">軟體測試與實驗結果</h1>
-
     <h2 style="color: red;">測試環境</h2>
     <ul>
         <li>硬體配備：
             <ul>
-                <li>筆電型號：Lenovo G50-80</li>
-                <li>CPU：Intel Core I7-5500U</li>
-                <li>記憶體：8G</li>
+                <li>CPU：Intel Core I7-7700</li>
+                <li>記憶體：DDR4 8G</li>
             </ul>
         </li>
         <br/>
-        <li>作業系統：Ubuntu 14.04</li>
+        <li>作業系統 : window 10</li>
         <br/>
-        <li>編譯器：gcc 4.8.4</li>
+        <li>IDE : Visual Stido 2017</li>
+        <br/>
+        <li>開發語言 : C#</li>
         <br/>
     </ul>
     <h2 style="color: red;">實驗結果</h2>
-    <img src="img/test.png" />
-    <ul>
-        <li>測資數量：542個點</li>
-        <br/>
-        <li>一般情況下超過500個點仍可以正常執行，但有機率陷入無窮迴圈，由於出錯時點的數量太多，所以目前還沒找到主要原因。</li>
+    <p>目前程式僅能執行4個點，暫無遞迴思維去鑽寫，因此4點以上Hyperplan無法正確找到最先接近的中垂段的交點，以致結果出錯。</p>
+    <ul class="archive_year">
+        <li class="years">2個點
+            <ul class="archive_month">
+                <li class="months">2-1
+                    <ul class="archive_posts">
+                        <img src="img/2/2.png" />
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li class="years">3個點
+            <ul class="archive_month">
+                <li class="months">3點共線
+                    <ul class="archive_posts">
+                        <img src="img/3/3-1.png" />
+                        <img src="img/3/3-2.png" />
+                        <img src="img/3/3-3.png" />
+                        <img src="img/3/3-4.png" />
+                    </ul>
+                </li>
+                <li class="months">直角三角形
+                    <ul class="archive_posts">
+                        <img src="img/3/3-5.png" />
+                    </ul>
+                </li>
+                <li class="months">銳角三角形
+                    <ul class="archive_posts">
+                        <img src="img/3/3-6.png" />
+                    </ul>
+                </li>
+                <li class="months">鈍角三角形
+                    <ul class="archive_posts">
+                        <img src="img/3/3-7.png" />
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li class="years">4個點
+            <ul class="archive_month">
+                <li class="months">正方形
+                    <ul class="archive_posts">
+                        <img src="img/4/4-1.png" />
+                    </ul>
+                </li>
+                <li class="months">菱形
+                    <ul class="archive_posts">
+                        <img src="img/4/4-2.png" />
+                    </ul>
+                </li>
+                <li class="months">3點包1內點
+                    <ul class="archive_posts">
+                        <img src="img/4/4-3.png" />
+                    </ul>
+                </li>
+                <li class="months">3點共線
+                    <ul class="archive_posts">
+                        <img src="img/4/4-4.png" />
+                        <img src="img/4/4-5.png" />
+                    </ul>
+                </li>
+            </ul>
+        </li>
     </ul>
 
     <hr/>
-
-    <h1 style="color: red;">結論與心得</h1>
+    <h1 style="color: red;" id>結論與心得</h1>
     <p>這份作業是我寫的第一隻視窗程式，以前從未接觸。本以為Qt跨平台很好用，寫完才發現跨平台很複雜，像這隻程式在windows 8 環境編譯會成功，但要執行時卻沒有任何回應。第一階段三個點的時候，還因為不知道要怎麽決定切掉線的哪邊而差點交不出來；而第二階段主要的難題在把線丟棄，還有如何決定下一個點。主要的缺憾是無法詳細解釋Hyperplane的時間複雜度，但邏輯上可以在O(n)的時間完成。</p>
 
     <hr/>
@@ -197,5 +286,12 @@
         <a href="test/test.save">測試輸出檔</a>
     </h3>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript">
+    $('.archive_month ul').hide();
+    $('.months').click(function () {
+        $(this).find('ul').slideToggle();
+    });
+</script>
 
 </html>

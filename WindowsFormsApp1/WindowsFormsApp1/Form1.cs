@@ -448,6 +448,7 @@ namespace WindowsFormsApp1
                 if (step == (int)Form1.step.Eliminate)
                 {
                     this.panel1.Refresh();
+                    DrawNode(NodeNumList[CurrentDataIndex]);//根據點數量，先畫出點
                     EdgeList.Clear();
                     OutputNodeList.Clear();
                     for (int i = 0; i < HP.Count - 1; i++)
