@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="app_name">WTE</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="google_places_api_key">AIzaSyDYjbxZqdwQ_BdkZgYe-VLjGNh5EXVba70</string>//已修改自己得place map api key
+
+    <string name="status_ok">OK</string>
+    <string name="status_zero_results">ZERO_RESULTS</string>
+    <string name="status_over_query_limit">OVER_QUERY_LIMIT</string>
+    <string name="status_request_denied">REQUEST_DENIED</string>
+    <string name="status_invalid_request">INVALID_REQUEST</string>
+</resources>
