@@ -16,7 +16,7 @@
         android:layout_height="match_parent"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="說明"
-        android:id="@+id/textView2" />
+        android:id="@+id/toolbar_textView" />
 
 
 </android.support.v7.widget.Toolbar>

@@ -20,9 +20,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import slidenerd.vivz.gpdemo.log.L;
 
-/**
- * Created by vivz on 25/08/15.
- */
 public abstract class BaseActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {

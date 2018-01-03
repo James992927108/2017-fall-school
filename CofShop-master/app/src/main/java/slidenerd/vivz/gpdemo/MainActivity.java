@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,11 +22,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import slidenerd.vivz.gpdemo.log.L;
+import slidenerd.vivz.gpdemo.model.RestaurantDB;
 import slidenerd.vivz.gpdemo.model.RestaurantShops;
 import slidenerd.vivz.gpdemo.model.Results;
 import slidenerd.vivz.gpdemo.rest.GooglePlacesService;
@@ -39,6 +43,8 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     private RecyclerView mRecyclerRestaurantShops;
     private RestaurantShopsAdapter mAdapter;
 
+    private Realm realm;
+    private TextView toolbar_textView;
     private void loadNearbyRestaurantShops(double latitude, double longitude) {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("https://maps.googleapis.com")
@@ -72,9 +78,17 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        realm = Realm.getDefaultInstance(); // opens "myrealm.realm"
+        toolbar_textView = (TextView)findViewById(R.id.toolbar_textView);
         initMap();
         initActionBar();
         initRecycler();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     private void initActionBar() {
@@ -102,7 +116,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     @Override
     public void onLocationUpdate(LatLng latLng) {
         Log.d("Test", "onLocationUpdate");
-        markMyLocation(latLng);
+        markMyLocation(latLng);// add my location marker
         loadNearbyRestaurantShops(latLng.latitude, latLng.longitude);
     }
     public void markMyLocation(LatLng latLng)
@@ -126,21 +140,22 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         int position = mAdapter.getPosition(marker.getTitle());
         if (position != -1) {
             mRecyclerRestaurantShops.smoothScrollToPosition(position);
+            refresh_DB();
         }
         return false;
     }
    
     public class RestaurantShopsCallback implements Callback<RestaurantShops> {
         @Override
-        public void success(RestaurantShops coffeeShops, Response response) {
-            Log.d("VIVZ", coffeeShops.toString());
-            String status = coffeeShops.getStatus();
+        public void success(RestaurantShops restaurantShops, Response response) {
+            Log.d("VIVZ", restaurantShops.toString());
+            String status = restaurantShops.getStatus();
 
             if (status.equals(getString(R.string.status_ok))) {
-
+                save_to_DB(restaurantShops);// save result to datebase
                 ArrayList<Results> listRestaurantShops = new ArrayList<>(40);
                 //Normal flow of events
-                for (Results current : coffeeShops.getResults()) {
+                for (Results current : restaurantShops.getResults()) {
                     double latitude = Double.valueOf(current.getGeometry().getLocation().getLatitude());
                     double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
@@ -170,5 +185,38 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         public void failure(RetrofitError error) {
             L.s(MainActivity.this, error.toString());
         }
+    }
+    private void save_to_DB(final RestaurantShops restaurantShops)
+    {
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                RestaurantDB shop = bgRealm.createObject(RestaurantDB.class);
+                for (Results current : restaurantShops.getResults()) {
+                    shop.setName(current.getName());
+                }
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                Log.d("Success", "Save to DB Success");
+
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                Log.d("Error", error.getMessage());
+            }
+        });
+    }
+    private void refresh_DB()
+    {
+        RealmResults<RestaurantDB> result = realm.where(RestaurantDB.class).findAllAsync();
+        result.load();
+        String Output ="";
+        for (RestaurantDB shop:result) {
+            Output += shop.toString();
+        }
+        toolbar_textView.setText(Output);
     }
 }

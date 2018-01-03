@@ -130,9 +130,12 @@
     <orderEntry type="library" name="com.google.android.gms:play-services-gcm-7.5.0" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-games-7.5.0" level="project" />
     <orderEntry type="library" name="com.android.support:recyclerview-v7-23.0.0" level="project" />
+    <orderEntry type="library" name="io.realm:realm-annotations:4.3.1@jar" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.3.1@jar" level="project" />
     <orderEntry type="library" name="com.android.support:support-annotations:23.0.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-wallet-7.5.0" level="project" />
+    <orderEntry type="library" name="com.google.code.findbugs:jsr305:3.0.2@jar" level="project" />
+    <orderEntry type="library" name="io.realm:realm-android-library-4.3.1" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-identity-7.5.0" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-7.5.0" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-panorama-7.5.0" level="project" />
@@ -143,6 +146,7 @@
     <orderEntry type="library" name="com.google.android.gms:play-services-appstate-7.5.0" level="project" />
     <orderEntry type="library" name="com.squareup.retrofit:retrofit:1.9.0@jar" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-base-7.5.0" level="project" />
+    <orderEntry type="library" name="com.getkeepsafe.relinker:relinker-1.2.2" level="project" />
     <orderEntry type="library" name="com.android.support:support-v4-23.0.0" level="project" />
   </component>
 </module>

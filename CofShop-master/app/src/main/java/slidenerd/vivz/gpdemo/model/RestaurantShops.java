@@ -2,6 +2,8 @@ package slidenerd.vivz.gpdemo.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import io.realm.RealmObject;
+
 public class RestaurantShops {
     @SerializedName("next_page_token")
     private String nextPageToken;
