@@ -1,6 +1,8 @@
 package slidenerd.vivz.gpdemo;
 
+import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,6 +144,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         if (position != -1) {
             mRecyclerRestaurantShops.smoothScrollToPosition(position);
             refresh_DB();
+            export_DB();
         }
         return false;
     }
@@ -152,10 +156,10 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
             String status = restaurantShops.getStatus();
 
             if (status.equals(getString(R.string.status_ok))) {
-                save_to_DB(restaurantShops);// save result to datebase
                 ArrayList<Results> listRestaurantShops = new ArrayList<>(40);
                 //Normal flow of events
                 for (Results current : restaurantShops.getResults()) {
+                    save_to_DB(current.getName());// save result to datebase
                     double latitude = Double.valueOf(current.getGeometry().getLocation().getLatitude());
                     double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
@@ -186,37 +190,73 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
             L.s(MainActivity.this, error.toString());
         }
     }
-    private void save_to_DB(final RestaurantShops restaurantShops)
+    private void save_to_DB(final String restaurantShops)
     {
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgRealm) {
-                RestaurantDB shop = bgRealm.createObject(RestaurantDB.class);
-                for (Results current : restaurantShops.getResults()) {
-                    shop.setName(current.getName());
-                }
-            }
-        }, new Realm.Transaction.OnSuccess() {
-            @Override
-            public void onSuccess() {
-                Log.d("Success", "Save to DB Success");
+        RestaurantDB shop = new RestaurantDB();
+        shop.setName(restaurantShops);
 
-            }
-        }, new Realm.Transaction.OnError() {
-            @Override
-            public void onError(Throwable error) {
-                Log.d("Error", error.getMessage());
-            }
-        });
+        realm.beginTransaction();
+        RestaurantDB realmUser = realm.copyToRealmOrUpdate(shop);
+        realm.commitTransaction();
+
+//        realm.executeTransactionAsync(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm bgRealm) {
+//                RestaurantDB shop = bgRealm.createObject(RestaurantDB.class);
+//                shop.setName(restaurantShops);
+//            }
+//        }, new Realm.Transaction.OnSuccess() {
+//            @Override
+//            public void onSuccess() {
+//                Log.d("Success", "Save to DB Success");
+//            }
+//        }, new Realm.Transaction.OnError() {
+//            @Override
+//            public void onError(Throwable error) {
+//                Log.d("Error", error.getMessage());
+//            }
+//        });
+    }
+    private void ForTestDBinsert()
+    {
+        RestaurantDB shop = new RestaurantDB();
+        shop.setName("");
+// Copy the object to Realm. Any further changes must happen on realmUser
+        realm.beginTransaction();
+        RestaurantDB realmUser = realm.copyToRealm(shop);
+        realm.commitTransaction();
     }
     private void refresh_DB()
     {
         RealmResults<RestaurantDB> result = realm.where(RestaurantDB.class).findAllAsync();
         result.load();
-        String Output ="";
-        for (RestaurantDB shop:result) {
-            Output += shop.toString();
-        }
-        toolbar_textView.setText(Output);
+//        String Output ="";
+//        for (RestaurantDB shop:result) {
+//            Output += shop.toString();
+//        }
+//        toolbar_textView.setText(Output);
+    }
+    public void export_DB() {
+        // init realm
+        Realm realm = Realm.getDefaultInstance();
+        File exportRealmFile = null;
+        // get or create an "export.realm" file
+        exportRealmFile = new File(this.getExternalCacheDir(), "export.realm");
+        // if "export.realm" already exists, delete
+        exportRealmFile.delete();
+        // copy current realm to "export.realm"
+        realm.writeCopyTo(exportRealmFile);
+        realm.close();
+        // init email intent and add export.realm as attachment
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("plain/text");
+        intent.putExtra(Intent.EXTRA_EMAIL, "james992927108@gmail.com");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "TestTest");
+        intent.putExtra(Intent.EXTRA_TEXT, "realm test");
+        Uri u = Uri.fromFile(exportRealmFile);
+        intent.putExtra(Intent.EXTRA_STREAM, u);
+
+        // start email intent
+        startActivity(Intent.createChooser(intent, "123"));
     }
 }
