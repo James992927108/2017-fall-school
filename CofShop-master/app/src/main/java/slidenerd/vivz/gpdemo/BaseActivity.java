@@ -123,7 +123,6 @@ public abstract class BaseActivity extends AppCompatActivity implements GoogleAp
         }
     }
     // The rest of this code is all about building the error dialog
-
     /* Creates a dialog for an error message */
     protected void showErrorDialog(int errorCode) {
         // Create a fragment for the error dialog
