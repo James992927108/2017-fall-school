@@ -7,6 +7,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,8 +43,6 @@ import slidenerd.vivz.gpdemo.model.Rows;
 import slidenerd.vivz.gpdemo.rest.GoogleDistanceMatrixService;
 import slidenerd.vivz.gpdemo.rest.GooglePlacesService;
 
-//-19.057045,72.905668
-
 public class MainActivity extends BaseActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
@@ -52,7 +52,9 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
 
     private LatLng CurrentPosition;
     private Realm realm;
+
     private TextView toolbar_textView;
+    private Button toolbar_button;
 
     private void loadNearbyRestaurantShops(LatLng OriginPosition) {
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -103,7 +105,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         return map;
     }
 
-
     private String getCsvLatLng(double latitude, double longitude) {
         return latitude + "," + longitude;
     }
@@ -113,6 +114,15 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
         toolbar_textView = (TextView)findViewById(R.id.toolbar_textView);
+
+        toolbar_button = (Button) findViewById(R.id.bt_debug);
+        toolbar_button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh_DB();
+                export_DB();
+            }
+        });
         initMap();
         initActionBar();
         initRecycler();
@@ -160,6 +170,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 .position(new LatLng(OriginPosition.latitude, OriginPosition.longitude))
                 .title("Current Position")
         );
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CurrentPosition,15.0f));
     }
     public void checkArrivalDestination(LatLng OriginPosition)
     {//22.6239637,120.270525
@@ -192,7 +203,8 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         Log.d("Test", "onMapReady");
         mMap = googleMap;
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 20.0F));
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 20.0F));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 20.0f));
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -204,8 +216,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         if (positionIndex != -1) {
             mRecyclerRestaurantShops.smoothScrollToPosition(positionIndex);
             loadWalkTime(OriginPosition,DestinationPosition);
-//            refresh_DB();
-//            export_DB();
         }
         return false;
     }
@@ -221,7 +231,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                     double latitude = Double.valueOf(current.getGeometry().getLocation().getLatitude());
                     double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
-
                     save_to_DB(current.getName(),position);// save result to DB
 
                     MarkerOptions markerOptions = new MarkerOptions();
@@ -229,7 +238,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                             .title(current.getName())
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_coficon));//加入圖標
                     mMap.addMarker(markerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     listRestaurantShops.add(current);
                 }
                 mAdapter.setDataSource(listRestaurantShops);
@@ -265,7 +273,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                         toolbar_textView.setText(item.getDuration().getText());
                     }
                 }
-
             } else if (status.equals(getString(R.string.status_over_query_limit))) {
                 //Do actions to indicate the developer that the tier for this application must be increased
             } else if (status.equals(getString(R.string.status_request_denied))) {
