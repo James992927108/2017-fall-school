@@ -11,9 +11,9 @@ import io.realm.annotations.PrimaryKey;
 public class RestaurantDB extends RealmObject {
     @PrimaryKey
     private String Name;
-
     private double latitude;
     private double longitude;
+    private double rating;
     private int VisitCount;
 
     @Override
@@ -22,6 +22,7 @@ public class RestaurantDB extends RealmObject {
                 "Name='" + Name + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
+                ", rating=" + rating +
                 ", VisitCount=" + VisitCount +
                 '}';
     }
@@ -48,6 +49,14 @@ public class RestaurantDB extends RealmObject {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
     }
 
     public int getVisitCount() {

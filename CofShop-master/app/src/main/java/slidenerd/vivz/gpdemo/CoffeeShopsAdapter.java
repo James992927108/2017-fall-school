@@ -12,6 +12,8 @@ import android.widget.FrameLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 
 import slidenerd.vivz.gpdemo.log.L;
@@ -23,7 +25,6 @@ class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter
     private Typeface mRalewayBlack;
     private Typeface mRalewayRegular;
     private Point displaySize;
-
 
     public RestaurantShopsAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -68,13 +69,26 @@ class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter
         yourRecyclerViewHolder.setRating(rating);
     }
 
-    public int getPosition(String title) {
+    public int getPositionIndex(String title) {
         int position = -1;
         for (int i = 0; i < list.size(); i++) {
             Results current = list.get(i);
             String currentTitle = current.getName();
             if (currentTitle.equalsIgnoreCase(title)) {
                 position = i;
+            }
+        }
+        return position;
+    }
+    public LatLng getPosition(String title) {
+        LatLng position = new LatLng(0,0);
+        for (int i = 0; i < list.size(); i++) {
+            Results current = list.get(i);
+            String currentTitle = current.getName();
+            if (currentTitle.equalsIgnoreCase(title)) {
+                double latitude = Double.valueOf(current.getGeometry().getLocation().getLatitude());
+                double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
+                position = new LatLng(latitude, longitude);
             }
         }
         return position;

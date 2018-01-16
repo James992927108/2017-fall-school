@@ -4,15 +4,15 @@ import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
 
-public class RestaurantShops {
-    @SerializedName("next_page_token")
-    private String nextPageToken;
+public class ReturnPlaceAPI {
+    @SerializedName("html_attributions")
+    private String[] htmlAttributions;
 
     @SerializedName("results")
     private Results[] results;
 
-    @SerializedName("html_attributions")
-    private String[] htmlAttributions;
+    @SerializedName("next_page_token")
+    private String nextPageToken;
 
     @SerializedName("status")
     private String status;
@@ -51,6 +51,6 @@ public class RestaurantShops {
 
     @Override
     public String toString() {
-        return "RestaurantShops [nextPageToken = " + nextPageToken + ", results = " + results.toString() + ", htmlAttributions = " + htmlAttributions + ", status = " + status + "]";
+        return "ReturnPlaceAPI [nextPageToken = " + nextPageToken + ", results = " + results.toString() + ", htmlAttributions = " + htmlAttributions + ", status = " + status + "]";
     }
 }
