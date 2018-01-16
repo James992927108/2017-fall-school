@@ -7,6 +7,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +54,9 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
 
     private LatLng CurrentPosition;
     private Realm realm;
+
     private TextView toolbar_textView;
+    private Button toolbar_button;
 
     private void loadNearbyRestaurantShops(LatLng OriginPosition) {
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -67,10 +71,11 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         GooglePlacesService service = restAdapter.create(GooglePlacesService.class);
         service.getCafes(getHashMapWithQueryParametersInPlaceService(OriginPosition), new RestaurantShopsCallback());
     }
+
     private Map<String, String> getHashMapWithQueryParametersInPlaceService(LatLng OriginPosition) {
         Map<String, String> map = new HashMap<>(5);
         //map.put("sensor", true + "");
-        map.put("language","zh-TW");
+        map.put("language", "zh-TW");
         map.put("type", "restaurant");
         map.put("radius", "500");
         //map.put("rankby","distance");
@@ -79,7 +84,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         return map;
     }
 
-    private void loadWalkTime(LatLng OriginPosition , LatLng DestinationPosition) {
+    private void loadWalkTime(LatLng OriginPosition, LatLng DestinationPosition) {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint("https://maps.googleapis.com")
                 .setLogLevel(RestAdapter.LogLevel.BASIC)
@@ -90,15 +95,15 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                     }
                 }).build();
         GoogleDistanceMatrixService service = restAdapter.create(GoogleDistanceMatrixService.class);
-        service.getWalkTime(getHashMapWithQueryParametersInDistanceMatrixService(OriginPosition,DestinationPosition), new WalkTimeCallback());
+        service.getWalkTime(getHashMapWithQueryParametersInDistanceMatrixService(OriginPosition, DestinationPosition), new WalkTimeCallback());
     }
 
-    private Map<String, String> getHashMapWithQueryParametersInDistanceMatrixService(LatLng OriginPosition,LatLng DestinationPosition) {
+    private Map<String, String> getHashMapWithQueryParametersInDistanceMatrixService(LatLng OriginPosition, LatLng DestinationPosition) {
         Map<String, String> map = new HashMap<>(5);
         map.put("origins", getCsvLatLng(OriginPosition.latitude, OriginPosition.longitude));
         map.put("destinations", getCsvLatLng(DestinationPosition.latitude, DestinationPosition.longitude));
-        map.put("mode ","walking ");
-        map.put("language","zh-TW");
+        map.put("mode ", "walking ");
+        map.put("language", "zh-TW");
         map.put("key", getString(R.string.google_distance_matrix_api_key));
         return map;
     }
@@ -112,7 +117,17 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realm = Realm.getDefaultInstance();
-        toolbar_textView = (TextView)findViewById(R.id.toolbar_textView);
+        toolbar_textView = (TextView) findViewById(R.id.toolbar_textView);
+
+        toolbar_button = (Button) findViewById(R.id.bt_debug);
+        toolbar_button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh_DB();
+                export_DB();
+            }
+        });
+
         initMap();
         initActionBar();
         initRecycler();
@@ -154,37 +169,31 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         loadNearbyRestaurantShops(OriginPosition);
         checkArrivalDestination(OriginPosition);
     }
-    public void markMyLocation(LatLng OriginPosition)
-    {
+
+    public void markMyLocation(LatLng OriginPosition) {
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(OriginPosition.latitude, OriginPosition.longitude))
                 .title("Current Position")
         );
     }
-    public void checkArrivalDestination(LatLng OriginPosition)
-    {//22.6239637,120.270525
+
+    public void checkArrivalDestination(LatLng OriginPosition) {//22.6239637,120.270525
         final LatLng LatLngDecimalFormat = DecimalFormat(OriginPosition);
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 RestaurantDB result = realm.where(RestaurantDB.class)
-                        .equalTo("latitude",LatLngDecimalFormat.latitude)
+                        .equalTo("latitude", LatLngDecimalFormat.latitude)
                         .and()
-                        .equalTo("longitude",LatLngDecimalFormat.longitude)
+                        .equalTo("longitude", LatLngDecimalFormat.longitude)
                         .findFirst();
-                if(result != null)
-                {
+                if (result != null) {
                     int lastVisitCount = result.getVisitCount();
                     lastVisitCount += 1;
                     result.setVisitCount(lastVisitCount);
                 }
             }
         });
-//        RestaurantDB result1 = realm.where(RestaurantDB.class)
-//                .equalTo("latitude",22.624)
-//                .and()
-//                .equalTo("longitude",120.2705)
-//                .findFirst();
     }
 
     @Override
@@ -200,15 +209,14 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     public boolean onMarkerClick(Marker marker) {
         int positionIndex = mAdapter.getPositionIndex(marker.getTitle());
         LatLng DestinationPosition = mAdapter.getPosition(marker.getTitle());
-        LatLng OriginPosition = CurrentPosition ;
+        LatLng OriginPosition = CurrentPosition;
         if (positionIndex != -1) {
             mRecyclerRestaurantShops.smoothScrollToPosition(positionIndex);
-            loadWalkTime(OriginPosition,DestinationPosition);
-//            refresh_DB();
-//            export_DB();
+            loadWalkTime(OriginPosition, DestinationPosition);
         }
         return false;
     }
+
     public class RestaurantShopsCallback implements Callback<ReturnPlaceAPI> {
         @Override
         public void success(ReturnPlaceAPI returnPlaceAPI, Response response) {
@@ -222,7 +230,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                     double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
 
-                    save_to_DB(current.getName(),position);// save result to DB
+                    save_to_DB(current.getName(), position);// save result to DB
 
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position)
@@ -244,6 +252,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 L.s(MainActivity.this, "Are you stranded on an island? Because we didnt find any coffee shops near you");
             }
         }
+
         @Override
         public void failure(RetrofitError error) {
             L.s(MainActivity.this, error.toString());
@@ -257,15 +266,12 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
             String status = returnDistanceMatrixAPI.getStatus();
             if (status.equals(getString(R.string.status_ok))) {
                 //設定 Text
-                for(Rows current : returnDistanceMatrixAPI.getRows())
-                {
-                    for(Elements item: current.getElements())
-                    {
-                        Log.d("returnDistanceMatrixAPI",item.getDuration().getText());
-                        toolbar_textView.setText(item.getDuration().getText());
+                for (Rows current : returnDistanceMatrixAPI.getRows()) {
+                    for (Elements item : current.getElements()) {
+                        Log.d("returnDistanceMatrixAPI", item.getDuration().getText());
+                        toolbar_textView.setText("步行時間 :" + item.getDuration().getText());
                     }
                 }
-
             } else if (status.equals(getString(R.string.status_over_query_limit))) {
                 //Do actions to indicate the developer that the tier for this application must be increased
             } else if (status.equals(getString(R.string.status_request_denied))) {
@@ -277,15 +283,14 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 L.s(MainActivity.this, "Are you stranded on an island? Because we didnt find any coffee shops near you");
             }
         }
+
         @Override
         public void failure(RetrofitError error) {
-            Log.d("WalkTimeCallbackERROR",  error.toString());
             L.s(MainActivity.this, error.toString());
         }
     }
 
-    private void save_to_DB(final String name,LatLng position)
-    {
+    private void save_to_DB(final String name, LatLng position) {
         LatLng LatLngDecimalFormat = DecimalFormat(position);
         RestaurantDB shop = new RestaurantDB();
         shop.setName(name);
@@ -295,19 +300,18 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         RestaurantDB realmUser = realm.copyToRealmOrUpdate(shop);//only update the date which not in DB
         realm.commitTransaction();
     }
-    private LatLng DecimalFormat(LatLng position)
-    {
+
+    private LatLng DecimalFormat(LatLng position) {
         double Latitude = position.latitude;
         double Longitude = position.longitude;
         DecimalFormat df = new DecimalFormat("##.0000");
         Latitude = Double.parseDouble(df.format(Latitude));
         Longitude = Double.parseDouble(df.format(Longitude));
-        LatLng LatLngDecimalFormat = new LatLng(Latitude,Longitude);
+        LatLng LatLngDecimalFormat = new LatLng(Latitude, Longitude);
         return LatLngDecimalFormat;
     }
 
-    private void refresh_DB()
-    {
+    private void refresh_DB() {
         RealmResults<RestaurantDB> result = realm.where(RestaurantDB.class).findAllAsync();
         result.load();
     }
