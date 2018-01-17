@@ -55,7 +55,6 @@ class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter
         yourRecyclerViewHolder.setVicinity(current.getVicinity());
 //        String ratingString = current.getRating();
 //        float rating = 0;
-//
 //        String message = "because rating is not available at " + i;
 //        if (ratingString != null && !ratingString.trim().isEmpty()) {
 //            try {
@@ -66,7 +65,7 @@ class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter
 //        } else {
 //            L.m(message);
 //        }
-        yourRecyclerViewHolder.setRating((float)current.getRating());
+        yourRecyclerViewHolder.setRating((float) current.getRating());
     }
 
     public int getPositionIndex(String title) {

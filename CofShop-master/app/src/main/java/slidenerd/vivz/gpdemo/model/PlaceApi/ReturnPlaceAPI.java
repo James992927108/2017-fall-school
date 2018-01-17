@@ -2,6 +2,8 @@ package slidenerd.vivz.gpdemo.model.PlaceApi;
 
 import com.google.gson.annotations.SerializedName;
 
+import slidenerd.vivz.gpdemo.model.PlaceApi.Results;
+
 public class ReturnPlaceAPI {
     @SerializedName("html_attributions")
     private String[] htmlAttributions;

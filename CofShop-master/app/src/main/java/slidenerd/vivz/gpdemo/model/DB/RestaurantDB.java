@@ -18,6 +18,17 @@ public class RestaurantDB extends RealmObject {
     private int VisitCount;
     private int UpdateCount;
 
+    public RestaurantDB() {
+    }
+    public RestaurantDB(String name, double latitude, double longitude, double rating, int visitCount, int updateCount) {
+        Name = name;
+        Latitude = latitude;
+        Longitude = longitude;
+        Rating = rating;
+        VisitCount = visitCount;
+        UpdateCount = updateCount;
+    }
+
     @Override
     public String toString() {
         return "RestaurantDB{" +
@@ -28,17 +39,6 @@ public class RestaurantDB extends RealmObject {
                 ", VisitCount=" + VisitCount +
                 ", UpdateCount=" + UpdateCount +
                 '}';
-    }
-
-
-
-    public RestaurantDB(String name, double latitude, double longitude, double rating, int visitCount, int updateCount) {
-        Name = name;
-        Latitude = latitude;
-        Longitude = longitude;
-        Rating = rating;
-        VisitCount = visitCount;
-        UpdateCount = updateCount;
     }
 
     public String getName() {
@@ -88,10 +88,4 @@ public class RestaurantDB extends RealmObject {
     public void setUpdateCount(int updateCount) {
         UpdateCount = updateCount;
     }
-
-
-
-    public RestaurantDB() {
-    }
-
 }

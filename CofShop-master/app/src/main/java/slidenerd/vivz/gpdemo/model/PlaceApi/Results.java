@@ -4,12 +4,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
 
-import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.Geometry;
-import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.OpeningHours;
-import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.Photos;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultsModel.Geometry;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultsModel.OpeningHours;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultsModel.Photos;
 
 public class Results {
-
     @SerializedName("icon")
     private String icon;
 
@@ -47,25 +46,6 @@ public class Results {
     private double rating;
 
     private String[] types;
-
-    @Override
-    public String toString() {
-        return "Results{" +
-                "icon='" + icon + '\'' +
-                ", placeId='" + placeId + '\'' +
-                ", scope='" + scope + '\'' +
-                ", reference='" + reference + '\'' +
-                ", geometry=" + geometry +
-                ", openingHours=" + openingHours +
-                ", id='" + id + '\'' +
-                ", photos=" + Arrays.toString(photos) +
-                ", priceLevel='" + priceLevel + '\'' +
-                ", vicinity='" + vicinity + '\'' +
-                ", name='" + name + '\'' +
-                ", rating=" + rating +
-                ", types=" + Arrays.toString(types) +
-                '}';
-    }
 
     public String getIcon() {
         return icon;
@@ -170,4 +150,24 @@ public class Results {
     public void setTypes(String[] types) {
         this.types = types;
     }
+
+    @Override
+    public String toString() {
+        return "Results{" +
+                "icon='" + icon + '\'' +
+                ", placeId='" + placeId + '\'' +
+                ", scope='" + scope + '\'' +
+                ", reference='" + reference + '\'' +
+                ", geometry=" + geometry +
+                ", openingHours=" + openingHours +
+                ", id='" + id + '\'' +
+                ", photos=" + Arrays.toString(photos) +
+                ", priceLevel='" + priceLevel + '\'' +
+                ", vicinity='" + vicinity + '\'' +
+                ", name='" + name + '\'' +
+                ", rating=" + rating +
+                ", types=" + Arrays.toString(types) +
+                '}';
+    }
+
 }
