@@ -1,8 +1,6 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.PlaceApi;
 
 import com.google.gson.annotations.SerializedName;
-
-import io.realm.RealmObject;
 
 public class ReturnPlaceAPI {
     @SerializedName("html_attributions")

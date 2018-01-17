@@ -1,8 +1,10 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.DistanceMatrixApi;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
+
+import slidenerd.vivz.gpdemo.model.DistanceMatrixApi.RowsModel.Elements;
 
 /**
  * Created by Antony Teng on 2018/1/16.

@@ -1,4 +1,4 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.DistanceMatrixApi;
 
 import com.google.gson.annotations.SerializedName;
 

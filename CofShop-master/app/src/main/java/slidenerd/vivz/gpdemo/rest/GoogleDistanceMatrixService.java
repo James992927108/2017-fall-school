@@ -5,7 +5,7 @@ import java.util.Map;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
-import slidenerd.vivz.gpdemo.model.ReturnDistanceMatrixAPI;
+import slidenerd.vivz.gpdemo.model.DistanceMatrixApi.ReturnDistanceMatrixAPI;
 
 /**
  * Created by Antony Teng on 2018/1/16.

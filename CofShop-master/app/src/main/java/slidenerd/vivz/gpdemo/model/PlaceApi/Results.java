@@ -1,8 +1,15 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.PlaceApi;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
+
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.Geometry;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.OpeningHours;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel.Photos;
+
 public class Results {
+
     @SerializedName("icon")
     private String icon;
 
@@ -37,9 +44,28 @@ public class Results {
     private String name;
 
     @SerializedName("rating")
-    private String rating;
+    private double rating;
 
     private String[] types;
+
+    @Override
+    public String toString() {
+        return "Results{" +
+                "icon='" + icon + '\'' +
+                ", placeId='" + placeId + '\'' +
+                ", scope='" + scope + '\'' +
+                ", reference='" + reference + '\'' +
+                ", geometry=" + geometry +
+                ", openingHours=" + openingHours +
+                ", id='" + id + '\'' +
+                ", photos=" + Arrays.toString(photos) +
+                ", priceLevel='" + priceLevel + '\'' +
+                ", vicinity='" + vicinity + '\'' +
+                ", name='" + name + '\'' +
+                ", rating=" + rating +
+                ", types=" + Arrays.toString(types) +
+                '}';
+    }
 
     public String getIcon() {
         return icon;
@@ -129,11 +155,11 @@ public class Results {
         this.name = name;
     }
 
-    public String getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
@@ -143,10 +169,5 @@ public class Results {
 
     public void setTypes(String[] types) {
         this.types = types;
-    }
-
-    @Override
-    public String toString() {
-        return "Results [icon = " + icon + ", placeId = " + placeId + ", scope = " + scope + ", reference = " + reference + ", geometry = " + geometry.toString() + ", openingHours = " + openingHours.toString() + ", id = " + id + ", photos = " + photos.toString() + ", priceLevel = " + priceLevel + ", vicinity = " + vicinity + ", name = " + name + ", rating = " + rating + ", types = " + types + "]";
     }
 }

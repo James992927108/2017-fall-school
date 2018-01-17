@@ -22,9 +22,17 @@
             android:id="@+id/bt_debug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="goToMap"
             android:text="Button" />
     </FrameLayout>
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_coffee_shops"

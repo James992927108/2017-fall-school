@@ -1,4 +1,4 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.PlaceApi.ResultModel;
 
 import com.google.gson.annotations.SerializedName;
 

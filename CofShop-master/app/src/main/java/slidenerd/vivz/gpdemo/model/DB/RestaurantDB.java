@@ -1,4 +1,4 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.DB;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -9,22 +9,36 @@ import io.realm.annotations.PrimaryKey;
  * Created by Antony Teng on 2018/1/3.
  */
 public class RestaurantDB extends RealmObject {
+
     @PrimaryKey
     private String Name;
-    private double latitude;
-    private double longitude;
-    private double rating;
+    private double Latitude;
+    private double Longitude;
+    private double Rating;
     private int VisitCount;
+    private int UpdateCount;
 
     @Override
     public String toString() {
         return "RestaurantDB{" +
                 "Name='" + Name + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", rating=" + rating +
+                ", Latitude=" + Latitude +
+                ", Longitude=" + Longitude +
+                ", Rating=" + Rating +
                 ", VisitCount=" + VisitCount +
+                ", UpdateCount=" + UpdateCount +
                 '}';
+    }
+
+
+
+    public RestaurantDB(String name, double latitude, double longitude, double rating, int visitCount, int updateCount) {
+        Name = name;
+        Latitude = latitude;
+        Longitude = longitude;
+        Rating = rating;
+        VisitCount = visitCount;
+        UpdateCount = updateCount;
     }
 
     public String getName() {
@@ -36,27 +50,27 @@ public class RestaurantDB extends RealmObject {
     }
 
     public double getLatitude() {
-        return latitude;
+        return Latitude;
     }
 
     public void setLatitude(double latitude) {
-        this.latitude = latitude;
+        Latitude = latitude;
     }
 
     public double getLongitude() {
-        return longitude;
+        return Longitude;
     }
 
     public void setLongitude(double longitude) {
-        this.longitude = longitude;
+        Longitude = longitude;
     }
 
     public double getRating() {
-        return rating;
+        return Rating;
     }
 
     public void setRating(double rating) {
-        this.rating = rating;
+        Rating = rating;
     }
 
     public int getVisitCount() {
@@ -66,4 +80,18 @@ public class RestaurantDB extends RealmObject {
     public void setVisitCount(int visitCount) {
         VisitCount = visitCount;
     }
+
+    public int getUpdateCount() {
+        return UpdateCount;
+    }
+
+    public void setUpdateCount(int updateCount) {
+        UpdateCount = updateCount;
+    }
+
+
+
+    public RestaurantDB() {
+    }
+
 }

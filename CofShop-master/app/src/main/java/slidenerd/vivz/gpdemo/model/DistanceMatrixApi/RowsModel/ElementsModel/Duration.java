@@ -1,4 +1,4 @@
-package slidenerd.vivz.gpdemo.model;
+package slidenerd.vivz.gpdemo.model.DistanceMatrixApi.RowsModel.ElementsModel;
 
 /**
  * Created by Antony Teng on 2018/1/16.

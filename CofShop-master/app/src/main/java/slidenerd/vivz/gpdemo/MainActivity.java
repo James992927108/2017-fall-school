@@ -3,6 +3,7 @@ package slidenerd.vivz.gpdemo;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,21 +30,20 @@ import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import slidenerd.vivz.gpdemo.log.L;
-import slidenerd.vivz.gpdemo.model.Elements;
-import slidenerd.vivz.gpdemo.model.ReturnDistanceMatrixAPI;
-import slidenerd.vivz.gpdemo.model.ReturnPlaceAPI;
-import slidenerd.vivz.gpdemo.model.RestaurantDB;
-import slidenerd.vivz.gpdemo.model.Results;
-import slidenerd.vivz.gpdemo.model.Rows;
+import slidenerd.vivz.gpdemo.model.DistanceMatrixApi.RowsModel.Elements;
+import slidenerd.vivz.gpdemo.model.DistanceMatrixApi.ReturnDistanceMatrixAPI;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ReturnPlaceAPI;
+import slidenerd.vivz.gpdemo.model.DB.RestaurantDB;
+import slidenerd.vivz.gpdemo.model.PlaceApi.Results;
+import slidenerd.vivz.gpdemo.model.DistanceMatrixApi.Rows;
 import slidenerd.vivz.gpdemo.rest.GoogleDistanceMatrixService;
 import slidenerd.vivz.gpdemo.rest.GooglePlacesService;
-
-//-19.057045,72.905668
 
 public class MainActivity extends BaseActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -56,6 +56,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     private Realm realm;
 
     private TextView toolbar_textView;
+
     private Button toolbar_button;
 
     private void loadNearbyRestaurantShops(LatLng OriginPosition) {
@@ -108,7 +109,6 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         return map;
     }
 
-
     private String getCsvLatLng(double latitude, double longitude) {
         return latitude + "," + longitude;
     }
@@ -116,9 +116,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getDefaultInstance();
         toolbar_textView = (TextView) findViewById(R.id.toolbar_textView);
-
         toolbar_button = (Button) findViewById(R.id.bt_debug);
         toolbar_button.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -127,16 +125,26 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 export_DB();
             }
         });
-
+        initDB();
         initMap();
         initActionBar();
         initRecycler();
+    }
+
+    public void goToMap(View view) {
+        refresh_DB();
+        Intent intent = new Intent(MainActivity.this, FirstActivity.class);
+        startActivity(intent);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
+    }
+
+    private void initDB() {
+        realm = Realm.getDefaultInstance();
     }
 
     private void initActionBar() {
@@ -175,17 +183,18 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 .position(new LatLng(OriginPosition.latitude, OriginPosition.longitude))
                 .title("Current Position")
         );
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CurrentPosition, 15.0f));
     }
 
     public void checkArrivalDestination(LatLng OriginPosition) {//22.6239637,120.270525
-        final LatLng LatLngDecimalFormat = DecimalFormat(OriginPosition);
+        final LatLng LatLngFormat = DecimalFormat(OriginPosition.latitude, OriginPosition.longitude);
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 RestaurantDB result = realm.where(RestaurantDB.class)
-                        .equalTo("latitude", LatLngDecimalFormat.latitude)
+                        .equalTo("Latitude", LatLngFormat.latitude)
                         .and()
-                        .equalTo("longitude", LatLngDecimalFormat.longitude)
+                        .equalTo("Longitude", LatLngFormat.longitude)
                         .findFirst();
                 if (result != null) {
                     int lastVisitCount = result.getVisitCount();
@@ -200,8 +209,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
     public void onMapReady(GoogleMap googleMap) {
         Log.d("Test", "onMapReady");
         mMap = googleMap;
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 20.0F));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(0, 0), 20.0f));
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -224,22 +232,25 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
             String status = returnPlaceAPI.getStatus();
             if (status.equals(getString(R.string.status_ok))) {
                 ArrayList<Results> listRestaurantShops = new ArrayList<>(40);
+                ArrayList<RestaurantDB> listDB = new ArrayList<>(40);
+
                 //Normal flow of events
                 for (Results current : returnPlaceAPI.getResults()) {
                     double latitude = Double.valueOf(current.getGeometry().getLocation().getLatitude());
                     double longitude = Double.valueOf(current.getGeometry().getLocation().getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
 
-                    save_to_DB(current.getName(), position);// save result to DB
+                    RestaurantDB value = new RestaurantDB(current.getName(), latitude, longitude, current.getRating(), 0, 0);
+                    listDB.add(value);
 
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(position)
                             .title(current.getName())
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_coficon));//加入圖標
                     mMap.addMarker(markerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
                     listRestaurantShops.add(current);
                 }
+                save_to_DB(listDB);// save result to DB
                 mAdapter.setDataSource(listRestaurantShops);
             } else if (status.equals(getString(R.string.status_over_query_limit))) {
                 //Do actions to indicate the developer that the tier for this application must be increased
@@ -269,7 +280,7 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
                 for (Rows current : returnDistanceMatrixAPI.getRows()) {
                     for (Elements item : current.getElements()) {
                         Log.d("returnDistanceMatrixAPI", item.getDuration().getText());
-                        toolbar_textView.setText("步行時間 :" + item.getDuration().getText());
+                        toolbar_textView.setText(item.getDuration().getText());
                     }
                 }
             } else if (status.equals(getString(R.string.status_over_query_limit))) {
@@ -290,24 +301,29 @@ public class MainActivity extends BaseActivity implements OnMapReadyCallback, Go
         }
     }
 
-    private void save_to_DB(final String name, LatLng position) {
-        LatLng LatLngDecimalFormat = DecimalFormat(position);
-        RestaurantDB shop = new RestaurantDB();
-        shop.setName(name);
-        shop.setLatitude(LatLngDecimalFormat.latitude);
-        shop.setLongitude(LatLngDecimalFormat.longitude);
-        realm.beginTransaction();
-        RestaurantDB realmUser = realm.copyToRealmOrUpdate(shop);//only update the date which not in DB
-        realm.commitTransaction();
+    private void save_to_DB(ArrayList<RestaurantDB> value) {
+        int lastUpdateCount = 0;
+        RestaurantDB result = realm.where(RestaurantDB.class).sort("UpdateCount", Sort.DESCENDING).findAll().first();
+        if(result != null)
+        {
+            lastUpdateCount = result.getUpdateCount();
+            lastUpdateCount += 1;
+        }
+        for(RestaurantDB current : value)
+        {
+            LatLng LatLngFormat = DecimalFormat(current.getLatitude(), current.getLongitude());
+            RestaurantDB shop = new RestaurantDB(current.getName(), LatLngFormat.latitude, LatLngFormat.longitude, current.getRating(), current.getVisitCount(), lastUpdateCount);
+
+            realm.beginTransaction();
+            RestaurantDB realmUser = realm.copyToRealmOrUpdate(shop);//only update the date which not in DB
+            realm.commitTransaction();
+        }
+
     }
 
-    private LatLng DecimalFormat(LatLng position) {
-        double Latitude = position.latitude;
-        double Longitude = position.longitude;
+    private LatLng DecimalFormat(double latitude, double longitude) {
         DecimalFormat df = new DecimalFormat("##.0000");
-        Latitude = Double.parseDouble(df.format(Latitude));
-        Longitude = Double.parseDouble(df.format(Longitude));
-        LatLng LatLngDecimalFormat = new LatLng(Latitude, Longitude);
+        LatLng LatLngDecimalFormat = new LatLng(Double.parseDouble(df.format(latitude)), Double.parseDouble(df.format(longitude)));
         return LatLngDecimalFormat;
     }
 

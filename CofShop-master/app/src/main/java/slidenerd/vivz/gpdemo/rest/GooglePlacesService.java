@@ -5,7 +5,7 @@ import java.util.Map;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
-import slidenerd.vivz.gpdemo.model.ReturnPlaceAPI;
+import slidenerd.vivz.gpdemo.model.PlaceApi.ReturnPlaceAPI;
 
 /**
  * Created by vivz on 24/08/15.

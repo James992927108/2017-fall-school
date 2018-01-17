@@ -17,7 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 
 import slidenerd.vivz.gpdemo.log.L;
-import slidenerd.vivz.gpdemo.model.Results;
+import slidenerd.vivz.gpdemo.model.PlaceApi.Results;
 
 class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter.YourRecyclerViewHolder> {
     private ArrayList<Results> list = new ArrayList<>();
@@ -53,20 +53,20 @@ class RestaurantShopsAdapter extends RecyclerView.Adapter<RestaurantShopsAdapter
         Results current = list.get(i);
         yourRecyclerViewHolder.setName(current.getName());
         yourRecyclerViewHolder.setVicinity(current.getVicinity());
-        String ratingString = current.getRating();
-        float rating = 0;
-
-        String message = "because rating is not available at " + i;
-        if (ratingString != null && !ratingString.trim().isEmpty()) {
-            try {
-                rating = Float.parseFloat(ratingString);
-            } catch (NumberFormatException e) {
-                L.m(e + message);
-            }
-        } else {
-            L.m(message);
-        }
-        yourRecyclerViewHolder.setRating(rating);
+//        String ratingString = current.getRating();
+//        float rating = 0;
+//
+//        String message = "because rating is not available at " + i;
+//        if (ratingString != null && !ratingString.trim().isEmpty()) {
+//            try {
+//                rating = Float.parseFloat(ratingString);
+//            } catch (NumberFormatException e) {
+//                L.m(e + message);
+//            }
+//        } else {
+//            L.m(message);
+//        }
+        yourRecyclerViewHolder.setRating((float)current.getRating());
     }
 
     public int getPositionIndex(String title) {
