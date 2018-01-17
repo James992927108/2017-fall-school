@@ -20,7 +20,11 @@ android {
 
 dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+<<<<<<< HEAD
     compile fileTree(include: ['*.jar'], dir: 'libs')
+=======
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+>>>>>>> 073cf0981f561097b1b31800639eb4d0f528b0c6
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'

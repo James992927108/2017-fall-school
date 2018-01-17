@@ -22,7 +22,14 @@
             android:id="@+id/bt_debug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+<<<<<<< HEAD
             android:layout_gravity="right"
+=======
+<<<<<<< HEAD
+            android:layout_gravity="right"
+=======
+>>>>>>> b046bb42a08757b8d71ccf6829e271c1e3e700fc
+>>>>>>> 073cf0981f561097b1b31800639eb4d0f528b0c6
             android:text="Button" />
 
         <Button
