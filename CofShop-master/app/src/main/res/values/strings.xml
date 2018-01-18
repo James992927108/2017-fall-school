@@ -12,6 +12,6 @@
     <string name="status_over_query_limit">OVER_QUERY_LIMIT</string>
     <string name="status_request_denied">REQUEST_DENIED</string>
     <string name="status_invalid_request">INVALID_REQUEST</string>
-    <string name="dialog_fire_missiles">test</string>
-    <string name="ok">OK</string>
+    <string name="dialog_Title">今天推薦</string>
+    <string name="dialog_ok">OK</string>
 </resources>
