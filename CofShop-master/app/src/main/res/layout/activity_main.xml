@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:onClick="onExportClick"
+            android:visibility="invisible"
             android:text="Button" />
         <Button
             android:id="@+id/button"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:onClick="onGoToMapClick"
-            android:text="Button" />
+            android:text="Map" />
 
     </FrameLayout>
 
