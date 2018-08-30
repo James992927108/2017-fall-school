@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/antonyteng/Desktop/Github/Simulated_Annealing_eil51/mac(nearest neighbor)/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+cmath
+-
+thread
+-
+cstring
+-
+unistd.h
+-
+
