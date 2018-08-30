@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+E:/GitHub/GA-IrisData/GA-2/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+cmath
+-
+thread
+-
+cstring
+-
+unistd.h
+-
+
