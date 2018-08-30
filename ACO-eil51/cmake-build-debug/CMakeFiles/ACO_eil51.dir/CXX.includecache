@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Antony/Desktop/github/ACO-eil51/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+thread
+-
+vector
+-
+iostream
+-
+cmath
+-
+process.h
+-
+time.h
+-
+
