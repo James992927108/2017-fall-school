@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/antonyteng/Desktop/Github/Tabu-IrisData/main.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+cmath
+-
+cstring
+-
+ctime
+-
+
