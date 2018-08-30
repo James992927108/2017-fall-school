@@ -1,3 +1,0 @@
-"E:\Program Files\JetBrains\CLion 2017.2.2\bin\cmake\bin\cmake.exe" -E remove -f CMakeFiles\GA_2.dir/objects.a
-E:\MinGW\bin\ar.exe cr CMakeFiles\GA_2.dir/objects.a @CMakeFiles\GA_2.dir\objects1.rsp
-E:\MinGW\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\GA_2.dir/objects.a -Wl,--no-whole-archive  -o GA_2.exe -Wl,--out-implib,libGA_2.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\GA_2.dir\linklibs.rsp

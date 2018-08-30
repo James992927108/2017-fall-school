@@ -1,3 +1,0 @@
-E:/GitHub/GA-IrisData/GA-1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-E:/GitHub/GA-IrisData/GA-1/cmake-build-debug/CMakeFiles/GA_IrisData.dir
-E:/GitHub/GA-IrisData/GA-1/cmake-build-debug/CMakeFiles/edit_cache.dir
